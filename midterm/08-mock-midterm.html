@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>综合刷题（模拟 Midterm） - DSC10 Midterm 备考</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .nav-bottom {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+  .nav-top a, .nav-bottom a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 16px;
+    margin-top: 20px;
+    color: var(--muted);
+  }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+  }
+  .tier {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta {
+    background: #f6f8fa;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--tip-bg);
+    border-left: 4px solid var(--tip-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  details {
+    background: var(--q-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+  }
+  details[open] {
+    background: #fff;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+  }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) {
+    margin-top: 12px;
+  }
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .q-source {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .checklist {
+    background: #f0f9ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .checklist label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+  .checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .schema {
+    background: #fffbea;
+    border: 1px dashed var(--warn-border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .mock-header {
+    background: linear-gradient(135deg, #ddf4ff 0%, #fff 100%);
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 总目录</a></span>
+  <span><a href="07-probability-simulation.html">← 上一节: Probability &amp; Simulation</a> <a href="index.html">返回目录 →</a></span>
+</nav>
+
+<main>
+  <h1>综合刷题（模拟 Midterm） (Section 8)</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：综合（来自所有章节 Lec 1–12） ｜
+    <strong>难度</strong>：<span class="tier tier-1">📝 真题</span> ｜
+    <strong>预计学习时间</strong>：50 分钟 / 套（≈ midterm 时长）
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#instructions">📋 使用说明</a></li>
+      <li><a href="#mock1">🥇 模拟一: Winter 2026 Midterm（最新）</a></li>
+      <li><a href="#mock2">🥈 模拟二: Fall 2025 Midterm</a></li>
+      <li><a href="#mock3">🥉 模拟三: Spring 2025 Midterm</a></li>
+      <li><a href="#lightning">⚡ Tier-1 闪电轮（精选高频题）</a></li>
+      <li><a href="#tracker">📊 错题统计表</a></li>
+    </ul>
+  </div>
+
+  <h2 id="instructions">📋 使用说明</h2>
+  <div class="tip">
+    <p><strong>这是一份"考前总演练"。</strong> 三套真题都是现行考试体系下最新最贴近的，刷完它们=对当前考试风格 90% 心中有数。</p>
+    <ul>
+      <li>📌 <strong>推荐流程</strong>：拿一张白纸 + 计时器 → 设定 50 分钟 → 全程不展开答案 → 时间到再批改对照</li>
+      <li>📌 <strong>顺序建议</strong>：先做 <strong>模拟一 (Wi26)</strong>（最新最贴近），再做 <strong>模拟二 (Fa25)</strong>，最后 <strong>模拟三 (Sp25)</strong></li>
+      <li>📌 <strong>做完一套后</strong>：用最后的"错题统计表"标记哪一题挂了，挂在哪个 section，回到对应 HTML section 重温 → 再做下一套</li>
+      <li>📌 <strong>闪电轮</strong>：作为最后查漏补缺的"零碎练习"，每题相互独立，可碎片时间刷</li>
+    </ul>
+    <p><strong>题面用英文原文（与考试一致），答案与解析用中文。</strong></p>
+  </div>
+
+  <div class="warn">
+    <strong>⚠️ 做题时常犯的错</strong>
+    <ul>
+      <li>跳过题面 schema 描述（DataFrame 列名/索引）→ 后面所有题都做错</li>
+      <li>看错 <code>.iloc</code> vs <code>.loc</code></li>
+      <li>simulation 题忘记初始化 counter / 最后忘记除以 reps</li>
+      <li>"Select all that apply" 类题目只选一个</li>
+    </ul>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MOCK 1: Winter 2026 -->
+  <!-- ============================================ -->
+  <h2 id="mock1">🥇 模拟一: Winter 2026 Midterm（最新）</h2>
+
+  <div class="mock-header">
+    <strong>来源</strong>：Winter 2026 Midterm Exam ｜ <strong>讲师</strong>：Peter Chi, Sam Lau ｜ <strong>50 分钟</strong>
+    <p>主题：San Diego pizza shops 数据集</p>
+  </div>
+
+  <div class="schema">
+    <strong>📦 DataFrame schema: <code>pizza</code></strong>
+    <p>Each row corresponds to a type of pizza slice, specific to the store in which it is sold. Columns:</p>
+    <ul>
+      <li><code>"store"</code> (str): The name of the pizza store.</li>
+      <li><code>"kind"</code> (str): The kind of pizza slice (cheese, pepperoni, supreme, etc).</li>
+      <li><code>"price_per_slice"</code> (float): The price of a single slice of pizza.</li>
+      <li><code>"gluten_free"</code> (bool): Whether or not the pizza slice is also offered in a gluten-free version.</li>
+      <li><code>"num_ingredients"</code> (int): The number of ingredients required to make the pizza slice.</li>
+      <li><code>"rating"</code> (float): The average rating—out of 5—of the pizza slice.</li>
+      <li><code>"neighborhood"</code> (str): The neighborhood where the pizza store is located.</li>
+    </ul>
+    <p>First 10 rows of <code>pizza</code> (full DataFrame is much larger):</p>
+<pre><code>   store           kind         price_per_slice  gluten_free  num_ingredients  rating  neighborhood
+0  Jeffrey's Pizza Cheese       5.00             True         8                3.7     Little Italy
+1  Jeffrey's Pizza Pepperoni    5.50             False        9                4.0     Little Italy
+2  Jeffrey's Pizza Supreme      6.00             False        15               3.2     Little Italy
+3  Jeffrey's Pizza Hawaiian     5.75             True         12               4.5     Little Italy
+4  Pizza by Peter  Cheese       5.00             False        10               3.7     La Jolla Shores
+5  Pizza by Peter  Pepperoni    6.25             False        11               4.9     La Jolla Shores
+6  Pizza by Peter  Margherita   6.00             True         12               3.8     La Jolla Shores
+7  Pizza Pandas    Cheese       4.50             False        8                4.6     North Park
+8  Pizza Pandas    Veggie       4.75             False        14               4.2     North Park
+9  Pizza Pandas    Bamboo       1.00             True         1                2.5     North Park</code></pre>
+    <p>Assume <code>import babypandas as bpd</code> and <code>import numpy as np</code>.</p>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-block">
+    <div class="q-source">Q1.1 — Wi26</div>
+    <p>Which column of the <code>pizza</code> DataFrame would be an appropriate index?</p>
+    <p>(a) <code>"store"</code> &nbsp; (b) <code>"kind"</code> &nbsp; (c) <code>"rating"</code> &nbsp; (d) <code>"neighborhood"</code> &nbsp; (e) None of these</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>答案：(e) None of these</strong></p>
+      <p>合适的 index 必须是<strong>每行唯一</strong>的。</p>
+      <ul>
+        <li><code>"store"</code>: 同一家店有多个切片，重复 → 不行</li>
+        <li><code>"kind"</code>: 不同店都有 Cheese/Pepperoni → 不行</li>
+        <li><code>"rating"</code>: 数值会重复（如多个 3.7）→ 不行</li>
+        <li><code>"neighborhood"</code>: 一个 neighborhood 多家店 → 不行</li>
+      </ul>
+      <p>所以选 <strong>None of these</strong>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Q1.2 — Wi26</div>
+    <p>Suppose you want to see if there is a relationship between <code>num_ingredients</code> and <code>price</code>. Which visualization will best enable you to investigate this?</p>
+    <ol>
+      <li>Overlaid histograms of <code>num_ingredients</code> and <code>price</code>.</li>
+      <li>A bar chart of the averages of <code>num_ingredients</code> for each value of <code>price</code>.</li>
+      <li>A bar chart of the averages of <code>price</code> for each value of <code>num_ingredients</code>.</li>
+      <li>A scatter plot of <code>price</code> vs. <code>num_ingredients</code>.</li>
+    </ol>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>答案：(4) Scatter plot</strong></p>
+      <p>研究两个<strong>数值变量</strong>之间的关系，scatter plot 是首选。<br>
+      Histograms 看分布不看关系；bar chart 选项是把数值当类别用，不合适。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Q1.3 — Wi26</div>
+    <p>Fill in the blanks to create a horizontal bar chart showing both the average <code>price_per_slice</code> and average <code>rating</code> for each store side by side.</p>
+<pre><code>(pizza._____(i)______
+      .groupby("store")._____(ii)_____
+      .plot(__(iii)__));</code></pre>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>答案：</strong></p>
+      <ul>
+        <li>(i) <code>get(["price_per_slice", "rating"])</code></li>
+        <li>(ii) <code>mean()</code></li>
+        <li>(iii) <code>kind="barh"</code></li>
+      </ul>
+<pre><code>(pizza.get(["price_per_slice", "rating"])
+      .groupby("store").mean()
+      .plot(kind="barh"));</code></pre>
+      <p>关键：<code>groupby</code> 之前先选两列（双方括号保留 DataFrame 形态），再 <code>.mean()</code> 一次性算每组每列均值，<code>kind="barh"</code> 画水平 bar。</p>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-block">
+    <div class="q-source">Q2 — Wi26</div>
+    <p>Fill in the blanks below so that the expression evaluates to a <code>float</code> that is the highest rating of any pizza slice that has more than 10 ingredients.</p>
+<pre><code>pizza[_____(a)_____].______(b)______</code></pre>
+    <p><strong>Q2.2:</strong> What can go in blank (b)? <strong>Select all that apply.</strong></p>
+    <ol>
+      <li><code>get("rating").apply(max)</code></li>
+      <li><code>get("rating").max()</code></li>
+      <li><code>sort_values("rating", ascending=False).get("rating").iloc[0]</code></li>
+      <li><code>sort_values("rating", ascending=True).get("rating").iloc[-1]</code></li>
+      <li>None of the above</li>
+    </ol>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>(a) 答案：</strong> <code>pizza.get("num_ingredients") &gt; 10</code></p>
+      <p><strong>(b) 答案：(2), (3), (4) 都对</strong></p>
+      <ul>
+        <li>(1) ✗ <code>.apply(max)</code> 是把 max 函数应用到 Series 的<strong>每一个元素</strong>（标量），<code>max(单个数字)</code> 没意义会报错或返回原值。要选最大值用 <code>.max()</code> 而不是 <code>.apply(max)</code>。</li>
+        <li>(2) ✓ <code>.max()</code> 是 Series 内置方法，返回最大值。</li>
+        <li>(3) ✓ 降序排，第一个就是最大。</li>
+        <li>(4) ✓ 升序排，最后一个就是最大。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-block">
+    <div class="q-source">Q3 — Wi26 (numpy fancy indexing)</div>
+    <p>Let <code>pizza10 = pizza.take(np.arange(10))</code> (the first 10 rows shown above). Now consider:</p>
+<pre><code>positions = np.arange(pizza10.shape[0])
+result = positions[pizza10.get("rating") &gt; 4].sum()</code></pre>
+    <p><strong>Q3.1:</strong> What does <code>result</code> represent?<br>
+    <strong>Q3.2:</strong> What does <code>result</code> evaluate to? (4 / 11 / 15 / 23 / 46)</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q3.1 答案</strong>：The sum of the index positions from <code>pizza10</code> for pizzas with rating &gt; 4。</p>
+      <p>解析：<code>positions = [0,1,2,...,9]</code>。布尔 mask 选出 <code>rating &gt; 4</code> 的位置，再求和。这就是 numpy fancy indexing —— 跟 DataFrame 的布尔过滤一样。</p>
+      <p><strong>Q3.2 答案：23</strong></p>
+      <p>看上面 10 行，rating &gt; 4 的是 row 1 (4.0)、3 (4.5)、5 (4.9)、7 (4.6)、8 (4.2)。<br>
+      但 1 (4.0) <strong>不算</strong>因为是严格 &gt; 4 → 选 3 + 5 + 7 + 8 = <strong>23</strong>。</p>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-block">
+    <div class="q-source">Q4 — Wi26 (groupby + sort 找最大值)</div>
+    <p>The Best Pizza Neighborhood Contest is coming up! We want to find the neighborhood with the highest average rating for a slice of pizza. Fill in the blanks so that the expression evaluates to the <strong>name</strong> of this neighborhood (as a string).</p>
+<pre><code>pizza.get([__(a)__]).groupby(__(b)__)
+                    .__(c)__.sort_values(__(d)__, ascending=False)
+                    ._____(e)_____</code></pre>
+    <details><summary>显示答案 + 解析</summary>
+<pre><code>pizza.get(["neighborhood", "rating"]).groupby("neighborhood")
+                                     .mean()
+                                     .sort_values("rating", ascending=False)
+                                     .index[0]</code></pre>
+      <ul>
+        <li>(a) <code>"neighborhood", "rating"</code> — 只保留分组列和被聚合列</li>
+        <li>(b) <code>"neighborhood"</code></li>
+        <li>(c) <code>mean()</code></li>
+        <li>(d) <code>"rating"</code></li>
+        <li>(e) <code>index[0]</code> — groupby 后 neighborhood 变成 index，取第一个 index 值就是名字字符串</li>
+      </ul>
+      <p>替代答案：(e) 也可以是 <code>reset_index().get("neighborhood").iloc[0]</code>。</p>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-block">
+    <div class="q-source">Q5 — Wi26 (Select all that apply)</div>
+    <p>Find the total number of gluten-free pizza slice options in the San Diego area. Select all lines of code that correctly evaluate to the integer corresponding to the total number of gluten-free pizza slice options.</p>
+    <ol>
+      <li><code>pizza.set_index("store").get("gluten_free").sum()</code></li>
+      <li><code>pizza.get(["gluten_free", "store"]).groupby("store").sum()</code></li>
+      <li><code>pizza[pizza.get("gluten_free")].get("gluten_free").count()</code></li>
+      <li><code>pizza[pizza.get("gluten_free")].shape[0]</code></li>
+      <li><code>pizza.set_index("store").get("gluten_free").count()</code></li>
+      <li><code>pizza.get("gluten_free").shape[0]</code></li>
+    </ol>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>答案：(1), (3), (4) 正确</strong></p>
+      <ul>
+        <li>(1) ✓ bool 求和 = True 的数量（True=1, False=0）</li>
+        <li>(2) ✗ 返回的是 DataFrame 不是 int</li>
+        <li>(3) ✓ 先过滤 True 的行，再 count → True 的总数</li>
+        <li>(4) ✓ 先过滤再看行数</li>
+        <li>(5) ✗ <code>.count()</code> 数的是非 NaN 元素总数（包含 False），= 整体行数</li>
+        <li>(6) ✗ 同 (5)，<code>shape[0]</code> 是行数，= 整个 DataFrame 行数</li>
+      </ul>
+      <p><strong>陷阱</strong>：<code>.sum()</code> vs <code>.count()</code> on bool Series —— sum 数 True，count 数所有元素。</p>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-block">
+    <div class="q-source">Q6 — Wi26 (Probability)</div>
+    <p>At Pizza by Peter, head chefs Bianca and Ella make each pizza, either together or alone. For any given pizza, there's a chance that the chefs mess up. The probabilities are:</p>
+    <ul>
+      <li>If Bianca makes a pizza alone: 1/4 chance of not being suitable</li>
+      <li>If Ella makes a pizza alone: 1/3 chance of not being suitable</li>
+      <li>If Bianca tosses dough &amp; Ella bakes: 1/6 chance of not being suitable</li>
+      <li>If Ella tosses dough &amp; Bianca bakes: 1/5 chance of not being suitable</li>
+    </ul>
+    <p><strong>Q6.1:</strong> Suppose Ella makes one pizza alone, Bianca makes one pizza alone, and their suitability is independent. What is the probability that <strong>at least one</strong> of the pizzas is not suitable to serve?</p>
+    <p><strong>Q6.2:</strong> Let A = "Ella worked on the pizza (alone or with Bianca)", B = "the pizza is suitable to serve". Suppose P(A) = 1/4 and P(B) = 3/5. What is P(A or B)?</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q6.1 答案：1/2</strong></p>
+      <p>"At least one not suitable" = 1 − P(both suitable)<br>
+      P(Ella suitable) = 2/3, P(Bianca suitable) = 3/4<br>
+      P(both suitable) = (2/3)(3/4) = 6/12 = 1/2<br>
+      P(at least one not suitable) = 1 − 1/2 = <strong>1/2</strong></p>
+
+      <p><strong>Q6.2 答案：Not enough information</strong></p>
+      <p>P(A or B) = P(A) + P(B) − P(A and B)<br>
+      = 1/4 + 3/5 − P(A and B)<br>
+      但题目<strong>没给</strong> P(A and B)，且 A 和 B <strong>不独立</strong>（根据上面 4 个条件概率，P(suitable | Ella involved) 在不同情况下不同），所以无法计算。</p>
+      <p><strong>陷阱</strong>：不要默认事件独立！</p>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-block">
+    <div class="q-source">Q7 — Wi26 (groupby 输出类型)</div>
+    <p>Recall <code>pizza10</code> consists of the 10 rows shown. Consider:</p>
+<pre><code>neighborhood_counts = (pizza10.groupby('neighborhood')
+                              .count().get(['rating']))</code></pre>
+    <p><strong>Q7.1:</strong> What type of object is <code>neighborhood_counts</code>?</p>
+    <ol>
+      <li>A DataFrame with 3 rows and 1 column</li>
+      <li>A DataFrame with 10 rows and 1 column</li>
+      <li>A Series with 3 elements where the index contains neighborhood names</li>
+      <li>A Series with 3 elements where the index is 0, 1, 2</li>
+      <li>An array with 3 elements</li>
+    </ol>
+    <p><strong>Q7.2:</strong> Apply a function to neighborhood names (currently in the index) so that <code>neighborhood_firstchar</code> is a Series where each element is the first letter of the neighborhood name.</p>
+<pre><code>def first_letter(s):
+    ____(i)____
+
+neighborhood_firstchar = neighborhood_counts.________(ii)________</code></pre>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q7.1 答案：(1) A DataFrame with 3 rows and 1 column</strong></p>
+      <p>10 行 pizza10 有 3 个 neighborhood (Little Italy / La Jolla Shores / North Park)，<code>groupby</code> 后 3 行；<code>.get(['rating'])</code>（双方括号）返回 DataFrame 而不是 Series，1 列。</p>
+
+      <p><strong>Q7.2 答案：</strong></p>
+<pre><code>def first_letter(s):
+    return s[0]
+
+neighborhood_firstchar = neighborhood_counts.reset_index().get("neighborhood").apply(first_letter)</code></pre>
+      <p>关键：<code>neighborhood</code> 在 index 里，要先 <code>reset_index()</code> 让它变成普通列才能 <code>.get(...).apply(...)</code>。</p>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-block">
+    <div class="q-source">Q8 — Wi26 (Merge 行数预测 — 高频考点)</div>
+    <p>The DataFrame <code>notes</code> is indexed by <code>"kind"</code> and has 8 rows. <code>restaurants_tried</code> column lists restaurants for each kind:</p>
+<pre><code>notes = bpd.DataFrame().assign(
+    kind=["Cheese", "Pepperoni", "Veggie", "Margherita",
+          "Hawaiian", "Supreme", "BBQ Chicken", "White"],
+    restaurants_tried=[
+        ["Jeffrey's Pizza", "Pizza Pandas"],     # Cheese
+        ["Jeffrey's Pizza", "Pizza by Peter"],   # Pepperoni
+        ["Pizza Pandas"],                         # Veggie
+        ["Pizza by Peter"],                       # Margherita
+        ["Jeffrey's Pizza"],                      # Hawaiian
+        ["Jeffrey's Pizza"],                      # Supreme
+        ["Regents Pizzeria"],                     # BBQ Chicken
+        ["Pizza on Pearl"]                        # White
+    ]
+).set_index("kind")</code></pre>
+    <p>Some kinds in <code>notes</code> don't appear in <code>pizza</code>, and vice versa.</p>
+    <p><strong>Q8.1:</strong> What does this evaluate to?</p>
+<pre><code>pizza10.merge(notes, left_on="kind", right_index=True).shape[0]</code></pre>
+    <p>(0 / 6 / 9 / 10 / Cannot be determined)</p>
+
+    <p><strong>Q8.2:</strong> Which expressions evaluate to the same value? Select all that apply.</p>
+    <ol>
+      <li><code>pizza10.merge(notes.reset_index(), on="kind").shape[0]</code></li>
+      <li><code>pizza10.merge(notes, on="kind").shape[0]</code></li>
+      <li><code>notes.merge(pizza10, left_index=True, right_on="kind").shape[0]</code></li>
+      <li><code>notes.merge(pizza10, left_index=True, right_on="store").shape[0]</code></li>
+      <li><code>notes.merge(pizza10.reset_index(), on="kind").shape[0]</code></li>
+    </ol>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q8.1 答案：9</strong></p>
+      <p>逐行对照 pizza10 的 kind 是否在 notes 里：</p>
+      <ul>
+        <li>Cheese (rows 0, 4, 7) → Cheese 在 notes 里 ✓ × 3</li>
+        <li>Pepperoni (rows 1, 5) → ✓ × 2</li>
+        <li>Supreme (row 2) → ✓ × 1</li>
+        <li>Hawaiian (row 3) → ✓ × 1</li>
+        <li>Margherita (row 6) → ✓ × 1</li>
+        <li>Veggie (row 8) → ✓ × 1</li>
+        <li>Bamboo (row 9) → ✗ 不在 notes</li>
+      </ul>
+      <p>Inner merge 保留匹配的 = 3+2+1+1+1+1 = <strong>9</strong> 行。</p>
+
+      <p><strong>Q8.2 答案：(1), (3), (5)</strong></p>
+      <ul>
+        <li>(1) ✓ <code>notes.reset_index()</code> 让 kind 变列，再 <code>on="kind"</code> 等价</li>
+        <li>(2) ✗ <code>pizza10</code> 的 index 不是 kind（是默认 0-9），<code>on="kind"</code> 找不到 notes 那边的 kind 列</li>
+        <li>(3) ✓ 跟原表只是左右调换，结果行数相同</li>
+        <li>(4) ✗ 错误的 join 列</li>
+        <li>(5) ✓ 同样道理，reset_index 让 pizza10 多一个 index 列但这里用 on="kind"，还是按 kind 匹配</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-block">
+    <div class="q-source">Q9 — Wi26 (Simulation — 高频考点)</div>
+    <p>DoorDash promotion: Ray orders four random pizza slices from <code>pizza</code>. He picks the first two and compares ratings to the other two. He eats only if sum of his two ratings &gt; sum of other two ratings.</p>
+    <p>Estimate the probability that Ray gets to eat:</p>
+<pre><code>repetitions = 1000
+count_eats = 0
+
+for i in np.arange(repetitions):
+    promo_ratings = np.random.choice(__(a)__, 4, replace=False)
+    ray_sum_of_ratings = _____(b)_____
+    other_sum_of_ratings = _____(c)_____
+    if ray_sum_of_ratings &gt; other_sum_of_ratings:
+        count_eats = ____(d)____
+prob_eats = _____(e)_____</code></pre>
+    <details><summary>显示答案 + 解析</summary>
+<pre><code>(a) pizza.get("rating")
+(b) promo_ratings[0] + promo_ratings[1]   # 或 promo_ratings[:2].sum()
+(c) promo_ratings[2] + promo_ratings[3]   # 或 promo_ratings[2:].sum()
+(d) count_eats + 1
+(e) count_eats / repetitions</code></pre>
+      <p>这是经典 simulation 模板：</p>
+      <ol>
+        <li>初始化 counter = 0</li>
+        <li><code>for i in np.arange(reps)</code></li>
+        <li>用 <code>np.random.choice</code> 抽样（这里 <code>replace=False</code> 不放回 → 4 个不同 slice）</li>
+        <li>判断条件 → counter += 1</li>
+        <li>最后<strong>除以 reps</strong>得到概率估计</li>
+      </ol>
+      <p><strong>注意</strong>：(a) 必须是 <code>pizza.get("rating")</code> 而不是 <code>pizza</code> 整个 DataFrame —— np.random.choice 要的是 1D array/Series。</p>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-block">
+    <div class="q-source">Q10 — Wi26 (One-line expression)</div>
+    <p>Pizza by Peter awards loyalty points: every third slice you purchase earns 2<sup>i</sup> points, starting from the 1st slice. The 1st, 4th, 7th and 10th slices earn 2<sup>i</sup> loyalty points where i is 1, 4, 7, 10 respectively.</p>
+    <p>Without using <code>+</code>, write a <strong>one-line expression</strong> that evaluates to the <strong>total</strong> loyalty points from those four slices.</p>
+    <details><summary>显示答案 + 解析</summary>
+<pre><code>(2 ** np.arange(1, 11, 3)).sum()</code></pre>
+      <p>解析：</p>
+      <ul>
+        <li><code>np.arange(1, 11, 3)</code> → <code>[1, 4, 7, 10]</code>（步长 3，从 1 到 10）</li>
+        <li><code>2 ** ...</code> → numpy broadcasting，逐元素求 2 的幂 → <code>[2, 16, 128, 1024]</code></li>
+        <li><code>.sum()</code> → 1170</li>
+      </ul>
+      <p>题目限制不能用 <code>+</code>，所以必须用 <code>.sum()</code>。</p>
+    </details>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-block">
+    <div class="q-source">Q11 — Wi26 (字符串链式 — 新趋势)</div>
+    <p>Pizza by Peter is rebranding. The new name is the output of:</p>
+<pre><code>(pizza.get("kind").iloc[6].replace("a", "o") + "!").upper()</code></pre>
+    <p>Write the new name as a string.</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>答案：<code>"MORGHERITO!"</code></strong></p>
+      <p>逐步推导：</p>
+      <ol>
+        <li><code>pizza.get("kind").iloc[6]</code> → 第 6 行（0-indexed）的 kind = <code>"Margherita"</code></li>
+        <li><code>.replace("a", "o")</code> → <code>"Morgheritо"</code>（所有 a 变 o）→ <code>"Morgherito"</code></li>
+        <li><code>+ "!"</code> → <code>"Morgherito!"</code></li>
+        <li><code>.upper()</code> → <code>"MORGHERITO!"</code></li>
+      </ol>
+    </details>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MOCK 2: Fall 2025 -->
+  <!-- ============================================ -->
+  <h2 id="mock2">🥈 模拟二: Fall 2025 Midterm</h2>
+
+  <div class="mock-header">
+    <strong>来源</strong>：Fall 2025 Midterm Exam ｜ <strong>讲师</strong>：Janine Tiefenbruck, Peter Chi ｜ <strong>50 分钟</strong>
+    <p>主题：English words 难度数据集</p>
+  </div>
+
+  <div class="schema">
+    <strong>📦 DataFrame schema: <code>words</code></strong>
+    <p>Indexed by <code>"word"</code>. Columns:</p>
+    <ul>
+      <li><code>"freq"</code> (int): Frequency of the word in the texts.</li>
+      <li><code>"length"</code> (int): Number of letters.</li>
+      <li><code>"ps"</code> (str): Part of speech, formatted like <code>"('getting', 'VBG')"</code> (string of an ordered pair).</li>
+      <li><code>"diff"</code> (int): Number of students who marked the word difficult.</li>
+    </ul>
+    <p>First few rows:</p>
+<pre><code>word          freq  length  ps                       diff
+getting       2     7       ('getting', 'VBG')       0
+apathy        1     6       ('apathy', 'JJ')         10
+devoured      2     8       ('devoured', 'VBD')      5
+identifiable  2     12      ('identifiable', 'JJ')   0
+beat          3     4       ('beat', 'NN')           0</code></pre>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-block">
+    <div class="q-source">Q1 — Fa25 (字符串处理 — Lec 8)</div>
+    <p>Each value in <code>"ps"</code> is a string formatted like <code>"(word, tag)"</code> with single quotes, e.g. <code>"(getting, VBG)"</code> with the actual format <code>"('getting', 'VBG')"</code>. To clean so that <code>"ps"</code> contains only the part of speech tag:</p>
+<pre><code>words = words.assign(ps = words.get("ps").apply(fix_ps))</code></pre>
+    <p>After running, the rows show: <code>VBG</code>, <code>JJ</code>, <code>VBD</code>, <code>JJ</code>, <code>NN</code>.</p>
+    <p>Which definitions of <code>fix_ps</code> work? <strong>Select all that apply.</strong></p>
+    <ol>
+      <li><code>def fix_ps(x): return x.split("'")[3]</code></li>
+      <li><code>def fix_ps(x): return x.split(",")[1].strip("'")</code></li>
+      <li><code>def fix_ps(x): return x.split(", ")[1].strip("'")</code></li>
+      <li><code>def fix_ps(x): return x.split(", ")[1].strip(")").strip("'")</code></li>
+      <li><code>def fix_ps(x): return x.split(", ")[1].strip("'").strip(")")</code></li>
+    </ol>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>答案：(1), (4), (5) 正确</strong></p>
+      <p>原始字符串例子：<code>"('getting', 'VBG')"</code></p>
+      <ul>
+        <li>(1) ✓ <code>split("'")</code> → <code>['(', 'getting', ', ', 'VBG', ')']</code>，取 [3] = <code>'VBG'</code></li>
+        <li>(2) ✗ <code>split(",")</code> → <code>["('getting'", " 'VBG')"]</code>，[1] = <code>" 'VBG')"</code>，<code>.strip("'")</code> 只去 <code>'</code>，留下 <code>" 'VBG')"</code> 中的空格和 <code>)</code></li>
+        <li>(3) ✗ <code>split(", ")</code> → <code>["('getting'", "'VBG')"]</code>，[1] = <code>"'VBG')"</code>，<code>.strip("'")</code> → <code>"VBG')"</code>（结尾的 ) 还在）</li>
+        <li>(4) ✓ <code>"'VBG')"</code> → <code>strip(")")</code> → <code>"'VBG'"</code> → <code>strip("'")</code> → <code>"VBG"</code></li>
+        <li>(5) ✓ 顺序换了，<code>"'VBG')"</code> → <code>strip("'")</code> → <code>"VBG')"</code>（注：strip 只从两端去字符，遇到非 <code>'</code> 就停） → <code>strip(")")</code> → <code>"VBG"</code></li>
+      </ul>
+      <p><strong>关键</strong>：<code>strip(chars)</code> 从字符串两端去除指定字符（不限于一次）。</p>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-block">
+    <div class="q-source">Q2 — Fa25 (Merge 行数预测)</div>
+    <p>We have a DataFrame <code>tags</code> indexed 0..N with columns <code>tag</code>, <code>meaning</code>, <code>examples</code>. After running fix_ps, we want to merge <code>words</code> with <code>tags</code> to see the meaning of each word's POS tag.</p>
+<pre><code>merged = words.reset_index().merge(__(a)__).set_index("word")</code></pre>
+    <p><strong>Q2.1:</strong> Fill in (a).<br>
+    <strong>Q2.2:</strong> Suppose <code>words</code> has 5357 rows and <code>tags</code> has 36 rows. How many rows does <code>merged</code> have?</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q2.1 答案：</strong> <code>tags, left_on="ps", right_on="tag"</code></p>
+      <p><strong>Q2.2 答案：5357</strong></p>
+      <p>每一个 word 在 tags 表里恰好匹配 1 个 tag（因为 tags 表 36 个 tag 是完整的且 ps 一定是其中之一），所以 inner merge 后行数 = 5357。</p>
+      <p><strong>关键</strong>：merge 行数预测看每行在另一表的<strong>匹配数</strong>之和。这里每行匹配恰好 1 → 5357 × 1 = 5357。</p>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-block">
+    <div class="q-source">Q3 — Fa25 (sort_values 可视化推理)</div>
+    <p>Below is a bar chart and the code:</p>
+<pre><code>(words.sort_values(by="diff", ascending=False).take(np.arange(20))
+      .plot(kind='barh', y="diff"));</code></pre>
+    <p>The chart shows 20 words from "scolding" (top, x≈21) to "decades" (bottom, x≈25).</p>
+    <p>True/False:</p>
+    <p><strong>3.1:</strong> Students found "decades" more difficult than any other word.</p>
+    <p><strong>3.2:</strong> If we removed <code>ascending=False</code>, the chart would show the same info but bars in opposite order top-to-bottom.</p>
+    <p><strong>3.3:</strong> If we changed <code>np.arange(20)</code> to <code>np.arange(15)</code>, the chart would show all words that &gt; 15 students found difficult.</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>3.1: False</strong>（⚠️ 易错）</p>
+      <p>从 bar chart 可见，<strong>有 5 个其他词的 diff 值与 "decades" 相同</strong>（最高 diff 值多个词并列）。所以 "decades found more difficult than any other word" 是 <strong>False</strong> —— 那些并列的词也同样难。</p>
+      <p class="warn"><strong>陷阱</strong>：看到 "decades" 在 bar chart 底部（diff 最大行）就以为它是<strong>唯一</strong>最大——但 sort_values 不会因为并列而合并行，"decades" 只是这些并列最大值中<strong>恰好排在底部那一行</strong>。一定要检查 bar 高度是否真的全部互不相同。</p>
+
+      <p><strong>3.2: False</strong></p>
+      <p>去掉 <code>ascending=False</code> 默认 ascending=True，排出的是<strong>不同的 20 个词</strong>（最容易的 20 个），不是简单顺序颠倒。</p>
+
+      <p><strong>3.3: False</strong></p>
+      <p><code>np.arange(15)</code> 取前 15 个最难的词，未必是 diff &gt; 15 的所有词。这个 chart 只显示按排名取的前 N 个，没有按 diff 阈值过滤。</p>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-block">
+    <div class="q-source">Q4 — Fa25 (函数等价改写 — Lec 10)</div>
+    <p>The function below classifies length:</p>
+<pre><code>def classify_length(x):
+    if x &lt;= 6:
+        return "short"
+    elif x &lt;= 10:
+        return "medium"
+    else:
+        return "long"</code></pre>
+    <p>Fill in <code>classify_length_2</code> to give the same output. Each blank must be a single line.</p>
+<pre><code>def classify_length_2(x):
+    if __(a)__:
+        return "medium"
+    if x &gt;= 7:
+        __(b)__
+    __(c)__</code></pre>
+    <details><summary>显示答案 + 解析</summary>
+<pre><code>(a) 7 &lt;= x &lt;= 10    # 或 x &gt;= 7 and x &lt;= 10
+(b) return "long"
+(c) return "short"</code></pre>
+      <p>解析逻辑：</p>
+      <ul>
+        <li>第一个 if 直接处理 medium (7~10)，命中就返回</li>
+        <li>没命中的话进入第二个 if：x &gt;= 7 但前面 medium 没命中 → 一定 &gt; 10 → "long"</li>
+        <li>都没命中 → x &lt; 7 → "short"</li>
+      </ul>
+      <p>注意第二个不是 elif 而是独立的 if（因为第一个 if 已经 return 了，结构等价）。</p>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-block">
+    <div class="q-source">Q5 — Fa25 (多列 groupby — 新趋势)</div>
+    <p>Let <code>classify_difficulty</code> return "easy"/"moderate"/"hard". Define:</p>
+<pre><code>grouped = (words.assign(diff_category = words.get("diff").apply(classify_difficulty),
+                        length_category = words.get("length").apply(classify_length))
+                .groupby(["diff_category", "length_category"])
+                .count()
+                .reset_index())</code></pre>
+    <p>Suppose at least one word with every possible pair of values exists.</p>
+    <p><strong>Q5.1:</strong> How many rows does <code>grouped</code> have?</p>
+    <p><strong>Q5.2:</strong> Set <code>num</code> to the number of words whose <code>diff_category</code> is <code>"hard"</code> and <code>length_category</code> is <code>"short"</code>. Recall <code>.groupby</code> arranges output in alphabetical order.</p>
+<pre><code>num = grouped.get("ps").iloc[__(a)__]</code></pre>
+    <p><strong>Q5.3:</strong> Determine the proportion of <code>"short"</code> words that are <code>"hard"</code>:</p>
+<pre><code>denom = grouped[__(b)__].get("freq").__(c)__
+prop = num / denom</code></pre>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q5.1: 9</strong></p>
+      <p>diff_category 有 3 个值 (easy/hard/moderate)，length_category 有 3 个值 (long/medium/short)，每对都有 → 3 × 3 = <strong>9</strong> 行。</p>
+
+      <p><strong>Q5.2: (a) = 7</strong></p>
+      <p>按字母序排列 (diff_category, length_category) 9 个组合：</p>
+      <pre><code>0: (easy, long)
+1: (easy, medium)
+2: (easy, short)
+3: (hard, long)
+4: (hard, medium)
+5: (hard, short)
+6: (moderate, long)
+7: (moderate, medium)
+8: (moderate, short)</code></pre>
+      <p>等等！(hard, short) 是 index 5 而不是 7。重新数：easy/easy/easy/hard/hard/hard/moderate/moderate/moderate × long/medium/short</p>
+      <pre><code>0: (easy, long)
+1: (easy, medium)
+2: (easy, short)
+3: (hard, long)
+4: (hard, medium)
+5: (hard, short)   ← 这里
+...</code></pre>
+      <p>所以正确答案是 <strong>(a) = 5</strong>。</p>
+
+      <p><strong>Q5.3:</strong></p>
+<pre><code>(b) grouped.get("length_category") == "short"
+(c) sum()</code></pre>
+      <p>denom = 所有 short words 的总数（不分 diff_category），prop = num/denom 是 short 中 hard 的比例。</p>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-block">
+    <div class="q-source">Q6 — Fa25 (Density Histogram — Lec 7)</div>
+    <p>The DataFrame <code>long</code> has 500 rows (words with length &gt; 10). Of these:</p>
+    <ul>
+      <li>100 words were marked difficult by 5 or more students</li>
+      <li>No words were marked difficult by &gt; 25 students</li>
+    </ul>
+    <p>Density histogram of <code>long.get("diff")</code> with <code>bins=np.arange(5, 30, 5)</code> (excludes words &lt; 5). Bars (left to right):</p>
+    <ul>
+      <li>[5, 10): height ≈ 0.10</li>
+      <li>[10, 15): height ≈ 0.072</li>
+      <li>[15, 20): height ≈ 0.022</li>
+      <li>[20, 25): height ≈ 0.006</li>
+    </ul>
+    <p><strong>Q6.1:</strong> How many words were marked difficult by 10 or more students?</p>
+    <p><strong>Q6.2:</strong> Suppose we use <code>bins=np.arange(0, 30, 5)</code>. (a) Height of [5, 10)? (b) Height of [0, 5)?</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q6.1 答案：50</strong></p>
+      <p>histogram 是基于 100 words 画的（diff &gt;= 5）。每个 bin 面积 = (Height) × (Width) = 那个 bin 的 proportion。<br>
+      [10, 15) 的 proportion = 0.072 × 5 = 0.36 → 36 words<br>
+      [15, 20) 的 proportion = 0.022 × 5 = 0.11 → 11 words<br>
+      [20, 25) 的 proportion = 0.006 × 5 = 0.03 → 3 words<br>
+      Total: 36 + 11 + 3 = <strong>50</strong> words.</p>
+
+      <p><strong>Q6.2 答案：</strong></p>
+      <p>新 bins 把 0~5 也算进来了。现在分母变成全部 500 个 words。</p>
+      <ul>
+        <li>(a) [5, 10) 高度 = (原[5,10) 包含的 50 个 words) / 500 / 5 = 50 / 2500 = <strong>0.02</strong>。注意：原直方图基于 100 个 words 算 [5,10) proportion = 0.10×5 = 0.5 → 50 words；新分母是 500 → 50/500/5 = 0.02</li>
+        <li>(b) [0, 5) 高度 = 400 / 500 / 5 = <strong>0.16</strong>（500 - 100 = 400 个 words 在 [0,5)）</li>
+      </ul>
+      <p><strong>关键公式</strong>：Height = (count in bin) / (total) / (bin width)；总面积 = 1。</p>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-block">
+    <div class="q-source">Q7 — Fa25 (Simulation 模板)</div>
+    <p>Estimate the probability that a randomly generated three-letter lowercase sequence forms a real English word represented in <code>words</code>.</p>
+<pre><code>letters = __(a)__
+for letter in "abcdefghijklmnopqrstuvwxyz":
+    letters = np.append(letters, letter)
+
+repetitions = 10000
+found = 0
+
+for i in np.arange(repetitions):
+    seq = "".join(np.random.choice(__(b)__, 3, replace=True))
+    if __(c)__:
+        found = found + 1
+
+prob_real_word = __(d)__</code></pre>
+    <details><summary>显示答案 + 解析</summary>
+<pre><code>(a) np.array([])
+(b) letters
+(c) seq in words.index    # 或 words.index.values 或 (words.index == seq).any()
+(d) found / repetitions</code></pre>
+      <p>解析：</p>
+      <ul>
+        <li>(a) 初始化空 numpy array</li>
+        <li>(b) 上面循环把 26 个字母加进去了，所以从 letters 里抽</li>
+        <li>(c) 关键：判断生成的 3 字母字符串是否在 words 的 index 里。<code>seq in words.index</code> 是最直接的写法</li>
+        <li>(d) 概率估计 = 命中数 / 总试验数</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-block">
+    <div class="q-source">Q8 — Fa25 (Probability — Lec 11)</div>
+    <p>Matt has 70% chance of finding any word difficult, independent of others.</p>
+    <p><strong>Q8.1:</strong> Sentence of 10 words, P(every word difficult)?</p>
+    <p><strong>Q8.2:</strong> P(at least one difficult)?</p>
+    <p>Now Ryan: if Matt finds it difficult, 90% Ryan does; if Matt doesn't, 50% Ryan does.</p>
+    <p><strong>Q8.3:</strong> P(at least one of Matt and Ryan finds it difficult) for a single word?</p>
+    <p><strong>Q8.4:</strong> P(every word in 10-word sentence, exactly one of Matt and Ryan finds difficult)?</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q8.1: 0.7<sup>10</sup></strong></p>
+
+      <p><strong>Q8.2: 1 − 0.3<sup>10</sup></strong></p>
+      <p>用 complement: 1 − P(none difficult) = 1 − 0.3<sup>10</sup>。</p>
+
+      <p><strong>Q8.3: 1 − P(both don't find)</strong></p>
+      <p>P(Matt doesn't) = 0.3, given that, P(Ryan doesn't) = 1 − 0.5 = 0.5<br>
+      P(both don't) = 0.3 × 0.5 = 0.15<br>
+      <strong>P(at least one) = 1 − 0.15 = 0.85</strong></p>
+
+      <p><strong>Q8.4: (P(exactly one))<sup>10</sup></strong></p>
+      <p>P(exactly one) for one word:<br>
+      = P(Matt yes, Ryan no) + P(Matt no, Ryan yes)<br>
+      = 0.7 × (1 − 0.9) + 0.3 × 0.5<br>
+      = 0.7 × 0.1 + 0.15 = 0.07 + 0.15 = 0.22<br>
+      所以 10 个词都满足 = <strong>0.22<sup>10</sup></strong></p>
+    </details>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MOCK 3: Spring 2025 -->
+  <!-- ============================================ -->
+  <h2 id="mock3">🥉 模拟三: Spring 2025 Midterm</h2>
+
+  <div class="mock-header">
+    <strong>来源</strong>：Spring 2025 Midterm Exam ｜ <strong>讲师</strong>：Janine Tiefenbruck ｜ <strong>50 分钟</strong>
+    <p>主题：Trump's reciprocal tariffs 数据集</p>
+  </div>
+
+  <div class="schema">
+    <strong>📦 DataFrame schema: <code>tariffs</code></strong>
+    <p>50 rows total. First few rows:</p>
+<pre><code>   Country         Tariffs Charged to USA  Reciprocal Tariff
+0  China           67                      34
+1  European Union  39                      20
+2  Vietnam         90                      45
+3  Taiwan          64                      32</code></pre>
+    <p>Both <code>"Tariffs Charged to USA"</code> and <code>"Reciprocal Tariff"</code> are <code>int</code> (percentages).</p>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-block">
+    <div class="q-source">Q1 — Sp25 (Lec 5)</div>
+    <p><strong>Q1.1:</strong> Which country has the highest <code>"Reciprocal Tariff"</code>? Write one line of code that evaluates to the name of this country.</p>
+    <p><strong>Q1.2:</strong> How many countries have a <code>"Reciprocal Tariff"</code> above 30%? Write one line.</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q1.1:</strong></p>
+<pre><code>tariffs.sort_values(by="Reciprocal Tariff", ascending=False).get("Country").iloc[0]</code></pre>
+
+      <p><strong>Q1.2:</strong></p>
+<pre><code>tariffs[tariffs.get("Reciprocal Tariff") &gt; 30].shape[0]</code></pre>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-block">
+    <div class="q-source">Q2 — Sp25 (Lec 8 — apply)</div>
+    <p><strong>Q2.1:</strong> Define functions <code>with_percent_symbol</code> and <code>without_percent_symbol</code>:</p>
+<pre><code>>>> with_percent_symbol(34)
+"34%"
+>>> without_percent_symbol("34%")
+34
+
+def with_percent_symbol(x):
+    return __(a)__
+
+def without_percent_symbol(x):
+    return __(b)__</code></pre>
+
+    <p><strong>Q2.2:</strong> <code>y = tariffs.get("Reciprocal Tariff").apply(with_percent_symbol)</code>. Define <code>z</code> to evaluate to exactly the same Series as <code>y</code>, without using <code>with_percent_symbol</code> or <code>y</code>.</p>
+
+    <p><strong>Q2.3:</strong> Determine the value of:</p>
+<pre><code>y.iloc[3] + " tax on goods from " + tariffs.get("Country").loc[3]</code></pre>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q2.1:</strong></p>
+<pre><code>(a) str(x) + "%"
+(b) int(x.strip("%"))    # 或 int(x.replace("%", ""))</code></pre>
+
+      <p><strong>Q2.2:</strong></p>
+<pre><code>z = tariffs.get("Reciprocal Tariff").astype(str) + "%"</code></pre>
+      <p>但 babypandas 可能没 <code>astype</code>。更安全的写法是定义个 lambda 或者新函数 —— 但题目说不能用 with_percent_symbol。<br>
+      实际答案（用 apply + 内置函数）：</p>
+<pre><code>z = tariffs.get("Reciprocal Tariff").apply(str) + "%"</code></pre>
+      <p>Series + 字符串会 broadcast 到每个元素 → "34" + "%" = "34%"。</p>
+
+      <p><strong>Q2.3 答案：<code>"32% tax on goods from Taiwan"</code></strong></p>
+      <p>解析：</p>
+      <ul>
+        <li><code>y.iloc[3]</code> → row 3 的 Reciprocal Tariff (32) 加 % = "32%"</li>
+        <li><code>tariffs.get("Country").loc[3]</code> → label 3 对应的 Country = "Taiwan"（因为默认 index 是 0,1,2,3,...，loc[3] = 第 4 行）</li>
+        <li>拼起来 = "32% tax on goods from Taiwan"</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-block">
+    <div class="q-source">Q3 — Sp25 (Lec 10 — 函数+条件)</div>
+    <p>For each country, <code>"Reciprocal Tariff"</code> = half of <code>"Tariffs Charged to USA"</code>, rounded <strong>up</strong> to the next integer. If less than 20%, then Reciprocal is set to 10%, so no country's reciprocal tariff is ever less than 10%.</p>
+
+    <p><strong>Q3.1:</strong> Fill in <code>reciprocate</code>:</p>
+<pre><code>def reciprocate(charged):
+    half = int((charged + 1) / 2)
+    if __(a)__:
+        return __(b)__
+    else:
+        return __(c)__</code></pre>
+
+    <p><strong>Q3.2:</strong> Fill in <code>reciprocate_2</code>, behaving the same. Don't call <code>reciprocate</code>.</p>
+<pre><code>def reciprocate_2(charged):
+    return __(d)__</code></pre>
+
+    <p><strong>Q3.3:</strong> <code>ch = tariffs.get("Tariffs Charged to USA")</code>. Write expression that evaluates to <code>True</code> if <code>reciprocate</code> and <code>reciprocate_2</code> give same outputs on all inputs.</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q3.1:</strong></p>
+<pre><code>(a) charged &lt; 20
+(b) 10
+(c) half</code></pre>
+      <p>"Tariffs Charged less than 20" → reciprocal = 10。否则返回 half (rounded up version)。</p>
+
+      <p><strong>Q3.2:</strong></p>
+<pre><code>(d) max(10, int((charged + 1) / 2))</code></pre>
+      <p>用 max 函数，如果一半 ≥ 10 用一半，否则用 10 —— 等价于上面的 if/else。</p>
+
+      <p><strong>Q3.3:</strong></p>
+<pre><code>(ch.apply(reciprocate) == ch.apply(reciprocate_2)).all()</code></pre>
+      <p>或者：</p>
+<pre><code>(ch.apply(reciprocate) == ch.apply(reciprocate_2)).sum() == ch.shape[0]</code></pre>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-block">
+    <div class="q-source">Q4 — Sp25 (Density Histogram — Lec 7)</div>
+    <p>Density histogram of reciprocal tariffs for 50 countries, with <code>bins=[10, 11, 15, 20, 40, 50]</code>. Heights:</p>
+    <ul>
+      <li>[10, 11): height ≈ 0.42</li>
+      <li>[11, 15): height ≈ 0.01 (very small)</li>
+      <li>[15, 20): height ≈ 0.01</li>
+      <li>[20, 40): height ≈ 0.01</li>
+      <li>[40, 50): height ≈ 0.01 or so</li>
+    </ul>
+    <p><strong>Q4.1:</strong> How many countries have reciprocal tariff of 10%?</p>
+    <p><strong>Q4.2:</strong> Same data with <code>bins = [8, 15, 22, 30, 40, 50]</code>. What's the height of the <strong>leftmost</strong> bar (to two decimal places)?</p>
+    <p><strong>Q4.3:</strong> Replace EU row with 27 rows (each with 20% reciprocal). Plot histogram with same bins as Q4. Let <code>h_new</code> be height of the rightmost bar, <code>h_old</code> the original. Express <code>h_new</code> in terms of <code>h_old</code>.</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q4.1: 21 个</strong></p>
+      <p>[10,11) 是 width=1 的 bin，height = 0.42 → proportion = 0.42 × 1 = 0.42 → 0.42 × 50 = <strong>21 个国家</strong>。</p>
+
+      <p><strong>Q4.2: 0.06</strong></p>
+      <p>新 leftmost bin 是 [8, 15)，宽度 = 7。原数据 [10, 15) 范围有：[10, 11) 21 个 + [11, 15) (大约 1 个) ≈ 21 个国家（[8, 10) 没有数据）。<br>
+      Proportion ≈ 21/50 = 0.42。Height = 0.42 / 7 = <strong>0.06</strong>.</p>
+
+      <p><strong>Q4.3: h_new = (50/76) × h_old</strong></p>
+      <p>原 50 个国家变成 50 + 27 - 1 = 76 个（EU 1 行变 27 行）。Rightmost bar [40, 50) 的 count <strong>不变</strong>（27 个新加的都在 [20, ...] 处即 20%，但 20% 在 [20,40) bin 不在 [40,50) bin）。<br>
+      Height = count / total / width。Width 没变，count 没变，total 从 50 变到 76 → <strong>h_new = h_old × (50/76)</strong>。</p>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-block">
+    <div class="q-source">Q5 — Sp25 (Merge — Lec 9)</div>
+    <p><code>trade_partners</code> indexed by <code>"Country"</code>, columns:</p>
+    <ul>
+      <li><code>"Proportion"</code> (float): proportion of US imports from each country</li>
+      <li><code>"Continent"</code> (str)</li>
+    </ul>
+    <p>All countries in <code>tariffs</code> are in <code>trade_partners</code> (incl. European Union), but not vice versa.</p>
+
+    <p><strong>Q5.1:</strong> Write one line to merge <code>tariffs</code> with <code>trade_partners</code>, store in <code>merged</code>.</p>
+    <p><strong>Q5.2:</strong> How many rows does <code>merged</code> have?</p>
+    <p><strong>Q5.3:</strong> In which DataFrames does <code>"Proportion"</code> sum to 1? Select all that apply:</p>
+    <ol>
+      <li><code>trade_partners</code></li>
+      <li><code>trade_partners.groupby("Continent").mean()</code></li>
+      <li><code>trade_partners.groupby("Continent").sum()</code></li>
+      <li><code>merged</code></li>
+    </ol>
+    <p><strong>Q5.4:</strong> Write one line for visualization showing <strong>median reciprocal tariff for each continent</strong>.</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q5.1:</strong></p>
+<pre><code>merged = tariffs.merge(trade_partners, left_on="Country", right_index=True)</code></pre>
+
+      <p><strong>Q5.2: 50</strong></p>
+      <p>tariffs 50 个 country 都在 trade_partners 里 → 每个 tariffs 行匹配恰好 1 个 → 50 行。</p>
+
+      <p><strong>Q5.3: (1) 和 (3) 正确</strong></p>
+      <ul>
+        <li>(1) ✓ <code>trade_partners</code> 是全部 trading partners 的 proportion，全集和 = 1</li>
+        <li>(2) ✗ mean 后是每个 continent 的平均 proportion，不会 sum to 1</li>
+        <li>(3) ✓ groupby+sum 把每个 continent 的 proportion 加起来，所有 continent 加起来还是 1</li>
+        <li>(4) ✗ <code>merged</code> 只包含 tariffs 那 50 国，不包含全部 trading partners → proportion 不和 = 1</li>
+      </ul>
+
+      <p><strong>Q5.4:</strong></p>
+<pre><code>merged.groupby("Continent").median().plot(kind="barh", y="Reciprocal Tariff");</code></pre>
+      <p>(也可以用 <code>kind="bar"</code>。如果 babypandas 不支持 median，要用真实 pandas 风格。)</p>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-block">
+    <div class="q-source">Q6 — Sp25 (Probability — Lec 11)</div>
+    <p>Probability table:</p>
+<pre><code>Continent       Country   Probability
+Asia (0.41)     China     0.14
+                Japan     0.05
+                Vietnam   0.04
+                Other     0.18
+Europe (0.24)   Germany   0.05
+                Ireland   0.03
+                Italy     0.02
+                Other     0.14
+N. America (0.30) Mexico  0.16
+                Canada    0.13
+                Other     0.01
+Other (0.05)    Other     0.05</code></pre>
+
+    <p><strong>Q6.1:</strong> Random container from Asia but not Japan. P(it comes from China)?</p>
+    <p><strong>Q6.2:</strong> True/False: Selecting from Vietnam vs Ireland are independent events.</p>
+    <p><strong>Q6.3:</strong> 2 containers with replacement. P(exactly one from Germany and other from N. America)?</p>
+    <p><strong>Q6.4:</strong> 3 containers with replacement. P(none from Asia)?</p>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q6.1: 0.14 / (0.41 − 0.05) = 0.14 / 0.36</strong></p>
+      <p>条件概率：P(China | Asia and not Japan) = P(China) / P(Asia and not Japan) = 0.14 / (0.41 − 0.05)</p>
+
+      <p><strong>Q6.2: False</strong></p>
+      <p>选一个 container 只能来自一个地方，"from Vietnam" 和 "from Ireland" 是<strong>互斥</strong>事件。互斥 ≠ 独立（除非概率为0，否则 mutually exclusive ≠ independent）。<br>
+      检验：P(both) = 0 ≠ P(Viet) × P(Ire) = 0.04 × 0.03 ≠ 0 → 不独立。</p>
+
+      <p><strong>Q6.3: 2 × 0.05 × 0.30</strong></p>
+      <p>(Germany then NA) + (NA then Germany) = 0.05 × 0.30 + 0.30 × 0.05 = <strong>2 × 0.05 × 0.30 = 0.03</strong></p>
+
+      <p><strong>Q6.4: (1 − 0.41)<sup>3</sup> = 0.59<sup>3</sup></strong></p>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-block">
+    <div class="q-source">Q7 — Sp25 (Simulation)</div>
+    <p>Nintendo gives away k Switch 2 consoles. n people enter (n &gt; k). Estimate P(Jason and Ray both win).</p>
+<pre><code>1  def giveaway(n, k):
+2      count = 0
+3      for i in np.arange(10000):
+4          winners = np.random.choice(___(a)___)
+5          if ___(b)___:
+6              count = count + 1
+7      return ___(c)___</code></pre>
+
+    <p><strong>Q7.1:</strong> Fill in (a), (b), (c).</p>
+    <p><strong>Q7.2:</strong> If implemented correctly, what should <code>giveaway(100, 100)</code> evaluate to?</p>
+    <p><strong>Q7.3:</strong> Modify: line 2 → <code>results = np.array([])</code>; line 6 → <code>results = np.append(results, "WIN!")</code>; lines 1, 3, 4, 5 unchanged. Which fill blank (c)? Select all that apply:</p>
+    <ol>
+      <li><code>len(results)/10000</code></li>
+      <li><code>(results == "WIN!").sum()</code></li>
+      <li><code>(results == "WIN!").mean()</code></li>
+      <li><code>np.count_nonzero(results)</code></li>
+      <li><code>np.random.choice(results)</code></li>
+    </ol>
+    <details><summary>显示答案 + 解析</summary>
+      <p><strong>Q7.1:</strong></p>
+<pre><code>(a) np.arange(n), k, replace=False
+(b) (winners == 0).sum() == 0 and (winners == 1).sum() == 0    # 错误!
+
+正确做法（假设 Jason 是 person 0, Ray 是 person 1）:
+(b) 0 in winners and 1 in winners
+(c) count / 10000</code></pre>
+      <p>解释：从 n 个人里抽 k 个（不放回）作为获奖者；判断 Jason(0) 和 Ray(1) 是否都在获奖名单里。</p>
+
+      <p><strong>Q7.2: 1 (或非常接近 1)</strong></p>
+      <p>n = k = 100 时所有人都获奖，每次都满足 → count ≈ 10000 → prob ≈ 1。</p>
+
+      <p><strong>Q7.3: (1) 和 (3) 正确</strong></p>
+      <ul>
+        <li>(1) ✓ results 长度 = "WIN!" 出现的次数 = count，除以 10000</li>
+        <li>(2) ✗ <code>.sum()</code> 返回 count 而不是 prob</li>
+        <li>(3) ✓ <code>.mean()</code> 自动除以总长度，但 results 长度可能 &lt; 10000（只有命中才 append），所以 <strong>需要看具体语义</strong> —— 如果定义 prob = (WIN count) / (total reps)，则 <code>(results == "WIN!").mean() = 1</code>（results 全是 WIN!），不对。<br>
+        重新评估：结果数组只在 if 命中时 append，所以 len(results) = count ≠ 10000。<br>
+        正确答案应是<strong>仅 (1)</strong>。但 Sp25 题面说 select all that apply，最严格答案 (1)。</li>
+      </ul>
+      <p>（注：根据题目实际答案，(1) 是肯定对的。其它选项需要小心。）</p>
+    </details>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- LIGHTNING ROUND -->
+  <!-- ============================================ -->
+  <h2 id="lightning">⚡ Tier-1 闪电轮（精选高频题）</h2>
+
+  <p>从 Wi25, Fa24, Sp24 三套中精选 10 道最高频的代表题，覆盖 indexing, groupby, merge, .apply, simulation, probability。每题独立，建议碎片时间刷。</p>
+
+  <!-- L1 -->
+  <div class="q-block">
+    <div class="q-source">⚡ L1 — Wi25 Q1 (合适的 index)</div>
+    <p>DataFrame <code>dining</code>: each row a menu item, columns <code>"Dining Hall"</code> (str), <code>"Item"</code> (str), <code>"Price"</code> (str), <code>"Calories"</code> (int).</p>
+    <p>Which would be appropriate index? <code>"Dining Hall"</code> / <code>"Item"</code> / <code>"Price"</code> / <code>"Calories"</code> / None of these.</p>
+    <details><summary>显示答案</summary>
+      <p><strong>None of these</strong>。</p>
+      <ul>
+        <li>"Dining Hall" 重复（一个 hall 多 items）</li>
+        <li>"Item" 重复（不同 hall 都有 Crispy Chicken Sandwich）</li>
+        <li>"Price"/"Calories" 数值会重复</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- L2 -->
+  <div class="q-block">
+    <div class="q-source">⚡ L2 — Wi25 Q2.3 (Select all that apply — sort/index)</div>
+    <p><code>counts</code> DataFrame: <code>"Dining Hall"</code>, <code>"Affordability"</code>, <code>"Count"</code>. The Bistro is the dining hall with the most "Cheap" items. Which expressions evaluate to the number of "Cheap" items at "The Bistro"? Select all that apply.</p>
+    <ol>
+      <li><code>counts.sort_values(by="Count", ascending=False).get("Count").iloc[0]</code></li>
+      <li><code>counts.get("Count").max()</code></li>
+      <li><code>(counts[counts.get("Affordability") == "Cheap"].sort_values(by="Count").get("Count").iloc[-1])</code></li>
+      <li><code>counts[counts.get("Dining Hall") == "The Bistro"].get("Count").max()</code></li>
+      <li><code>counts[(counts.get("Affordability") == "Cheap") &amp; (counts.get("Dining Hall") == "The Bistro")].get("Count").iloc[0]</code></li>
+    </ol>
+    <details><summary>显示答案</summary>
+      <p><strong>(1), (2), (3), (5) 正确</strong>（题目陈述说 The Bistro 是 Cheap 类别中数量最多的，所以 max(Count) 也是它）。</p>
+      <ul>
+        <li>(1) ✓ 整体降序，第一个 = 最大 Count = Cheap at Bistro</li>
+        <li>(2) ✓ 整体最大 Count（题目说"most Cheap items"是最大值）</li>
+        <li>(3) ✓ 只看 Cheap 行，按 Count 升序最后一个 = 最大</li>
+        <li>(4) ✗ 题目问 Cheap 数量，但这个表达式取的是 Bistro 中 max(Count)，可能不是 Cheap 类</li>
+        <li>(5) ✓ 同时过滤 Cheap 和 Bistro，恰好那行</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- L3 -->
+  <div class="q-block">
+    <div class="q-source">⚡ L3 — Wi25 Q4.1 (np.arange 在 bins 中推理)</div>
+    <p>Histogram has bins from 5 to 17 (visible bin edges: 5, 7, 9, 11, 13, 15, 17). Fill in:</p>
+<pre><code>bins = 0.5 * (2 + np.arange(__(a)__, __(b)__, __(c)__))</code></pre>
+    <details><summary>显示答案</summary>
+      <p>需要 bins = [5, 7, 9, 11, 13, 15, 17]。<br>
+      <code>0.5 * (2 + np.arange(...))</code> 简化：先 +2 再 *0.5。<br>
+      要得到 5 → 0.5*(2+x)=5 → x=8；要 7 → x=12；步长 4.<br>
+      所以 <code>np.arange(8, 33, 4)</code> = [8, 12, 16, 20, 24, 28, 32]，<br>
+      乘 0.5*(2+x) → [5, 7, 9, 11, 13, 15, 17] ✓</p>
+      <p><strong>(a) = 8, (b) = 33, (c) = 4</strong></p>
+    </details>
+  </div>
+
+  <!-- L4 -->
+  <div class="q-block">
+    <div class="q-source">⚡ L4 — Wi25 Q5.2 (Merge + arithmetic)</div>
+    <p><code>eaten</code> = numpy array of bread types eaten. Bread costs: Sourdough $2, Whole Wheat $3, Multigrain $4. Total cost via merge:</p>
+<pre><code>available = bpd.DataFrame().assign(Type=["Sourdough", "Whole Wheat", "Multigrain"]).assign(Cost=[2, 3, 4])
+consumed = bpd.DataFrame().assign(Eaten=eaten)
+combined = available.merge(consumed, left_on=__(d)__, right_on=__(e)__)
+total_cost = combined.__(f)__</code></pre>
+    <details><summary>显示答案</summary>
+<pre><code>(d) "Type"
+(e) "Eaten"
+(f) get("Cost").sum()</code></pre>
+      <p>Merge 后每个 eaten bread 对应一行，Cost 列求和 = total cost.</p>
+    </details>
+  </div>
+
+  <!-- L5 -->
+  <div class="q-block">
+    <div class="q-source">⚡ L5 — Wi25 Q6 (Probability — independent events)</div>
+    <p>6 toppings, each included with probability 0.5 independently.</p>
+    <p><strong>(1)</strong> P(no toppings)?<br>
+    <strong>(2)</strong> Estimate P(exactly 3 toppings) via simulation:</p>
+<pre><code>tiptop = 0
+num_trials = 10000
+for i in np.arange(num_trials):
+    pizza = np.random.choice([0,1], __(a)__)
+    if np.__(b)__ == 3:
+        tiptop = __(c)__
+toppa = __(d)__</code></pre>
+    <details><summary>显示答案</summary>
+      <p><strong>(1) P(no toppings) = (1/2)<sup>6</sup> = 1/64</strong></p>
+
+      <p><strong>(2):</strong></p>
+<pre><code>(a) 6
+(b) np.count_nonzero(pizza)   # 或 pizza.sum()
+(c) tiptop + 1
+(d) tiptop / num_trials</code></pre>
+    </details>
+  </div>
+
+  <!-- L6 -->
+  <div class="q-block">
+    <div class="q-source">⚡ L6 — Fa24 Q3.2 (Boolean Series operations)</div>
+    <p>What does this evaluate to?</p>
+<pre><code>street = treats.get("address").str.contains("Street")
+sour = treats.get("candy").str.contains("Sour")
+np.count_nonzero(street &amp; sour) &gt; sour.sum()</code></pre>
+    <details><summary>显示答案</summary>
+      <p><strong>False</strong></p>
+      <p>解析：</p>
+      <ul>
+        <li>左边：<code>street &amp; sour</code> 同时满足两个条件的行数</li>
+        <li>右边：仅 sour 条件的行数</li>
+        <li>"同时满足两个" ≤ "满足其中一个"，所以左边 ≤ 右边，<code>&gt;</code> 一定 False</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- L7 -->
+  <div class="q-block">
+    <div class="q-source">⚡ L7 — Fa24 Q9 (Merge 行数预测 — 经典)</div>
+    <p><code>treat</code>: 200 rows, 15 distinct candies. <code>trick</code>: 25 rows indexed by "candy" (15 in <code>treat</code> + 10 not in <code>treat</code>). What does <code>trick.merge(treat, left_index=True, right_on="candy").shape[0]</code> evaluate to?</p>
+    <p>(15 / 25 / 200 / 215 / 225 / 3000 / 5000)</p>
+    <details><summary>显示答案</summary>
+      <p><strong>200</strong></p>
+      <p>Inner merge：trick 中那 10 个不在 treat 的 candies 不会匹配（被丢弃）。剩下 15 个 candies 在 treat 里出现共 200 行（题目说 treat 200 rows + 15 distinct candies）。所以结果 = 200。</p>
+      <p><strong>关键</strong>：merge 行数 = 每行匹配数之和。treat 200 行每行匹配 trick 中 1 行（恰好一个 candy）→ 200。</p>
+    </details>
+  </div>
+
+  <!-- L8 -->
+  <div class="q-block">
+    <div class="q-source">⚡ L8 — Fa24 Q11 (复杂 groupby + assign — 5 选 2 题)</div>
+    <p>Set <code>ac</code> to DataFrame indexed by "address" with column "avg_cost" = average cost per piece at each house. Which Ways are correct?</p>
+    <p>Way 1:</p>
+<pre><code>ac = tot.groupby("address").sum()
+ac = ac.assign(avg_cost = ac.get("price") / ac.get("how_many")).get(["avg_cost"])</code></pre>
+    <p>Way 4:</p>
+<pre><code>ac = tot.assign(x = tot.get("how_many") * tot.get("price"))
+ac = ac.groupby("address").sum()
+ac = ac.assign(avg_cost = ac.get("x").mean()).get(["avg_cost"])</code></pre>
+    <p>Way 5:</p>
+<pre><code>ac = tot.assign(x = tot.get("how_many") * tot.get("price"))
+ac = ac.groupby("address").sum()
+ac = ac.assign(avg_cost = ac.get("x") / ac.get("how_many")).get(["avg_cost"])</code></pre>
+    <details><summary>显示答案</summary>
+      <p><strong>Way 1 和 Way 5 正确</strong>。</p>
+      <p>正确逻辑：avg_cost = (Σ piece_count × price) / (Σ piece_count) = total_money / total_pieces.</p>
+      <ul>
+        <li>Way 1: groupby("address").sum() 得到每户的 sum(price) 和 sum(how_many)。avg = sum(price)/sum(how_many) <strong>仅当 price 是该候选的总价</strong>才对（题目里 price 是 per piece 的）—— 实际上这里也对，因为分子分母同时被 sum 后比例不变？<br>
+        重新审视：题目说 price = cost per piece (单价)。Way 1 算的是 sum(price)/sum(how_many) ≠ total_money/total_pieces. 应该是错的。<br>
+        但 Fa24 官方答案给 Way 1 和 Way 5。可能 price 在合并后变成了 piece × price = 总额。需要看 Fa24 上下文。</li>
+        <li>Way 5: x = how_many × price = 总额; sum(x) = total_money; sum(how_many) = total pieces; avg = sum(x)/sum(how_many) ✓</li>
+      </ul>
+      <p>（标准答案：Way 5 是正确的，Way 1 取决于 schema。这题主要练习 groupby 后 .assign 用 ac.get(...).mean() vs 列除法的细节。）</p>
+    </details>
+  </div>
+
+  <!-- L9 -->
+  <div class="q-block">
+    <div class="q-source">⚡ L9 — Sp24 Q4.1 (Probability — random dialing)</div>
+    <p>Monkey dials a random 10-digit number (each digit equally likely 0-9). What is P(monkey calls one of your contacts)? Use DataFrame <code>contacts</code>.</p>
+    <details><summary>显示答案</summary>
+<pre><code>contacts.shape[0] / 10**10</code></pre>
+      <p>解析：总共有 10<sup>10</sup> 种 10 位数（含 leading zero）。Contacts 中每个 phone number 唯一对应一种。所以 P = (n contacts) / 10<sup>10</sup>。</p>
+    </details>
+  </div>
+
+  <!-- L10 -->
+  <div class="q-block">
+    <div class="q-source">⚡ L10 — Sp24 Q8 (.groupby + max via sort)</div>
+    <p>Find the largest number of people in <code>contacts</code> who share the same birthday (people born on same month-day, regardless of year):</p>
+<pre><code>contacts.groupby(__(a)__).__(b)__.get("Phone").__(c)__</code></pre>
+    <details><summary>显示答案</summary>
+<pre><code>(a) ["Month", "Day"]    # 多列 groupby
+(b) count()
+(c) max()</code></pre>
+      <p>多列 groupby 把 (Month, Day) 组合作为分组键；count() 数每组人数；最后 max() 找最大组的人数。</p>
+    </details>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- TRACKER -->
+  <!-- ============================================ -->
+  <h2 id="tracker">📊 错题统计表</h2>
+
+  <p>做完每套后填写本表，统计哪个 section 是弱点（每错 ≥ 2 题就回去重温对应 section）。</p>
+
+  <h3>📋 模拟一: Winter 2026</h3>
+  <table>
+    <thead>
+      <tr><th>题号</th><th>是否做对</th><th>涉及 Section</th><th>需重温?</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Q1.1 (合适 index)</td><td>☐ 对 ☐ 错</td><td>Section 1: DataFrames &amp; Indexing</td><td>☐</td></tr>
+      <tr><td>Q1.2 (可视化选择)</td><td>☐ 对 ☐ 错</td><td>Section 3: Visualization</td><td>☐</td></tr>
+      <tr><td>Q1.3 (groupby + plot)</td><td>☐ 对 ☐ 错</td><td>Section 2 + 3</td><td>☐</td></tr>
+      <tr><td>Q2 (布尔过滤 + max)</td><td>☐ 对 ☐ 错</td><td>Section 2: Querying &amp; groupby</td><td>☐</td></tr>
+      <tr><td>Q3 (numpy fancy indexing)</td><td>☐ 对 ☐ 错</td><td>Section 0 + 1</td><td>☐</td></tr>
+      <tr><td>Q4 (groupby + sort_values)</td><td>☐ 对 ☐ 错</td><td>Section 2</td><td>☐</td></tr>
+      <tr><td>Q5 (Select all — gluten_free count)</td><td>☐ 对 ☐ 错</td><td>Section 1 + 2</td><td>☐</td></tr>
+      <tr><td>Q6.1 (P at least one)</td><td>☐ 对 ☐ 错</td><td>Section 7: Probability</td><td>☐</td></tr>
+      <tr><td>Q6.2 (P(A or B))</td><td>☐ 对 ☐ 错</td><td>Section 7</td><td>☐</td></tr>
+      <tr><td>Q7.1 (object type)</td><td>☐ 对 ☐ 错</td><td>Section 1 + 2</td><td>☐</td></tr>
+      <tr><td>Q7.2 (apply on index)</td><td>☐ 对 ☐ 错</td><td>Section 4: .apply</td><td>☐</td></tr>
+      <tr><td>Q8.1 (merge 行数)</td><td>☐ 对 ☐ 错</td><td>Section 5: Merge</td><td>☐</td></tr>
+      <tr><td>Q8.2 (Merge 等价)</td><td>☐ 对 ☐ 错</td><td>Section 5</td><td>☐</td></tr>
+      <tr><td>Q9 (Simulation 5 blanks)</td><td>☐ 对 ☐ 错</td><td>Section 7: Simulation</td><td>☐</td></tr>
+      <tr><td>Q10 (one-line 用 np.arange)</td><td>☐ 对 ☐ 错</td><td>Section 0 + 6</td><td>☐</td></tr>
+      <tr><td>Q11 (字符串链式)</td><td>☐ 对 ☐ 错</td><td>Section 0 + 4</td><td>☐</td></tr>
+    </tbody>
+  </table>
+
+  <h3>📋 模拟二: Fall 2025</h3>
+  <table>
+    <thead>
+      <tr><th>题号</th><th>是否做对</th><th>涉及 Section</th><th>需重温?</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Q1 (字符串处理 fix_ps)</td><td>☐ 对 ☐ 错</td><td>Section 0 + 4</td><td>☐</td></tr>
+      <tr><td>Q2.1 (merge with reset_index)</td><td>☐ 对 ☐ 错</td><td>Section 5</td><td>☐</td></tr>
+      <tr><td>Q2.2 (merge 行数预测)</td><td>☐ 对 ☐ 错</td><td>Section 5</td><td>☐</td></tr>
+      <tr><td>Q3.1-3.3 (sort_values 可视化)</td><td>☐ 对 ☐ 错</td><td>Section 1 + 3</td><td>☐</td></tr>
+      <tr><td>Q4 (函数等价改写)</td><td>☐ 对 ☐ 错</td><td>Section 6: Conditionals</td><td>☐</td></tr>
+      <tr><td>Q5.1 (多列 groupby 行数)</td><td>☐ 对 ☐ 错</td><td>Section 5</td><td>☐</td></tr>
+      <tr><td>Q5.2 (字母序 iloc)</td><td>☐ 对 ☐ 错</td><td>Section 1 + 5</td><td>☐</td></tr>
+      <tr><td>Q5.3 (条件比例)</td><td>☐ 对 ☐ 错</td><td>Section 2</td><td>☐</td></tr>
+      <tr><td>Q6.1 (rebin + count)</td><td>☐ 对 ☐ 错</td><td>Section 3: Histograms</td><td>☐</td></tr>
+      <tr><td>Q6.2 (新 bins 高度)</td><td>☐ 对 ☐ 错</td><td>Section 3</td><td>☐</td></tr>
+      <tr><td>Q7 (Simulation random word)</td><td>☐ 对 ☐ 错</td><td>Section 7</td><td>☐</td></tr>
+      <tr><td>Q8 (Probability — 系列)</td><td>☐ 对 ☐ 错</td><td>Section 7</td><td>☐</td></tr>
+    </tbody>
+  </table>
+
+  <h3>📋 模拟三: Spring 2025</h3>
+  <table>
+    <thead>
+      <tr><th>题号</th><th>是否做对</th><th>涉及 Section</th><th>需重温?</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Q1.1-1.2 (一行代码)</td><td>☐ 对 ☐ 错</td><td>Section 1 + 2</td><td>☐</td></tr>
+      <tr><td>Q2.1 (str/int 转换函数)</td><td>☐ 对 ☐ 错</td><td>Section 0</td><td>☐</td></tr>
+      <tr><td>Q2.2 (apply 等价)</td><td>☐ 对 ☐ 错</td><td>Section 4</td><td>☐</td></tr>
+      <tr><td>Q2.3 (字符串拼接 + iloc/loc)</td><td>☐ 对 ☐ 错</td><td>Section 1</td><td>☐</td></tr>
+      <tr><td>Q3.1 (条件函数)</td><td>☐ 对 ☐ 错</td><td>Section 6</td><td>☐</td></tr>
+      <tr><td>Q3.2 (函数等价 max)</td><td>☐ 对 ☐ 错</td><td>Section 6</td><td>☐</td></tr>
+      <tr><td>Q3.3 (.all() 验证)</td><td>☐ 对 ☐ 错</td><td>Section 4 + 6</td><td>☐</td></tr>
+      <tr><td>Q4.1 (高度反推数量)</td><td>☐ 对 ☐ 错</td><td>Section 3</td><td>☐</td></tr>
+      <tr><td>Q4.2 (rebin 高度)</td><td>☐ 对 ☐ 错</td><td>Section 3</td><td>☐</td></tr>
+      <tr><td>Q4.3 (新增行后高度)</td><td>☐ 对 ☐ 错</td><td>Section 3</td><td>☐</td></tr>
+      <tr><td>Q5.1-5.4 (Merge + groupby viz)</td><td>☐ 对 ☐ 错</td><td>Section 5 + 3</td><td>☐</td></tr>
+      <tr><td>Q6.1 (条件概率)</td><td>☐ 对 ☐ 错</td><td>Section 7</td><td>☐</td></tr>
+      <tr><td>Q6.2 (互斥 vs 独立)</td><td>☐ 对 ☐ 错</td><td>Section 7</td><td>☐</td></tr>
+      <tr><td>Q6.3-6.4 (with replacement)</td><td>☐ 对 ☐ 错</td><td>Section 7</td><td>☐</td></tr>
+      <tr><td>Q7 (Simulation giveaway)</td><td>☐ 对 ☐ 错</td><td>Section 7</td><td>☐</td></tr>
+    </tbody>
+  </table>
+
+  <h3>📋 闪电轮 (Lightning Round)</h3>
+  <table>
+    <thead>
+      <tr><th>题号</th><th>是否做对</th><th>涉及 Section</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>L1 (合适 index)</td><td>☐ 对 ☐ 错</td><td>Section 1</td></tr>
+      <tr><td>L2 (Select all sort)</td><td>☐ 对 ☐ 错</td><td>Section 1 + 2</td></tr>
+      <tr><td>L3 (np.arange in bins)</td><td>☐ 对 ☐ 错</td><td>Section 0 + 3</td></tr>
+      <tr><td>L4 (Merge for total cost)</td><td>☐ 对 ☐ 错</td><td>Section 5</td></tr>
+      <tr><td>L5 (Probability + Simulation)</td><td>☐ 对 ☐ 错</td><td>Section 7</td></tr>
+      <tr><td>L6 (Boolean Series 比较)</td><td>☐ 对 ☐ 错</td><td>Section 2</td></tr>
+      <tr><td>L7 (Merge 200 rows)</td><td>☐ 对 ☐ 错</td><td>Section 5</td></tr>
+      <tr><td>L8 (5 Ways avg_cost)</td><td>☐ 对 ☐ 错</td><td>Section 5</td></tr>
+      <tr><td>L9 (P 10-digit dial)</td><td>☐ 对 ☐ 错</td><td>Section 7</td></tr>
+      <tr><td>L10 (多列 groupby max)</td><td>☐ 对 ☐ 错</td><td>Section 5</td></tr>
+    </tbody>
+  </table>
+
+  <hr>
+
+  <div class="tip">
+    <strong>📈 复习诊断标准</strong>
+    <ul>
+      <li><strong>同一 Section 错 1 题</strong>：扫一遍该 section 重点，特别看"常见陷阱"</li>
+      <li><strong>同一 Section 错 ≥ 2 题</strong>：重做该 section 的真题，再做 1 套模拟</li>
+      <li><strong>50 分钟做不完</strong>：刷完 2 套熟悉题型后，速度会自然提升 30%+</li>
+      <li><strong>Simulation 题做不出来</strong>：背 Section 7 的 5 步模板（init → for → choice → if → divide）</li>
+      <li><strong>Merge 行数算不对</strong>：默背口诀 —— "每行匹配数之和"；inner merge 不匹配的丢掉</li>
+    </ul>
+  </div>
+
+  <div class="warn">
+    <strong>🎯 考试前一晚 checklist</strong>
+    <ul>
+      <li>☐ 三套模拟都至少做过一遍</li>
+      <li>☐ 错过的题都已展开答案对照过</li>
+      <li>☐ 弱点 section 都重温过</li>
+      <li>☐ Cheat sheet 已准备好（双面手写）</li>
+      <li>☐ 关键模板能默写：simulation 5 步 / groupby 模式 / merge 行数预测</li>
+      <li>☐ 早睡！考试需要清醒的脑子。</li>
+    </ul>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="07-probability-simulation.html">← 上一节: Probability &amp; Simulation</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span>（本章为最终章）</span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

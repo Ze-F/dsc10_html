@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 6 · Permutation Testing & A/B Testing - DSC10 Quiz4</title>
+<style>
+  :root { --bg: #fafaf7; --text: #1f2328; --muted: #57606a; --accent: #0969da; --accent-bg: #ddf4ff; --code-bg: #1e1e2e; --code-text: #cdd6f4; --warn-bg: #fff8c5; --warn-border: #d4a72c; --tip-bg: #ddf4ff; --tip-border: #54aeff; --danger-bg: #ffebe9; --danger-border: #cf222e; --ok-bg: #dafbe1; --ok-border: #1a7f37; --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781; --border: #d0d7de; --q-bg: #f6f8fa; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📕 Quiz4 总目录</a></span>
+  <span><a href="05-ci-as-hypothesis-test.html">← 上一节</a> <a href="07-mock-quiz4.html">下一节: Mock Quiz4 →</a></span>
+</nav>
+
+<main>
+  <h1>Section 6 · Permutation Testing &amp; A/B Testing</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 21-22（Permutation Testing） ｜
+    <strong>Quiz 4 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1</span>（每份 Q4/Q5 都直接考） ｜
+    <strong>预计学习时间</strong>：2-3 小时（最长的一节）
+  </p>
+
+  <div class="meta">
+    <strong>🎯 本节定位</strong>：这是 Quiz 4 的<strong>大头</strong>。Lec 22 的 permutation test 是<em>两 sample 比较</em>的标准工具，每年至少一道完整代码题（Wi26 Q4 P1-3、Fa24 Q4 P4、Sp24 Q5 P1、Wi25 Q5 P1）。<br>
+    本节要把(1) 概念（什么时候用 permutation，为什么 shuffle 而不是 resample）、(2) 完整代码模板、(3) 高频陷阱（abs vs 不带 abs、shuffle 哪一列、TVD 能否用）全部锁死。
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 真题 &amp; 练习</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>一句话</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Permutation test 的<strong>适用场景</strong></td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>两个 sample，<em>不知道 population</em>，问"它们来自同一分布吗"</td>
+      </tr>
+      <tr>
+        <td>核心机制：<strong>shuffle group labels</strong>（不是 resample）</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td><code>np.random.permutation(col)</code>，without replacement</td>
+      </tr>
+      <tr>
+        <td>Test stat 选择（同 Section 2）</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>difference of means（单边）/ abs diff of means（双边）/ diff of medians，<strong>不能用 TVD</strong></td>
+      </tr>
+      <tr>
+        <td>Shuffle 哪一列？</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>概念上"两个都可以"；<strong>代码结构</strong>通常限制 shuffle 哪个（Wi25 Q5 P1.1）</td>
+      </tr>
+      <tr>
+        <td>Permutation test 标准代码模板</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>permute → assign → groupby → mean → diff → append</td>
+      </tr>
+      <tr>
+        <td>A/B testing = permutation test（本课程语境）</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>题目说 A/B 就是 permutation</td>
+      </tr>
+      <tr>
+        <td>Reject ≠ causation</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>Deflategate 例子，再三强调</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. 为什么需要 permutation test</h3>
+
+  <p>Standard hypothesis test（Lec 19-20）的设定：<em>知道 population 分布</em>，问 "这个 sample 是不是从这个 population 抽的"。</p>
+
+  <p>但很多实际问题不是这样。例子：</p>
+  <ul>
+    <li>Smoking 母亲的婴儿 vs non-smoking 母亲的婴儿，出生重<strong>是否相同</strong>？<br>
+        → 我们有<em>两个 sample</em>，但不知道任何一个的 population 分布</li>
+    <li>Patriots 和 Colts 的 ball pressure drop 是否相同？<br>
+        → 同样：两个 sample，无 population</li>
+    <li>UCSD 旧版 vs 新版 TritonLink 网站，停留时间是否相同？</li>
+  </ul>
+
+  <p>这种"两个 sample，无 population"的场景叫 <strong>two-sample problem</strong> 或 <strong>A/B testing</strong>。Permutation test 就是处理这类问题的标准工具。</p>
+
+  <h3>2. Permutation test 的核心 idea</h3>
+
+  <div class="formula formula-big">
+    Null hypothesis: 两个 sample 来自<strong>同一个</strong> population distribution<br>
+    如果 null 真，那么 group label（A 还是 B）<em>不带任何信息</em>，<br>
+    所以我们可以<strong>把 label 打乱重新分配</strong>，结果应该差不多。
+  </div>
+
+  <p>具体做法：把两组合并成一个 pool，然后随机分回两组（保持原来的两组大小），<strong>重复成千上万次</strong>，得到 test statistic 在 null 下的分布。</p>
+
+  <h3>3. 标准 hypothesis pair（permutation test 模板）</h3>
+
+  <ul>
+    <li><strong>Null</strong>: The two samples come from the same population distribution; the observed difference is due to random chance.</li>
+    <li><strong>Alt (双边)</strong>: The two samples come from different distributions.</li>
+    <li><strong>Alt (单边)</strong>: One group has higher / lower mean (or median, etc.).</li>
+  </ul>
+
+  <h3>4. 完整代码模板（背！）</h3>
+
+  <pre><code># 数据：DataFrame df，一列 'group' (两个 label，如 True/False)，一列 'value' (数值)
+# 目标：测 group 是否影响 value（permutation test）
+
+# Step 1: observed statistic
+group_means = df.groupby('group').mean().get('value')
+observed_diff = group_means.loc['A'] - group_means.loc['B']
+
+# Step 2: 写计算 simulated stat 的函数
+def difference_in_group_means(shuffled_df):
+    means = shuffled_df.groupby('shuffled').mean().get('value')
+    return means.loc['A'] - means.loc['B']
+
+# Step 3: shuffle 循环
+n_repetitions = 5000  # 或 10000
+differences = np.array([])
+
+for i in np.arange(n_repetitions):
+    shuffled_labels = np.random.permutation(df.get('group'))  # ← 关键！
+    shuffled = df.assign(shuffled=shuffled_labels)
+    diff = difference_in_group_means(shuffled)
+    differences = np.append(differences, diff)
+
+# Step 4: p-value（根据 alt 方向）
+# 假设 alt: A's mean > B's mean → 右尾
+p_value = np.count_nonzero(differences &gt;= observed_diff) / n_repetitions</code></pre>
+
+  <h3>5. 三个 <strong>关键代码</strong>陷阱</h3>
+
+  <h4>5.1 用 <code>np.random.permutation</code>，<strong>不</strong>是 <code>df.sample</code></h4>
+
+  <pre><code># ✗ 错误：sample 会改变行顺序，把 value 和 group 的对应破坏了
+df.sample(df.shape[0])
+
+# ✓ 正确：shuffle 一列，保持原 index 不动
+shuffled = np.random.permutation(df.get('group'))
+df.assign(shuffled=shuffled)</code></pre>
+
+  <p>Lec 22 用 5 行 DataFrame 演示这个区别：</p>
+
+  <pre><code>data:
+  x  y
+0 a  1
+1 b  2
+2 c  3
+3 d  4
+4 e  5
+
+# data.sample(5) 打乱整行 → (x, y) 配对不变（错）
+# np.random.permutation(data.get('x')) → 只打乱 x，y 不变（对）</code></pre>
+
+  <h4>5.2 <strong>没</strong> resample with replacement</h4>
+
+  <pre><code># ✗ 这是 bootstrap，不是 permutation
+df.sample(df.shape[0], replace=True)
+
+# ✓ Permutation 是<strong>不放回</strong>的重排
+np.random.permutation(df.get('group'))</code></pre>
+
+  <h4>5.3 <strong>shuffle 完后用 assign 重新挂列</strong></h4>
+
+  <pre><code># 直接对 shuffled 用 groupby 是错的；必须先 assign 回 DataFrame
+shuffled_labels = np.random.permutation(df.get('group'))
+shuffled_df = df.assign(shuffled=shuffled_labels)  # ← 重新挂列
+# 然后才能 groupby('shuffled')</code></pre>
+
+  <h3>6. Shuffle 哪一列？（Wi25 Q5 P1.1）</h3>
+
+  <p>这是 Quiz 4/5 的高频概念题。题目：</p>
+
+  <pre><code>def one_stat():
+    shuffled = np.random.permutation(___(a)___)
+    shuffled_df = tritonlink.assign(shuffled = shuffled)
+    grouped = shuffled_df.groupby(___(b)___).mean().get("minutes")
+    return ___(c)___</code></pre>
+
+  <p>问 "(a) 该填 'version' 还是 'minutes'"？</p>
+
+  <div class="tip">
+    <strong>正确答案</strong>：<em>"We must shuffle 'version' because of the structure of the provided code"</em>。<br>
+    解释：(a) 处填什么<strong>取决于其余代码</strong>。这里：
+    <ul>
+      <li>(b) 必须按"组别"groupby，所以新挂的 'shuffled' 列是组别</li>
+      <li>所以 (a) shuffle 的必须是<strong>组别 'version'</strong>，让新挂的 shuffled 是版本标签</li>
+    </ul>
+    <strong>概念上</strong>：理论上 shuffle 哪一列都行（因为 permutation test 只关心"label 和 value 的配对是否随机"，打乱 label 或 value 等价）。但<strong>给定的代码结构</strong>限制了答案。
+  </div>
+
+  <div class="warn">
+    ⚠️ 干扰选项："只有 numerical column 能 shuffle" / "只有 group label 能 shuffle" —— <strong>错</strong>。两个都能，但具体代码结构决定。
+  </div>
+
+  <h3>7. 经典例 1：Smoking &amp; Birth Weight（Lec 21-22）</h3>
+
+  <ul>
+    <li>1174 个 babies，2 列：<code>'Maternal Smoker'</code>（True/False）、<code>'Birth Weight'</code></li>
+    <li>Null: smokers' babies 和 non-smokers' babies 出生重<em>相同</em>（同一分布）</li>
+    <li>Alt: smokers' babies 平均出生重<em>更轻</em></li>
+    <li>Test stat: <code>non-smokers' mean − smokers' mean</code>（差值；不带 abs）</li>
+    <li>Observed: 9.27 ounces</li>
+  </ul>
+
+  <pre><code>def difference_in_group_means(weights_df):
+    group_means = weights_df.groupby('Shuffled_Labels').mean().get('Birth Weight')
+    return group_means.loc[False] - group_means.loc[True]
+
+# observed
+observed_diff = babies.groupby('Maternal Smoker').mean().get('Birth Weight')
+observed_diff = observed_diff.loc[False] - observed_diff.loc[True]  # 9.27
+
+# permutation 循环
+differences = np.array([])
+for i in np.arange(500):
+    shuffled = np.random.permutation(babies.get('Maternal Smoker'))
+    shuffled_df = babies.assign(Shuffled_Labels=shuffled)
+    differences = np.append(differences,
+                             difference_in_group_means(shuffled_df))
+
+# alt: smokers' 更轻 → non-smokers − smokers 应该大 → 右尾
+p_value = np.count_nonzero(differences &gt;= observed_diff) / 500
+# ≈ 0 → reject</code></pre>
+
+  <p>结论：reject null。但<strong>不能</strong>说 "smoking causes lower birth weight" —— 可能有其他因素（如 smoker 更可能 drink caffeine）。</p>
+
+  <h3>8. 经典例 2：Deflategate（Lec 22）</h3>
+
+  <ul>
+    <li>Patriots 10 个球，Colts 4 个球，每个球记 pressure drop</li>
+    <li>Null: 两队的 pressure drop 来自同一分布</li>
+    <li>Alt: Patriots 的 pressure drop 更大</li>
+    <li>Test stat: <code>mean_Patriots − mean_Colts</code></li>
+    <li>Observed: 0.74 psi</li>
+  </ul>
+
+  <pre><code>def difference_in_mean_pressure_drops(pressures_df):
+    team_means = pressures_df.groupby('Team').mean().get('Shuffled_Drops')
+    return team_means.loc['Patriots'] - team_means.loc['Colts']
+
+# 注意这里 shuffle 的是 PressureDrop（数值列）而不是 Team —— 同样合法
+n_repetitions = 5000
+differences = np.array([])
+for i in np.arange(n_repetitions):
+    shuffled_drops = np.random.permutation(footballs.get('PressureDrop'))
+    shuffled = footballs.assign(Shuffled_Drops=shuffled_drops)
+    differences = np.append(differences,
+                             difference_in_mean_pressure_drops(shuffled))
+
+# alt 单边右尾
+p_value = np.count_nonzero(differences &gt;= 0.74) / 5000
+# ≈ 0.0048 → highly significant，reject null</code></pre>
+
+  <p><strong>注意点</strong>：</p>
+  <ul>
+    <li>Lec 22 此例 shuffle 的是<strong>数值列 PressureDrop</strong>（不是 Team label）—— 同样合法。这印证 "shuffle 哪个都行" 的概念。</li>
+    <li>Reject 之后<strong>不能</strong>推 Patriots 故意 deflate（causation）。NFL 后续的 Wells Report 用物理学 + 其他证据综合判断才有 causation 结论。</li>
+  </ul>
+
+  <h3>9. Test statistic 选择（permutation 专属强化）</h3>
+
+  <table>
+    <thead><tr><th>Alt</th><th>Test statistic</th><th>p-value 方向</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>"A and B come from different distributions"</td>
+        <td>|mean_A − mean_B| 或 (mean_A − mean_B)²</td>
+        <td>右尾 <code>&gt;=</code></td>
+      </tr>
+      <tr>
+        <td>"A's mean &gt; B's mean"</td>
+        <td>mean_A − mean_B（不带 abs）</td>
+        <td>右尾 <code>&gt;=</code></td>
+      </tr>
+      <tr>
+        <td>"A's mean &lt; B's mean"</td>
+        <td>mean_A − mean_B（不带 abs）</td>
+        <td>左尾 <code>&lt;=</code></td>
+      </tr>
+      <tr>
+        <td>"A and B 中位数不同" (Sp25 Q5 P1)</td>
+        <td>|median_A − median_B|</td>
+        <td>右尾</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="danger">
+    <strong>🔥 Permutation test 不能用 TVD</strong>。TVD 是 categorical 分布距离；permutation test 通常处理 numerical 数据。Lec 21 summary 明确："TVD is not used for permutation tests"。
+  </div>
+
+  <h3>10. A/B testing（Lec 21-22 注释）</h3>
+
+  <div class="formula">
+    A/B test ≈ Hypothesis test 用 permutation 方法测两个 sample
+  </div>
+
+  <p>Lec 21 原话："Permutation tests are <em>one way to perform A/B tests</em>. For us, they mean the same thing."</p>
+
+  <p class="meta">📌 考试看到 "A/B test" 就当 permutation test 来做即可。</p>
+
+  <h3>11. Permutation test 结论 ≠ Causation（必背）</h3>
+
+  <ul>
+    <li>Reject null → two samples 看起来不来自同一分布</li>
+    <li>但<strong>没</strong>证明<em>谁导致了谁</em>（confounders 可能存在）</li>
+    <li>Smoking & birth weight：reject 后只能说"相关"，不能说"smoking causes"</li>
+    <li>Deflategate：reject 后只能说"压力降幅不同"，不能直接说"Patriots intentionally deflated"</li>
+  </ul>
+
+  <p>这是 Quiz 4 的<strong>哲学性陷阱</strong>，选项里如果含 "causes" 通常错。</p>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <h3>陷阱 1：⭐ Permutation vs Bootstrap 混淆</h3>
+  <table>
+    <thead><tr><th></th><th>Permutation</th><th>Bootstrap</th></tr></thead>
+    <tbody>
+      <tr><td>用什么</td><td><code>np.random.permutation</code></td><td><code>df.sample(n, replace=True)</code></td></tr>
+      <tr><td>放回？</td><td><strong>不放回</strong>（shuffle）</td><td><strong>放回</strong></td></tr>
+      <tr><td>用途</td><td>两 sample hypothesis test</td><td>单 sample CI</td></tr>
+    </tbody>
+  </table>
+
+  <h3>陷阱 2：⭐ 用 TVD 做 permutation test</h3>
+  <p>题目里 smoking & birth weight、bike prices、pressure drops 都是数值变量，<strong>不能</strong>用 TVD。<br>
+  Wi26 Q4 P2.2 选项 "The total variation distance between two graders' score distributions" —— <strong>错</strong>（score 是数值，不是 categorical）。</p>
+
+  <h3>陷阱 3：⭐ Test stat 方向反</h3>
+  <p>Wi26 Q4 P2.2 重磅陷阱：alt 是 "Jeffrey 比 Kate 严"（Jeffrey 的 mean 小）。<br>
+  ✓ Valid：<code>Kate's mean − Jeffrey's mean</code>（这样大 → Jeffrey 严 → 偏 alt，看右尾）<br>
+  ✓ Valid：<code>Jeffrey's mean − Kate's mean</code>（小/负 → Jeffrey 严 → 偏 alt，看左尾）<br>
+  ✗ <strong>不</strong> valid：<code>|...|</code>（abs 后无法区分谁严）<br>
+  ✗ <strong>不</strong> valid：TVD（数值）</p>
+
+  <h3>陷阱 4：⭐ Permutation 不能从中推 causation</h3>
+  <p>"Reject null → smoking causes lower birth weight" —— <strong>错</strong>。Reject 只说明相关，不说 causation。</p>
+
+  <h3>陷阱 5：⭐ shuffle 完忘记 assign</h3>
+  <p><code>np.random.permutation(...)</code> 返回 array，要 <code>df.assign(...)</code> 才能用 groupby。</p>
+
+  <h3>陷阱 6：⭐ 用 <code>df.sample</code> 当 permutation</h3>
+  <p><code>df.sample(df.shape[0])</code> 整体打乱所有列的<em>行</em>，但同一行内各列仍配对 —— <strong>不破坏 group-value 配对</strong>，达不到 permutation 效果。必须 <code>np.random.permutation</code> 单独 shuffle 一列。</p>
+
+  <h3>陷阱 7：⭐ 把 "两个 sample 比较" 用 simulate under null（Lec 19 风格）</h3>
+  <p>Wi26 Q4 P1 干扰选项 "Under the null, simulate by resampling with replacement from the combined 50 scores" —— <strong>错</strong>。这是 bootstrap 风格，不是 permutation。Permutation 必须 shuffle，without replacement。</p>
+
+  <h3>陷阱 8：⭐ 把已知 "categorical proportion match" 当 permutation</h3>
+  <p>"测试 bikes 类型分布是否符合 [15%, 20%, 40%, 20%, 5%]" —— 这是 <em>standard hypothesis test with TVD</em>（已知 population），<strong>不是</strong> permutation test。</p>
+
+  <h3>陷阱 9：observed_diff 方向和 simulated 不一致</h3>
+  <p>定义 <code>diff = mean_A − mean_B</code>，observed_diff 也得用同样方向。如果 observed 是 <code>mean_B − mean_A</code>，比较时方向就反了。</p>
+
+  <h3>陷阱 10：<code>groupby</code> 后 <code>.loc[True/False]</code> 大小写</h3>
+  <p>Group label 是 boolean 时用 <code>.loc[True]</code> 和 <code>.loc[False]</code>（Python 关键字，<em>不带引号</em>）。是字符串时用 <code>.loc['Patriots']</code> 等（带引号）。混了会 KeyError。</p>
+
+  <h2 id="problems">📝 真题 &amp; 练习</h2>
+
+  <h3>真题 1：Wi26 Q4 P1 ⭐⭐⭐（为什么用 permutation）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 4, Problem 1 (Lec 20)</div>
+    <p>Detective Peter 有 Jeffrey 和 Kate 各自的 score sample，无 population。要测两位 grader 是否一致。哪个选项最佳解释 (a) 为什么用 permutation test，(b) 怎么做？</p>
+    <ol type="A">
+      <li>两个 sample，要测是否同分布。Under null，shuffle group labels，因为如果分布相同，labels 不该有意义。</li>
+      <li>两个 sample，要测是否同分布。Under null，resample with replacement from combined 50 scores 形成两组。</li>
+      <li>比较 Jeffrey 的 scores 和已知的 Quiz 3 population distribution。Under null，shuffle scores 重算 test stat。</li>
+      <li>Shuffle grader labels 生成两个 random sample，估计 sampling distribution。</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：A</strong>。</p>
+      <ul>
+        <li>A 对：permutation = shuffle labels（不放回），符合 null "labels 无意义"</li>
+        <li>B 错：那是 bootstrap，不是 permutation</li>
+        <li>C 错：没有 known population</li>
+        <li>D 错：sampling distribution 是 bootstrap 的概念，跟 permutation 不同</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>真题 2：Wi26 Q4 P2.1 P2.2 ⭐⭐⭐（null/alt 配对 + test stat 选择）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 4, Problem 2.1 + 2.2 (Lec 20)</div>
+    <p>怀疑 Jeffrey 比 Kate 严（mean 更低）。</p>
+    <p><strong>2.1 选 null/alt 配对：</strong></p>
+    <ol type="A">
+      <li>Null: Jeffrey 和 Kate 的 scores 来自同一分布。Alt: Jeffrey 的 scores 来自 mean 更小的分布。</li>
+      <li>Null: Jeffrey 的 scores 来自 mean=70 的 population。Alt: 不是 70。</li>
+      <li>Null: 同分布。Alt: Jeffrey 的 distribution 完全在 Kate 之下。</li>
+      <li>Null: Jeffrey 的 mean = Kate 的 mean。Alt: ≠。</li>
+    </ol>
+    <p><strong>2.2 哪些 test stat 能直接从 empirical distribution 算 p-value？多选：</strong></p>
+    <ol type="A">
+      <li>Kate's mean − Jeffrey's mean</li>
+      <li>Jeffrey's mean − Kate's mean</li>
+      <li>|两组 mean 的差|</li>
+      <li>两组 score distribution 的 TVD</li>
+      <li>None of the above</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>2.1：A</strong></p>
+      <ul>
+        <li>A 对：标准 permutation 配对，alt 单边（Jeffrey mean 更小）</li>
+        <li>B 错：B 是用 known population 测，跟题意（两 sample 比较）不符</li>
+        <li>C 错："distribution 完全在 Kate 之下" 过强</li>
+        <li>D 错：(D 在 Wi26 实际是 valid 但不是<em>最佳</em>) —— Wi26 P2.1 标准答案是 A</li>
+      </ul>
+      <p><strong>2.2：A 和 B</strong></p>
+      <ul>
+        <li>A ✓：Kate − Jeffrey 大 → Jeffrey 严 → 右尾 p-value</li>
+        <li>B ✓：Jeffrey − Kate 小（负）→ Jeffrey 严 → 左尾 p-value</li>
+        <li>C ✗：abs 后单边 alt 无法区分方向</li>
+        <li>D ✗：TVD 用于 categorical，score 是数值</li>
+        <li>E ✗</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>真题 3：Wi26 Q4 P3 ⭐⭐⭐（p-value 代码 fill in）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 4, Problem 3 (Lec 21)</div>
+    <p>Ray 用如下代码算 observed_stat（注意 Ray 自创的 test stat 写法）：</p>
+    <pre><code>observed_stat = (abs(grading[grading.get('grader') == 'Kate']
+                  .get('score').mean())
+                 - abs(grading[grading.get('grader') == 'Jeffrey']
+                  .get('score').mean()))
+
+p_value = (simulated_stats ___(a)___ observed_stat).sum() / ___(b)___</code></pre>
+    <p>填 (a) 和 (b)。Test alt: Jeffrey 比 Kate 严。</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p>Test stat：abs(Kate's mean) − abs(Jeffrey's mean)。注意 score 都是正数 → <code>abs(...)</code> 不改变值，等价于 Kate's mean − Jeffrey's mean。</p>
+      <ul>
+        <li>Jeffrey 严 → Jeffrey's mean 更小 → Kate − Jeffrey 更大 → 右尾</li>
+        <li>(a) <code>&gt;=</code></li>
+        <li>(b) <code>10000</code>（permutation 次数）</li>
+      </ul>
+      <p>所以：<code>p_value = (simulated_stats &gt;= observed_stat).sum() / 10000</code></p>
+      <p class="warn">⚠️ <code>.sum()</code> 在 boolean array 上等价于 <code>np.count_nonzero(...)</code>。两者都对。</p>
+    </details>
+  </div>
+
+  <h3>真题 4：Fa24 Q4 P4 ⭐⭐⭐（permutation 完整代码 fill）</h3>
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 4, Problem 4 (Lec 22)</div>
+    <p>Action vs Horror movies 的 rating mean 是否不同。Test stat: mean_Action − mean_Horror。</p>
+    <pre><code>def one_stat(df):
+    group_means = df.groupby("New").mean().get("Rating")
+    return group_means.loc[___(a)___] - group_means.loc[___(b)___]
+
+action_horror = movies[(movies.get("Genre") == "Action") |
+                       (movies.get("Genre") == "Horror")]
+diffs = np.array([])
+for i in np.arange(5000):
+    new_df = action_horror.assign(New = ___(c)___)
+    diffs = np.append(diffs, ___(d)___)
+
+p_value = np.count_nonzero(___(e)___) / 5000</code></pre>
+    <p>P4.2: p = 0.14，alt 哪个更被支持？P4.3: 这是 standard test 还是 permutation test？</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>P4.1 fill:</strong></p>
+      <ul>
+        <li>(a) <code>"Action"</code></li>
+        <li>(b) <code>"Horror"</code></li>
+        <li>(c) <code>np.random.permutation(action_horror.get("Genre"))</code></li>
+        <li>(d) <code>one_stat(new_df)</code></li>
+        <li>(e) <code>diffs &gt;= observed</code>（alt: Action mean &gt; Horror mean，右尾）</li>
+      </ul>
+      <p><strong>P4.2 答案：Null</strong>。p = 0.14 &gt; 0.05 → fail to reject → null 更被支持。</p>
+      <p><strong>P4.3 答案：Permutation test</strong>（两 sample 比较，shuffle labels）。</p>
+    </details>
+  </div>
+
+  <h3>真题 5：Sp24 Q5 P1 ⭐⭐⭐（bike permutation 完整）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Quiz 5, Problem 1 (Lec 22)</div>
+    <p>Road vs hybrid bike price 是否不同。Test stat: mean_road − mean_hybrid。Alt: hybrid 更贵（即 road − hybrid 应该<strong>小或负</strong>）。</p>
+    <pre><code>def find_diff(df):
+    group_means = df.groupby("shuffled").mean().get("price")
+    return group_means.loc["road"] - group_means.loc["hybrid"]
+
+some_bikes = ___(x)___
+diffs = np.array([])
+for i in np.arange(10000):
+    shuffled_df = some_bikes.assign(shuffled = ___(y)___)
+    diffs = np.append(diffs, find_diff(shuffled_df))</code></pre>
+    <p>(1.1) 填 (x) 和 (y)。(1.2) 大的 observed stat 偏哪个 hypothesis？(1.3) p = 0.04，结论？</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(1.1)</strong></p>
+      <ul>
+        <li>(x) <code>bikes[(bikes.get("style") == "road") | (bikes.get("style") == "hybrid")]</code></li>
+        <li>(y) <code>np.random.permutation(some_bikes.get("style"))</code></li>
+      </ul>
+      <p><strong>(1.2) Null</strong>。Test stat = road − hybrid。Alt 说 hybrid &gt; road，即 stat 应该<em>负</em>或<em>小</em>。所以<strong>大的</strong> observed → 偏 null。</p>
+      <p><strong>(1.3)</strong> p = 0.04 → <strong>fail to reject at 0.01，reject at 0.05</strong>（多选）。</p>
+      <p class="warn">⚠️ (1.2) 是关键陷阱：要看 alt 方向，决定 stat 的"大"偏哪边。</p>
+    </details>
+  </div>
+
+  <h3>真题 6：Wi25 Q4 P2.2 ⭐⭐（permutation 适用 T/F）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 4, Problem 2.2 (Lec 22)</div>
+    <p>研究 fertilizer 是否影响花高度。能否用 permutation test？T/F</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：True</strong>。两个 sample（treated vs untreated）+ 数值 outcome（高度）+ 不知道 population → permutation test 是首选工具。</p>
+    </details>
+  </div>
+
+  <h3>真题 7：Sp25 Q5 P1 ⭐⭐⭐（permutation 用 |diff of medians|）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Quiz 5, Problem 1 (Lec 22)</div>
+    <p>测 Bach 和 Mozart 的 polyphony 分布是否不同。Test stat: <strong>absolute difference of medians</strong>。</p>
+    <pre><code>total = 0
+for i in np.arange(5000):
+    shuffled_composer = np.random.permutation(___(a)___)
+    shuffled_df = music.assign(shuff=shuffled_composer)
+    poly = shuffled_df.groupby(___(b)___).___(c)___.get("polyphony")
+    stat = ___(d)___
+    if stat ___(e)___ observed:
+        ___(f)___
+p_value = total / 5000</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <ul>
+        <li>(a) <code>music.get("composer")</code></li>
+        <li>(b) <code>"shuff"</code>（shuffle 后的列名）</li>
+        <li>(c) <code>median()</code>（test stat 用 median）</li>
+        <li>(d) <code>abs(poly.loc["Bach"] - poly.loc["Mozart"])</code></li>
+        <li>(e) <code>&gt;=</code>（abs 双边右尾）</li>
+        <li>(f) <code>total = total + 1</code></li>
+      </ul>
+      <p>另外：P1.2 观察 Bach 偏右偏分布 (mode ≈ 1)，Mozart 接近正态 (mean ≈ 2.7)。median 差约 1 → 选最接近 1 的答案。</p>
+      <p>P1.3 如果改用 absolute difference of <em>means</em>：Bach 偏右偏导致 mean 比 median 大不少；具体可能<strong>大</strong>或差不多，没固定答案 —— 实际课上答案是 "bigger"。</p>
+    </details>
+  </div>
+
+  <h3>练习 8：Permutation vs Bootstrap vs Standard Test 判别</h3>
+  <div class="q-block">
+    <div class="q-source">综合判别</div>
+    <p>下面每个场景，选合适的方法（permutation / bootstrap CI / standard test with TVD / standard test with custom stat / sample size formula）：</p>
+    <ol>
+      <li>估计 UCSD 学生 sleep 时间的 95% CI</li>
+      <li>测 UCSD 男生女生平均身高是否相同</li>
+      <li>测一枚硬币是否公平</li>
+      <li>测 bike 类型是否符合预期 [15%, 20%, 40%, 20%, 5%]</li>
+      <li>预先计算 polling 的 sample size</li>
+      <li>测 Patriots 和 Colts 的 pressure drop 是否一样</li>
+      <li>用已有 sample 检测 mean 是否 = 98.6</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <ol>
+        <li><strong>Bootstrap CI</strong>（或 CLT CI for mean）</li>
+        <li><strong>Permutation test</strong>（两 sample 比较）</li>
+        <li><strong>Standard hypothesis test</strong>（已知 null distribution P=0.5）</li>
+        <li><strong>Standard test with TVD</strong>（categorical 比较）</li>
+        <li><strong>Sample size formula</strong> n ≥ (4·SD/w)²</li>
+        <li><strong>Permutation test</strong>（两 sample）</li>
+        <li><strong>CI as hypothesis test</strong>（CI 法）或 standard test with custom stat（差值绝对值）</li>
+      </ol>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>说清楚 permutation test 的适用场景（两 sample、无 population）</span></label>
+    <label><input type="checkbox"><span>解释 null hypothesis 的标准措辞（"same distribution"）</span></label>
+    <label><input type="checkbox"><span>讲清 permutation test 和 bootstrap 的核心区别（shuffle vs resample）</span></label>
+    <label><input type="checkbox"><span>口头写出 permutation 标准代码模板（permute → assign → groupby → mean → diff → append）</span></label>
+    <label><input type="checkbox"><span>解释为什么 <code>df.sample(n)</code> 不是 permutation</span></label>
+    <label><input type="checkbox"><span>记住 test stat 选择：单边不带 abs；双边带 abs；<strong>不能用 TVD</strong></span></label>
+    <label><input type="checkbox"><span>讲清"shuffle 哪一列都行"的概念 + 但代码结构决定具体填哪一个</span></label>
+    <label><input type="checkbox"><span>口述 Smoking & Birth Weight 例子完整流程</span></label>
+    <label><input type="checkbox"><span>口述 Deflategate 例子完整流程 + 为什么 reject ≠ "intentionally deflate"</span></label>
+    <label><input type="checkbox"><span>"A/B test 在本课程 = permutation test"</span></label>
+    <label><input type="checkbox"><span>不看答案做 Wi26 Q4 P1, P2.1, P2.2, P3（每年高频）</span></label>
+    <label><input type="checkbox"><span>不看答案做 Fa24 Q4 P4 完整代码 fill-in</span></label>
+    <label><input type="checkbox"><span>不看答案做 Sp24 Q5 P1（注意 1.2 看 stat 方向）</span></label>
+    <label><input type="checkbox"><span>不看答案做 Sp25 Q5 P1（test stat = abs diff of medians）</span></label>
+    <label><input type="checkbox"><span>能列出 4-5 个"reject 后<strong>不能</strong>说 causation"的考试陷阱</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="05-ci-as-hypothesis-test.html">← 上一节</a></span>
+  <span><a href="index.html">📕 返回目录</a></span>
+  <span><a href="07-mock-quiz4.html">下一节: Mock Quiz4 →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

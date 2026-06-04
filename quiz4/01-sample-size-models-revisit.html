@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 1 · Sample Size & Models（Quiz 4 视角） - DSC10 Quiz4</title>
+<style>
+  :root {
+    --bg: #fafaf7; --text: #1f2328; --muted: #57606a;
+    --accent: #0969da; --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e; --code-text: #cdd6f4;
+    --warn-bg: #fff8c5; --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff; --tip-border: #54aeff;
+    --danger-bg: #ffebe9; --danger-border: #cf222e;
+    --ok-bg: #dafbe1; --ok-border: #1a7f37;
+    --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781;
+    --border: #d0d7de; --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📕 Quiz4 总目录</a></span>
+  <span><a href="02-hypothesis-testing-fundamentals.html">下一节: Hypothesis Testing 基础 →</a></span>
+</nav>
+
+<main>
+  <h1>Section 1 · Sample Size &amp; Statistical Models（Quiz 4 视角）</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 18（Choosing Sample Sizes, Statistical Models）｜
+    <strong>Quiz 4 出现率</strong>：<span class="tier tier-2">⭐⭐ Tier 2</span>（Wi26 Q4 P4 直接考 sample size；其余作为 hypothesis testing 引子）｜
+    <strong>预计学习时间</strong>：1-1.5 小时
+  </p>
+
+  <div class="meta">
+    <strong>🌉 这一节的特殊定位</strong>：Lec 18 在 Quiz 3 模块里被作为<em>样本量公式 + 模拟</em>讲过。这次是从 <strong>Quiz 4 视角</strong>重新过一遍 ——
+    <ul>
+      <li>(1) <strong>sample size 公式</strong>仍然会考（Wi26 Q4 P4 原题，width → 4x），必须秒杀；</li>
+      <li>(2) <strong>statistical models</strong>和 Swain jury simulation 是 Lec 19 hypothesis testing 的<em>同一个故事</em> —— 这里的"model"在下节就变成"null hypothesis"；</li>
+      <li>(3) <strong><code>np.random.multinomial</code></strong> 是后续所有 hypothesis testing simulation 的核心工具，必须熟到见到就会写。</li>
+    </ul>
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 真题 &amp; 练习</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <table>
+    <thead>
+      <tr><th>考点</th><th>Tier</th><th>一句话</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Sample size 公式 <code>n ≥ (4·SD/w)²</code></td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>给定 95% CI 期望最大宽度 w，反推最小 sample size；<strong>halving w → 4× n</strong>（Wi26 Q4 P4 原题）</td>
+      </tr>
+      <tr>
+        <td>0/1 数据 SD 上界 = 0.5</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>polling proportion 时 sample SD 未知 → 用 0.5 兜底，公式简化为 <code>n ≥ (2/w)²</code></td>
+      </tr>
+      <tr>
+        <td><code>np.random.multinomial(n, [p1, p2, ...])</code></td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>返回 <strong>counts</strong> array（不是 proportion），with replacement；后续 hypothesis testing 模拟必备</td>
+      </tr>
+      <tr>
+        <td>Statistical model 概念</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>"a set of assumptions about how data was generated"；下一节 null hypothesis 就是一种 model</td>
+      </tr>
+      <tr>
+        <td>Swain v. Alabama jury 模拟流程</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>"假设 model 为真 → 模拟 → 看观测值是否罕见"；这就是 hypothesis testing 的雏形</td>
+      </tr>
+      <tr>
+        <td>区分 <code>choice</code> / <code>multinomial</code> / <code>permutation</code></td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>用错就直接扣分；后续每一节都会涉及</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. Recap：95% CLT-based CI &amp; 宽度公式</h3>
+
+  <p>来自 Quiz 3 模块（Lec 17）的核心公式 —— 这是<strong>样本量推导的起点</strong>：</p>
+
+  <div class="formula formula-big">
+    95% CI for population mean<br>
+    = [ sample_mean − 2·SD/√n ,&nbsp;&nbsp;sample_mean + 2·SD/√n ]
+  </div>
+
+  <p>所以这条 CI 的<strong>宽度</strong>（右端 − 左端）是：</p>
+
+  <div class="formula formula-big">
+    width = 4 · SD / √n
+  </div>
+
+  <p class="meta">📌 注意是 <strong>4</strong>·SD/√n（来自 2·SD/√n 的左右两个 ± 加起来），不是 2·SD/√n。考试时常把这俩混了。</p>
+
+  <h3>2. 反推 sample size：从 width 解 n</h3>
+
+  <p>问题："我想要 95% CI 宽度不超过 w，最少要采集多少 sample？"</p>
+
+  <p>从 <code>width = 4·SD/√n ≤ w</code> 解不等式：</p>
+
+  <pre><code>      4·SD/√n  ≤  w
+  ⇔  √n  ≥  4·SD/w
+  ⇔  n   ≥  (4·SD/w)²</code></pre>
+
+  <div class="formula formula-big">
+    n ≥ (4 · SD / w)²
+  </div>
+
+  <p>实际取<strong>满足该不等式的最小整数</strong>（向上取整）。</p>
+
+  <h4>🧮 4× 关系（Wi26 Q4 P4 高频考点）</h4>
+
+  <p>因为公式里 w 出现在<strong>分母平方</strong>里，所以：</p>
+
+  <div class="tip">
+    <strong>把 CI 宽度变成原来的一半</strong>（精度提高 2 倍）<br>
+    → <strong>sample size 变成原来的 4 倍</strong>（不是 2 倍！）<br><br>
+    一般地：宽度变成原来的 <em>1/k</em>，sample size 变成原来的 <em>k²</em> 倍。
+  </div>
+
+  <p>直观理解：CLT 告诉我们 <code>SE = SD/√n</code>，所以"精度"和 √n 成正比 —— 想精度翻倍，得 n 翻 4 倍。</p>
+
+  <h3>3. 当 sample SD 未知怎么办：找 SD 的上界</h3>
+
+  <p>问题：还没采集 sample，怎么知道 sample SD？</p>
+  <p>答：找一个<strong>upper bound</strong>，用它代入。这样能保证 CI 宽度不会超过目标 w。</p>
+
+  <h4>3.1 一般情况</h4>
+
+  <p>如果对数据本身一无所知，无法找 SD 上界 —— 这种情况公式用不了，得先做 pilot study 估一个 SD。</p>
+
+  <h4>3.2 ⭐ 关键特例：0/1 数据（proportions are means）</h4>
+
+  <p>当数据只有 <strong>0 和 1</strong>（例如 polling：1 = 用 Duolingo，0 = 不用）时：</p>
+
+  <ul>
+    <li><strong>proportion of 1s = mean of the sample</strong>（把 0/1 平均一下就是 1 占的比例）</li>
+    <li>对 0/1 collection，SD 公式简化为：</li>
+  </ul>
+
+  <div class="formula">
+    SD of collection of 0s and 1s = √(prop_of_0s · prop_of_1s) = √(p · (1−p))
+  </div>
+
+  <p>这个表达式在 p = 0.5 时取最大值：</p>
+
+  <div class="formula formula-big">
+    max SD of 0/1 collection = √(0.5 · 0.5) = 0.5
+  </div>
+
+  <p>所以对 polling proportion，我们<strong>总能</strong>用 SD = 0.5 作为兜底：</p>
+
+  <div class="formula formula-big">
+    n ≥ (4 · 0.5 / w)² = (2 / w)²
+  </div>
+
+  <p>这是 polling 类问题的<strong>速算公式</strong>。背下来：<code>n ≥ (2/w)²</code>。</p>
+
+  <h4>3.3 三组速算（背在小本本上）</h4>
+
+  <table>
+    <thead><tr><th>目标 CI 宽度 w</th><th>n ≥ (2/w)²</th><th>最小 n（向上取整）</th></tr></thead>
+    <tbody>
+      <tr><td>0.10</td><td>(20)² = 400</td><td><strong>400</strong></td></tr>
+      <tr><td>0.06</td><td>(33.33)² ≈ 1111.11</td><td><strong>1112</strong>（Lec 18 Duolingo 例子）</td></tr>
+      <tr><td>0.04</td><td>(50)² = 2500</td><td><strong>2500</strong></td></tr>
+      <tr><td>0.03</td><td>(66.67)² ≈ 4444.44</td><td><strong>4445</strong></td></tr>
+      <tr><td>0.02</td><td>(100)² = 10000</td><td><strong>10000</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>4. <code>np.random.multinomial</code> —— Quiz 4 的核心武器</h3>
+
+  <div class="warn">
+    ⚠️ <strong>这个函数会在后续每一节出现</strong>：jury panel 模拟、hypothesis testing simulation 都靠它。务必掌握。
+  </div>
+
+  <h4>4.1 签名 &amp; 行为</h4>
+
+  <pre><code>np.random.multinomial(sample_size, pop_distribution)</code></pre>
+
+  <ul>
+    <li><code>sample_size</code>：要抽几个样本</li>
+    <li><code>pop_distribution</code>：每个 category 的概率（数组），<strong>必须近似和为 1</strong></li>
+    <li>返回：长度等于 category 数的 <strong>counts</strong> array（不是 proportion！）</li>
+    <li><strong>with replacement</strong>（每次抽都独立，不放回也叫"放回采样"）</li>
+  </ul>
+
+  <h4>4.2 例子：万圣节糖果（Lec 18 原例）</h4>
+
+  <p>35 户人家，每家糖盒：30% Starbursts、30% Sour Patch Kids、40% Twix。每家抓一颗。</p>
+
+  <pre><code>np.random.multinomial(35, [0.3, 0.3, 0.4])
+# 可能输出：array([ 8, 14, 13])
+#                  ↑   ↑   ↑
+#         Starbursts  SPK  Twix</code></pre>
+
+  <p>每次运行结果都不同（随机），但加起来一定 = 35。</p>
+
+  <h4>4.3 例子：Swain jury panel</h4>
+
+  <p>人口 26% Black，74% non-Black，panel 100 人：</p>
+
+  <pre><code>demographics = [0.26, 0.74]
+np.random.multinomial(100, demographics)
+# 可能输出：array([28, 72])
+# 第 0 个 = Black 人数；第 1 个 = non-Black 人数
+
+# 只要 Black 人数：
+np.random.multinomial(100, demographics)[0]
+# 28</code></pre>
+
+  <h4>4.4 模拟 N 次 jury panel：标准模板</h4>
+
+  <pre><code>counts = np.array([])
+for i in np.arange(10000):
+    new_count = np.random.multinomial(100, demographics)[0]
+    counts = np.append(counts, new_count)
+
+# 现在 counts 是 10000 次模拟下的 Black 人数 array
+counts.min()  # 比如 11 → 说明历史最少都有 11 人，8 极罕见</code></pre>
+
+  <p class="tip">📌 这就是 hypothesis testing 的<strong>骨架代码</strong>。下一节我们把"Black 人数"换成"test statistic"，就完全是一样的循环。</p>
+
+  <h4>4.5 想要 proportion 而非 count：除以 sample_size</h4>
+
+  <pre><code># Counts
+np.random.multinomial(1453, eligible)
+# array([222, 244, 165, 798, 24])
+
+# Proportions（除以 sample size）
+np.random.multinomial(1453, eligible) / 1453
+# array([0.153, 0.168, 0.114, 0.549, 0.017])</code></pre>
+
+  <h3>5. Statistical Models —— Quiz 4 的概念引子</h3>
+
+  <p>从这里开始，Lec 18 进入 Quiz 4 的核心思维。</p>
+
+  <h4>5.1 Statistical inference 的两类问题</h4>
+
+  <table>
+    <thead><tr><th>类型</th><th>例子</th><th>对应技术</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Parameter estimation</strong>（参数估计）</td>
+        <td>"美国成年人平均身高是多少？"</td>
+        <td>bootstrap CI / CLT CI（Quiz 3 范围）</td>
+      </tr>
+      <tr>
+        <td><strong>Yes/no questions</strong>（是非题）</td>
+        <td>"这个 jury panel 是从这个 population 随机抽的吗？"<br>"这枚硬币公平吗？"</td>
+        <td><strong>Hypothesis testing</strong>（Quiz 4 范围！）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>5.2 "Model" 的定义</h4>
+
+  <div class="formula formula-big">
+    A model is a set of assumptions about how data was generated.
+  </div>
+
+  <p>例子：</p>
+  <ul>
+    <li>"This jury panel was randomly drawn from a population that is 26% Black."</li>
+    <li>"This coin lands heads with probability 0.5 each flip, independently."</li>
+    <li>"Section C 的成绩是从全班分数分布中随机抽 108 个得到的。"</li>
+  </ul>
+
+  <p>注意 model 必须是<strong>可以拿来模拟的</strong>（well-defined probability model）—— 否则没法跑 simulation。这一点在下一节会变成 null hypothesis 的硬性要求。</p>
+
+  <h4>5.3 评估 model 的标准套路（Lec 18 → Lec 19 桥梁）</h4>
+
+  <ol>
+    <li>假设 model 为真</li>
+    <li>在这个假设下，反复 simulate 生成 statistic 的 empirical distribution</li>
+    <li>看 observed statistic 落在哪 —— 如果非常罕见，说明 model 可能不对</li>
+  </ol>
+
+  <p class="tip">💡 <strong>记住这个流程</strong>：Lec 19 起的 hypothesis testing 就是把它<em>形式化</em> —— "model"变成"null hypothesis"，"罕见程度"用"p-value"量化。</p>
+
+  <h3>6. 完整跑一遍：Swain v. Alabama jury panel</h3>
+
+  <p>这是 Lec 18 的高潮，也是 Lec 19 的开场。完整背下来。</p>
+
+  <h4>背景</h4>
+  <ul>
+    <li>1965 年 Talladega County, Alabama</li>
+    <li>合格陪审员人口：men 21+，其中 <strong>26%</strong> 是 Black</li>
+    <li>Robert Swain 的 jury panel 100 人，<strong>只有 8 人</strong>是 Black</li>
+    <li>问题：jury panel 真的是 random 抽的吗？</li>
+  </ul>
+
+  <h4>三要素</h4>
+  <table>
+    <tbody>
+      <tr><td><strong>Model</strong></td><td>Jury panel 是从 26% Black 的人口中随机抽 100 人</td></tr>
+      <tr><td><strong>Observation</strong></td><td>实际 panel 100 人里只有 8 个 Black</td></tr>
+      <tr><td><strong>Statistic</strong></td><td>panel 里 Black 人数</td></tr>
+      <tr><td><strong>Question</strong></td><td>Model 能解释这个 observation 吗？</td></tr>
+    </tbody>
+  </table>
+
+  <h4>三步模拟</h4>
+
+  <pre><code># Step 1：一次实验生成一个 statistic
+demographics = [0.26, 0.74]
+np.random.multinomial(100, demographics)[0]  # → 比如 26
+
+# Step 2：重复 10000 次
+counts = np.array([])
+for i in np.arange(10000):
+    new_count = np.random.multinomial(100, demographics)[0]
+    counts = np.append(counts, new_count)
+
+# Step 3：看分布、和 observed = 8 比较
+counts.min()  # 比如 11 → 历史最少 11，远大于 8</code></pre>
+
+  <h4>结论</h4>
+  <ul>
+    <li>在 10,000 次随机模拟里，<strong>从未</strong>出现 ≤ 8 个 Black（最小值 11）</li>
+    <li>所以 "random selection" 这个 model 极难解释 observation</li>
+    <li>结论：jury panel <strong>很可能不是 random</strong>，存在其他因素（种族偏见）</li>
+  </ul>
+
+  <p class="warn">⚠️ 注意：我们<strong>没有证明</strong> bias 存在，只是说 random model 解释不了。可能还有其他模型（虽然这里直觉上 bias 是唯一合理解释）。这种谨慎的措辞会反复在 Quiz 4 出现 —— 永远不要从 reject 推 causation。</p>
+
+  <h3>7. 三个 <code>np.random</code> 函数的<strong>对比表</strong>（高频考点）</h3>
+
+  <table>
+    <thead>
+      <tr><th>函数</th><th>用途</th><th>典型 Quiz 4 场景</th><th>放回？</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>np.random.choice(arr, n)</code></td>
+        <td>从 array 里抽 n 个元素</td>
+        <td>已知所有可能取值的 list（如 ["H","T"]、所有学生）</td>
+        <td>默认放回；<code>replace=False</code> 不放回</td>
+      </tr>
+      <tr>
+        <td><code>np.random.multinomial(n, probs)</code></td>
+        <td>按概率分布抽 n 个，返回 counts</td>
+        <td>已知 population 的<strong>类别比例</strong>，不知道总人数（jury, 民意调查）</td>
+        <td>始终放回</td>
+      </tr>
+      <tr>
+        <td><code>np.random.permutation(arr)</code></td>
+        <td>把 array 重新洗牌</td>
+        <td>Permutation test（Lec 22）shuffle group labels</td>
+        <td>—（不放回的"重排"）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="danger">
+    <strong>🔥 高频考点</strong>：考试给你一个场景，问该用哪个？口诀：
+    <ul>
+      <li>"知道有多少人，每个人具体取值" → <code>choice</code></li>
+      <li>"只知道比例，要按比例抽 n 个" → <code>multinomial</code></li>
+      <li>"已有两个 sample 要打散" → <code>permutation</code></li>
+    </ul>
+  </div>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <h3>陷阱 1：w 是<strong>总宽度</strong>，不是 margin</h3>
+  <div class="danger">
+    <ul>
+      <li>"95% CI 宽度不超过 0.06" → w = 0.06，<strong>不是</strong> 0.03</li>
+      <li>公式 <code>n ≥ (4·SD/w)²</code> 里的 w 就是<strong>右端 − 左端</strong></li>
+      <li>但有时题目说 "margin of error ≤ 0.03"，<strong>那时</strong> w = 2 × 0.03 = 0.06</li>
+    </ul>
+  </div>
+
+  <h3>陷阱 2：sample size 一定向上取整</h3>
+  <p>如果算出 1111.11，答案是 <strong>1112</strong>，不是 1111 也不是 1111.11。因为 1111 不<em>满足</em>不等式。</p>
+
+  <h3>陷阱 3：<code>multinomial</code> 返回 counts，不是 proportion</h3>
+  <pre><code># ✗ 错误：以为返回比例
+sample_dist = np.random.multinomial(100, [0.26, 0.74])  # array([28, 72])
+
+# ✓ 想要 proportion 要除以 sample size
+sample_dist = np.random.multinomial(100, [0.26, 0.74]) / 100  # array([0.28, 0.72])</code></pre>
+
+  <h3>陷阱 4：<code>multinomial</code> 第二个参数必须近似和为 1</h3>
+  <pre><code># ✗ 错误：概率和 ≠ 1
+np.random.multinomial(100, [0.26, 0.50])  # 概率和 = 0.76，结果不可靠
+
+# ✓ 正确
+np.random.multinomial(100, [0.26, 0.74])  # 概率和 = 1.00</code></pre>
+
+  <h3>陷阱 5：用错 np.random 系列函数</h3>
+  <ul>
+    <li>"模拟 400 次抛硬币" → <code>np.random.multinomial(400, [0.5, 0.5])[0]</code>（heads 的次数）<strong>或</strong> <code>np.random.choice(['H','T'], 400)</code> 都行；后者得手动 count</li>
+    <li>"从 1453 个 Alameda County 居民里按比例抽" → <code>multinomial</code>（按比例）</li>
+    <li>"shuffle smoker labels" → <code>permutation</code></li>
+  </ul>
+
+  <h3>陷阱 6：SD = 0.5 只对 0/1 数据</h3>
+  <p>不要对任意 polling 都用 0.5。题目里如果出现连续值（如身高、温度），SD 就不是 0.5 —— 通常会给你 sample SD 或要你假设一个值。</p>
+
+  <h3>陷阱 7：multinomial 是"with replacement"</h3>
+  <p>真实 jury 抽签理论上是 without replacement（同一人不会被抽两次）。但 Lec 18 指出：当 sample 规模相对 population 很小时，with vs without replacement 几乎没差别，所以放心用 <code>multinomial</code>。考试不要为这个纠结。</p>
+
+  <h3>陷阱 8：Model ≠ "事实"</h3>
+  <p>Model 是一个 <strong>假设</strong>。结论"reject model"不等于"证明了反面"。这个谨慎措辞在 Quiz 4 的 hypothesis testing 题里反复考。</p>
+
+  <h2 id="problems">📝 真题 &amp; 练习</h2>
+
+  <h3>真题 1：Wi26 Q4 Problem 4 ⭐⭐⭐（必做）</h3>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 4, Problem 4 (Lec 18)</div>
+    <p>Detective Peter 想估计 Jeffrey 评分中 score 低于 70 的<strong>比例</strong>。他构造 <strong>95% CLT-based confidence interval</strong>。</p>
+    <p><strong>(a)</strong> 他希望 CI <strong>宽度不超过 0.08</strong>，最少需要多少条 Jeffrey 的 submission？</p>
+    <p><strong>(b)</strong> 假如改要宽度不超过 0.04，最少 sample size 是 (a) 的几倍？</p>
+
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>(a)</strong></p>
+      <ul>
+        <li>这是 polling proportion 问题（0/1：score &lt; 70 或不 &lt; 70）→ 用 SD 上界 = 0.5</li>
+        <li>公式：<code>n ≥ (4 · 0.5 / 0.08)² = (2/0.08)² = 25² = 625</code></li>
+        <li><strong>答案：625</strong></li>
+      </ul>
+      <p><strong>(b)</strong></p>
+      <ul>
+        <li>w 从 0.08 → 0.04，<strong>除以 2</strong> → n 变成<strong>原来 4 倍</strong></li>
+        <li>验算：<code>n ≥ (2/0.04)² = 50² = 2500 = 4 × 625 ✓</code></li>
+        <li><strong>答案：4 倍</strong></li>
+      </ul>
+      <p class="tip">💡 这道题就是为本节高频陷阱 1+2 设计的：(1) 总宽度不是 margin；(2) w 减半 → n × 4。两点都得脱口而出。</p>
+    </details>
+  </div>
+
+  <h3>练习 2：Multinomial 输出预测</h3>
+
+  <div class="q-block">
+    <div class="q-source">综合练习</div>
+    <p>下面的代码各返回什么 shape / 含义？写出你的预测。</p>
+    <pre><code>(A) np.random.multinomial(50, [0.4, 0.3, 0.2, 0.1])
+(B) np.random.multinomial(50, [0.4, 0.3, 0.2, 0.1])[0]
+(C) np.random.multinomial(50, [0.4, 0.3, 0.2, 0.1]) / 50
+(D) np.random.multinomial(50, [0.4, 0.3, 0.2, 0.1]).sum()
+(E) np.random.multinomial(1, [0.5, 0.5])</code></pre>
+
+    <details>
+      <summary>显示答案</summary>
+      <ul>
+        <li><strong>(A)</strong>：长度 4 的 array，每个元素是该 category 的 count；和必等于 50。例如 <code>array([19, 17, 9, 5])</code></li>
+        <li><strong>(B)</strong>：第一个 category 的 count（一个 int / numpy 整数）。例如 19</li>
+        <li><strong>(C)</strong>：长度 4 的 array，每个元素是 proportion；和必等于 1。例如 <code>array([0.38, 0.34, 0.18, 0.10])</code></li>
+        <li><strong>(D)</strong>：恒等于 50（counts 总和 = sample size）</li>
+        <li><strong>(E)</strong>：长度 2 的 array，每个 0 或 1，和等于 1。例如 <code>array([0, 1])</code>。这是"抽一次"的模拟，相当于抛一枚 biased coin</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>练习 3：选对 np.random 函数</h3>
+
+  <div class="q-block">
+    <div class="q-source">综合练习</div>
+    <p>下列每个场景，选 <code>np.random.choice</code> / <code>np.random.multinomial</code> / <code>np.random.permutation</code> 之一：</p>
+    <ol>
+      <li>"DataFrame <code>students</code> 有 393 行，要随机抽 108 个作为 Section C 的模拟"</li>
+      <li>"已知 Alameda County 人口中 Asian 15%、Black 18%、Latino 12%、White 54%、Other 1%，要按比例抽 1453 人作为一个模拟 panel"</li>
+      <li>"smoking 数据 1174 行，要 shuffle Maternal Smoker 列以做 permutation test"</li>
+      <li>"模拟抛公平硬币 400 次，得到 heads 数量"</li>
+      <li>"已知一个游戏每局赢的概率 0.3，模拟 100 局看赢几局"</li>
+    </ol>
+
+    <details>
+      <summary>显示答案</summary>
+      <ol>
+        <li><strong><code>df.sample(108, replace=False)</code></strong>（DataFrame 直接 sample）。用 <code>np.random.choice</code> 也可以，但题目说"DataFrame"通常用 <code>.sample</code></li>
+        <li><strong><code>np.random.multinomial(1453, [0.15, 0.18, 0.12, 0.54, 0.01])</code></strong>。已知<em>比例</em>而非具体名单 → multinomial</li>
+        <li><strong><code>np.random.permutation(babies.get('Maternal Smoker'))</code></strong>。shuffle 现有 array → permutation</li>
+        <li><strong><code>np.random.multinomial(400, [0.5, 0.5])[0]</code></strong>。或 <code>np.random.choice(['H','T'], 400)</code> 然后数 H 的个数</li>
+        <li><strong><code>np.random.multinomial(100, [0.3, 0.7])[0]</code></strong>。本质是 binomial，但课程里用 multinomial</li>
+      </ol>
+    </details>
+  </div>
+
+  <h3>练习 4：完整跑一遍 jury 模拟</h3>
+
+  <div class="q-block">
+    <div class="q-source">基于 Lec 18 原例 / Lec 19 起点</div>
+    <p>Robert Swain 案：合格人口 26% Black，panel 100 人，observed 8 Black。完整写出三步模拟代码，并描述结论。</p>
+
+    <details>
+      <summary>显示答案</summary>
+      <pre><code># Setup
+demographics = [0.26, 0.74]
+observed = 8
+
+# Step 1: one simulation
+np.random.multinomial(100, demographics)[0]  # → e.g. 28
+
+# Step 2: 10,000 simulations
+counts = np.array([])
+for i in np.arange(10000):
+    new_count = np.random.multinomial(100, demographics)[0]
+    counts = np.append(counts, new_count)
+
+# Step 3: compare
+counts.min()  # ≈ 11（远大于 8）
+np.count_nonzero(counts &lt;= observed) / 10000  # ≈ 0.0
+# → p-value ≈ 0：极罕见</code></pre>
+      <p><strong>结论</strong>：模拟下从未出现 ≤ 8 Black（最少 ≈ 11），所以 "random panel" 这个 model 解释不了 observation。Quiz 4 的措辞应当是 "reject" 而不是 "证明 bias"。</p>
+    </details>
+  </div>
+
+  <h3>练习 5：综合判断（Quiz 4 风格）</h3>
+
+  <div class="q-block">
+    <div class="q-source">综合判断 · Tier 2 整合题</div>
+    <p>下面哪些陈述<strong>正确</strong>？（多选）</p>
+    <ol type="A">
+      <li>对 polling proportion，无论数据怎样，把 sample SD 取为 0.5 总能保证 CI 宽度满足要求</li>
+      <li>如果一开始计算得 n = 624.99，可以四舍五入到 625</li>
+      <li>把目标 CI 宽度从 0.10 缩到 0.05，sample size 也变为原来一半</li>
+      <li><code>np.random.multinomial(100, [0.4, 0.6])</code> 返回长度为 2 的 array，且两个元素之和恒等于 100</li>
+      <li>一个 "model" 必须能用代码模拟才能用于做 hypothesis testing</li>
+    </ol>
+
+    <details>
+      <summary>显示答案</summary>
+      <ul>
+        <li><strong>A ✓</strong>：0.5 是 √(p(1−p)) 在 [0,1] 上的最大值，用它一定够。</li>
+        <li><strong>B ✓</strong>：624.99 向上取整就是 625（等价于"不小于 624.99 的最小整数"）。注意如果是 625.01 就得取 626。</li>
+        <li><strong>C ✗</strong>：宽度减半 → n 变 <strong>4 倍</strong>，不是 1/2 倍。</li>
+        <li><strong>D ✓</strong>：multinomial 返回 counts，和 = sample size。</li>
+        <li><strong>E ✓</strong>：这就是下一节 null hypothesis 的核心要求 —— "well-defined probability model"。</li>
+      </ul>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <p>对着 Claude 把下面每条都讲一遍。讲清楚说明掌握了。</p>
+
+  <div class="checklist">
+    <label><input type="checkbox"><span>能从 95% CLT CI 公式 <code>[mean ± 2·SD/√n]</code> 推出宽度 = 4·SD/√n，再推出 sample size 公式 n ≥ (4·SD/w)²</span></label>
+    <label><input type="checkbox"><span>解释为什么 0/1 数据 SD 上界 = 0.5（√(p(1−p)) 在 p=0.5 最大）</span></label>
+    <label><input type="checkbox"><span>背下来 polling proportion 的速算：<code>n ≥ (2/w)²</code></span></label>
+    <label><input type="checkbox"><span>讲清楚 "w 减半 → n 变 4 倍" 的原因（n 与 1/w² 成正比）</span></label>
+    <label><input type="checkbox"><span>区分 w（总宽度）和 margin（半宽度）；题目里看到 "margin ≤ 0.03" 知道 w = 0.06</span></label>
+    <label><input type="checkbox"><span>解释 sample size 必须<strong>向上取整</strong>的原因</span></label>
+    <label><input type="checkbox"><span>背下来 <code>np.random.multinomial(n, [p1, p2, ...])</code> 的签名：sample_size + 概率分布，返回 counts</span></label>
+    <label><input type="checkbox"><span>用一句话写出 jury panel 模拟代码骨架（multinomial inside for loop）</span></label>
+    <label><input type="checkbox"><span>用具体例子说出 <code>choice</code>、<code>multinomial</code>、<code>permutation</code> 的区别和使用场景</span></label>
+    <label><input type="checkbox"><span>讲清楚 "statistical model" 的定义和"well-defined probability model"的要求</span></label>
+    <label><input type="checkbox"><span>把 Swain v. Alabama 案的 setup（model / observation / statistic / question）默写一遍</span></label>
+    <label><input type="checkbox"><span>讲清楚 "reject model" ≠ "证明反面"（为什么不能从模拟结论推 causation）</span></label>
+    <label><input type="checkbox"><span>Wi26 Q4 P4 的两小问能口头说出推导过程，秒答 625 和 4 倍</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span></span>
+  <span><a href="index.html">📕 返回目录</a></span>
+  <span><a href="02-hypothesis-testing-fundamentals.html">下一节: Hypothesis Testing 基础 →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

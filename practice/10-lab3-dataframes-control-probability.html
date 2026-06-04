@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 10 · Lab 3 — DataFrames, Control Flow, Probability · DSC10</title>
+<style>
+  :root { --bg:#fafaf7; --text:#1f2328; --muted:#57606a; --accent:#0969da; --code-bg:#1e1e2e; --code-text:#cdd6f4; --warn-bg:#fff8c5; --warn-border:#d4a72c; --tip-bg:#ddf4ff; --tip-border:#54aeff; --ok-bg:#dafbe1; --ok-border:#1a7f37; --tier-1:#cf222e; --tier-2:#bf8700; --tier-3:#6e7781; --border:#d0d7de; }
+  * { box-sizing: border-box; } html { scroll-behavior: smooth; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.7; font-size:16px; }
+  .nav-top, .nav-bottom { background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:14px; flex-wrap:wrap; gap:8px; }
+  .nav-bottom { border-bottom:none; border-top:1px solid var(--border); margin-top:60px; }
+  .nav-top a, .nav-bottom a { color:var(--accent); text-decoration:none; margin-right:16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration:underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color:var(--muted); cursor:not-allowed; text-decoration:none; }
+  main { max-width:880px; margin:0 auto; padding:32px 24px 60px; }
+  h1 { font-size:28px; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:22px; margin-top:48px; border-left:4px solid var(--accent); padding-left:12px; }
+  h3 { font-size:18px; margin-top:28px; }
+  p, ul, ol { margin:12px 0; } ul, ol { padding-left:28px; } li { margin:4px 0; }
+  code { font-family:"Menlo","Monaco","Consolas",monospace; background:#eef0f2; padding:2px 6px; border-radius:4px; font-size:14px; color:#cf222e; }
+  pre { background:var(--code-bg); color:var(--code-text); padding:16px; border-radius:8px; overflow-x:auto; font-size:14px; line-height:1.5; margin:16px 0; }
+  pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:14px; }
+  .tier { display:inline-block; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:600; margin-right:8px; }
+  .tier-1 { background:#ffebe9; color:var(--tier-1); border:1px solid #ffcecb; }
+  .tier-2 { background:#fff8c5; color:var(--tier-2); border:1px solid #d4a72c; }
+  .meta { background:#f6f8fa; border-left:4px solid var(--accent); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .warn { background:var(--warn-bg); border-left:4px solid var(--warn-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .tip { background:var(--tip-bg); border-left:4px solid var(--tip-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .ok { background:var(--ok-bg); border-left:4px solid var(--ok-border); padding:10px 14px; margin:12px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .q-block { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:18px 0; }
+  .q-id { display:inline-block; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:4px; margin-right:10px; letter-spacing:0.5px; }
+  .q-title { font-size:15px; font-weight:600; }
+  .why { margin:8px 0; font-size:14px; } .why strong { color:#1f883d; }
+  .checklist { background:#f0f9ff; border:1px solid #54aeff; border-radius:8px; padding:16px 20px; }
+  .checklist label { display:block; margin:8px 0; cursor:pointer; user-select:none; }
+  .checklist input[type="checkbox"] { margin-right:8px; transform:scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration:line-through; color:var(--muted); }
+  .toc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:24px 0; }
+  .toc ul { list-style:none; padding-left:0; } .toc li { margin:4px 0; } .toc a { color:var(--accent); text-decoration:none; }
+  .crosslink { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:20px 0; font-size:14px; }
+  .crosslink h4 { margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600; }
+  .crosslink ul { margin:4px 0; padding-left:20px; } .crosslink a { color:var(--accent); text-decoration:none; }
+  table { border-collapse:collapse; width:100%; margin:16px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 12px; text-align:left; } th { background:#f6f8fa; font-weight:600; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="09-hw3-names-cereal-loans-probability.html">⬅ 上一份：HW 3</a> | <a href="11-hw2-ikea-broadway-histograms.html">下一份 ➡：HW 2</a></span>
+</nav>
+
+<main>
+  <h1>Practice 10 · Lab 3 — DataFrames, Control Flow, Probability</h1>
+  <p class="meta">
+    <strong>截止</strong>：Thursday, April 23rd at 11:59PM ｜ <strong>Topics</strong>：BPD 11.4, BPD 13, CIT 9.1, 9.2, 9.5 ｜
+    <strong>对应模块</strong>：Midterm ｜ <strong>预计时长</strong>：2 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#sec1">📚 Section 1 — California National Parks（Q1.1–1.3）groupby + merge</a></li>
+      <li><a href="#sec2">📚 Section 2 — Coffee Shop（Q2.1–2.5）函数 + apply</a></li>
+      <li><a href="#sec3">📚 Section 3 — Iteration（Q3.1–3.4）for-loop 累加器模板</a></li>
+      <li><a href="#sec4">📚 Section 4 — Hungry Billy / Marbles（Q4.1–4.4）概率</a></li>
+      <li><a href="#pitfalls">⚠️ 典型陷阱</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链：</h4>
+    <ul>
+      <li>条件、for-loop、累加器 → <a href="../midterm/06-conditionals-loops.html">midterm/06-conditionals-loops</a></li>
+      <li>函数 + .apply → <a href="../midterm/04-functions-apply.html">midterm/04-functions-apply</a></li>
+      <li>多列 groupby + merge → <a href="../midterm/05-multi-groupby-merge.html">midterm/05-multi-groupby-merge</a></li>
+      <li>概率（complement、without replacement）→ <a href="../midterm/07-probability-simulation.html">midterm/07-probability-simulation</a></li>
+    </ul>
+  </div>
+
+  <h2 id="sec1">📚 Section 1 — California National Parks</h2>
+
+  <div class="q-block"><span class="q-id">Q 1.1</span><span class="q-title"><code>species_counts</code>：每个公园的物种数</span>
+<pre><code>species_counts = (species.groupby('Park Name').count()
+    .assign(Count=species.groupby('Park Name').count().get('Category'))
+    .get(['Count']))</code></pre>
+    <p class="why"><strong>💡 "rename" 一列</strong>：<code>groupby().count()</code> 后所有列名等于原列名（如 'Category'、'Order' 等），值都相同（= 行数）。babypandas 没有 <code>.rename()</code>，所以 <code>.assign(Count=...)</code> 复制出 'Count' 列，再 <code>.get(['Count'])</code> 只保留它。</p>
+    <p class="why"><strong>💡 7 parks → 7 rows ✓，sum = 17785 ✓</strong>。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.2</span><span class="q-title"><code>parks_with_species</code>：merge index ↔ column</span>
+<pre><code>parks_with_species = parks.merge(species_counts, left_on='Park Name', right_index=True)</code></pre>
+    <p class="why"><strong>💡 <code>right_index=True</code></strong>：因为 species_counts 是用 'Park Name' 当 <u>index</u> 而不是普通列。这是 merge index 的标准技巧。<br>
+      <u>alternative</u>：先 <code>species_counts.reset_index()</code> 再普通 merge。
+    </p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.3</span><span class="q-title">多列 groupby + rename → 76 rows</span>
+<pre><code>species_category = (species.groupby(['Park Name', 'Category']).count()
+    .reset_index()
+    .assign(Count=species.groupby(['Park Name', 'Category']).count().reset_index().get('Order'))
+    .get(['Park Name', 'Category', 'Count']))</code></pre>
+    <p class="why"><strong>💡 多列 groupby + count</strong>：每个 (Park, Category) 组合一行。reset_index 把这两列从 multi-index 拿回普通列。同 Q1.1 套路 rename。</p>
+    <div class="warn"><strong>⚠️ babypandas <code>.assign(Count=1)</code> 不能传 scalar</strong>——必须传 array / Series。如果要"全部填 1"得自己造 array。</div>
+  </div>
+
+  <h2 id="sec2">📚 Section 2 — Coffee Shop</h2>
+
+  <div class="q-block"><span class="q-id">Q 2.1</span><span class="q-title">数 'Medium' 的个数</span>
+<pre><code>number_medium = np.count_nonzero(ten_coffees == 'Medium')</code></pre>
+    <p class="why"><strong>💡 标准模板</strong>：array == val 生成 bool array，<code>count_nonzero</code> 数 True。任何"数符合条件的个数"都是这个套路。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.2</span><span class="q-title"><code>coffee_price(size)</code></span>
+<pre><code>def coffee_price(size):
+    if   size == 'Small':  return 2.99
+    elif size == 'Medium': return 3.99
+    elif size == 'Large':  return 4.79
+    else:                  return 4.99</code></pre>
+    <p class="why"><strong>💡 字符串比较</strong>：用 <code>==</code> 比较字符串。<u>不</u>是 <code>=</code>。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.3</span><span class="q-title">用 .apply 加 Price 列</span>
+<pre><code>ten_coffees_df = ten_coffees_df.assign(
+    Price=ten_coffees_df.get('Size').apply(coffee_price)
+)</code></pre>
+    <p class="why"><strong>💡 .apply(<u>函数名</u>，不带括号)</strong>：传函数对象。<u>不</u>是 <code>apply(coffee_price())</code>（那是调用结果）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.4</span><span class="q-title">数 Price &gt; 4</span>
+<pre><code>over_4_dollars = np.count_nonzero(ten_coffees_df.get('Price') &gt; 4)</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.5</span><span class="q-title"><code>small_or_xl(coffee_df)</code>—— 通用函数</span>
+<pre><code>def small_or_xl(coffee_df):
+    coffees = coffee_df.get('Size')
+    n_s  = np.count_nonzero(coffees == 'Small')
+    n_xl = np.count_nonzero(coffees == 'Extra Large')
+    if   n_s &gt; n_xl: return 'More Small coffees'
+    elif n_xl &gt; n_s: return 'More Extra Large coffees'
+    else:             return 'Same amount'</code></pre>
+    <div class="warn"><strong>⚠️ 用<u>参数</u> coffee_df，不是全局 ten_coffees_df</strong>。函数要可复用——传<u>任何</u> coffee DataFrame 都能跑。一旦在函数里硬编码全局名就破了通用性。</div>
+  </div>
+
+  <h2 id="sec3">📚 Section 3 — Iteration</h2>
+
+  <div class="q-block"><span class="q-id">Q 3.1</span><span class="q-title">飞镖累加：1000 投的总分</span>
+<pre><code>possible_point_values = np.arange(1, 11)
+tosses = 1000
+
+total_score = 0
+for i in np.arange(tosses):
+    total_score = total_score + np.random.choice(possible_point_values)</code></pre>
+    <p class="why"><strong>💡 累加器初值 = 0</strong>（加法 identity）。每轮添加一个随机值。期望总分 = 1000 × 5.5 = 5500。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.2</span><span class="q-title">平均分</span>
+<pre><code>average_score = total_score / tosses</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.3</span><span class="q-title">数 &gt; 8 字母的词（计数累加器）</span>
+<pre><code>longer_than_8 = 0
+for word in gatsby_words:
+    if len(word) &gt; 8:
+        longer_than_8 = longer_than_8 + 1</code></pre>
+    <div class="ok"><strong>✅ 期望 = 3704</strong>。</div>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.4</span><span class="q-title">收集所有 &gt; 8 字母的词（array 累加器）</span>
+<pre><code>long_words = np.array([])
+for word in gatsby_words:
+    if len(word) &gt; 8:
+        long_words = np.append(long_words, word)</code></pre>
+    <div class="warn"><strong>⚠️ np.append 必须重新赋值</strong>。<code>np.append(arr, x)</code> 返回<u>新</u> array，不修改原 array。如果只写 <code>np.append(long_words, word)</code> 不赋值，长度永远是 0。</div>
+  </div>
+
+  <h2 id="sec4">📚 Section 4 — Hungry Billy / Marbles</h2>
+
+  <div class="q-block"><span class="q-id">Q 4.1</span><span class="q-title"><code>wings_prob</code>：能吃到的概率</span>
+<pre><code>wings_prob = 1 - 0.1   # = 0.9</code></pre>
+    <p class="why"><strong>💡 P(available) = 1 − P(out)</strong>。<u>别</u>错填 0.1（那是 sold out 的概率，是相反方向）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.2</span><span class="q-title">4 项全有的概率（独立相乘）</span>
+<pre><code>all_prob = 0.9 ** 4   # = 0.6561</code></pre>
+    <p class="why"><strong>💡 4 个 independent</strong> → P(all) = 0.9 × 0.9 × 0.9 × 0.9。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.3</span><span class="q-title">至少一项 sold out（complement）</span>
+<pre><code>something_is_out = 1 - 0.9 ** 4   # = 0.3439</code></pre>
+    <p class="why"><strong>💡 "至少一个" 模板</strong>：P(at least 1) = 1 − P(none) = 1 − P(all available)。<u>不</u>用容斥（那会复杂）。这是高频陷阱：直觉是想用 + 但实际用 complement。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.4</span><span class="q-title">3 色弹珠无放回</span>
+<pre><code>winning_prob = (6 / 8) * (3 / 7)   # = 9/28 ≈ 0.3214</code></pre>
+    <p class="why"><strong>💡 推导</strong>：
+      <ul>
+        <li>第 1 颗：任意（P = 9/9 = 1）。</li>
+        <li>第 2 颗：必须跟第 1 颗<u>不</u>同色，剩 8 颗里 6 颗不同色 → P = 6/8。</li>
+        <li>第 3 颗：必须是第 3 种颜色，剩 7 颗里 3 颗那色 → P = 3/7。</li>
+      </ul>
+      乘起来 = 1 × 6/8 × 3/7 = 18/56 = <strong>9/28</strong>。
+    </p>
+  </div>
+
+  <h2 id="pitfalls">⚠️ 典型陷阱</h2>
+  <div class="warn"><strong>陷阱 1</strong>：babypandas 没 .rename()——用 assign + drop。Q1.1, 1.3 反复用。</div>
+  <div class="warn"><strong>陷阱 2</strong>：assign 不能传 scalar（Count=1）——必须传 array/Series。</div>
+  <div class="warn"><strong>陷阱 3</strong>：np.append 必须重新赋值（Q3.4）。</div>
+  <div class="warn"><strong>陷阱 4</strong>：累加器初值——计数用 0，乘法用 1，array 用 np.array([])。</div>
+  <div class="warn"><strong>陷阱 5</strong>：apply 传函数<u>名</u>，不带 ()。</div>
+  <div class="warn"><strong>陷阱 6</strong>：函数用<u>参数</u>，不要在函数体里硬编码全局变量（Q2.5）。</div>
+  <div class="warn"><strong>陷阱 7</strong>："至少一个" 用 complement：1 − P(none)。</div>
+
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① babypandas "rename" 的标准 workaround？什么时候 .assign 不能传 scalar？</span></label>
+    <label><input type="checkbox"><span>② <code>merge(left_on='X', right_index=True)</code> 的用法？跟 reset_index 后普通 merge 的关系？</span></label>
+    <label><input type="checkbox"><span>③ 三种累加器初值：计数 / 乘法 / array？为什么？</span></label>
+    <label><input type="checkbox"><span>④ np.append 为什么必须重新赋值？返回什么？</span></label>
+    <label><input type="checkbox"><span>⑤ Q2.5 为什么函数体用 coffee_df 而不是 ten_coffees_df？</span></label>
+    <label><input type="checkbox"><span>⑥ "至少一个" 概率：为什么用 1 − P(none) 而不是逐个加？</span></label>
+    <label><input type="checkbox"><span>⑦ Q4.4 第 3 颗的 P = 3/7 怎么来的？无放回里的"剩 7 颗" 是怎么算出的？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="09-hw3-names-cereal-loans-probability.html">⬅ 上一份：HW 3</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="11-hw2-ikea-broadway-histograms.html">下一份 ➡：HW 2</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

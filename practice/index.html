@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSC10 Practice — Labs, Homeworks & Final Project 总目录</title>
+<style>
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", -apple-system, "Segoe UI", sans-serif;
+    background: #fafaf7;
+    color: #1f2328;
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+  }
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+  h1 {
+    font-size: 32px;
+    border-bottom: 3px solid #0969da;
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: #57606a;
+    font-size: 16px;
+    margin-bottom: 40px;
+  }
+  .intro {
+    background: #ddf4ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0 28px;
+    font-size: 14px;
+  }
+  .group-header {
+    font-size: 17px;
+    font-weight: 600;
+    color: #57606a;
+    margin: 36px 0 12px;
+    padding-left: 4px;
+    border-left: 4px solid #0969da;
+    padding-left: 12px;
+  }
+  .section-card,
+  .section-card-planned {
+    background: #fff;
+    border: 1px solid #d0d7de;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 12px 0;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .section-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+  .section-card-planned {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .section-num {
+    color: #0969da;
+    font-weight: 700;
+    font-size: 13px;
+    margin-right: 8px;
+    letter-spacing: 0.4px;
+  }
+  .section-title {
+    font-size: 19px;
+    font-weight: 600;
+    margin: 4px 0 6px;
+  }
+  .section-desc {
+    color: #57606a;
+    font-size: 13.5px;
+    margin: 6px 0;
+  }
+  .section-desc code {
+    background: #f6f8fa;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12.5px;
+  }
+  .meta-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    font-size: 12.5px;
+  }
+  .badge {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 12px;
+    padding: 2px 10px;
+    color: #57606a;
+  }
+  .tier-1 { background: #ffebe9; color: #cf222e; border-color: #ffcecb; font-weight: 600; }
+  .tier-2 { background: #fff8c5; color: #bf8700; border-color: #d4a72c; font-weight: 600; }
+  .tier-3 { background: #f0f0f0; color: #6e7781; }
+  .badge-final   { background: #fce7f3; color: #be185d; border-color: #f9a8d4; }
+  .badge-quiz4   { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+  .badge-quiz3   { background: #dcfce7; color: #15803d; border-color: #86efac; }
+  .badge-midterm { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+  .badge-active  { background: #dafbe1; color: #1a7f37; border-color: #aceebb; font-weight: 600; }
+  .progress-check {
+    float: right;
+    font-size: 22px;
+    color: #cf222e;
+  }
+  .checked .progress-check { color: #1a7f37; }
+  .back {
+    font-size: 14px;
+    color: #0969da;
+    text-decoration: none;
+  }
+  .back:hover { text-decoration: underline; }
+  .footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #d0d7de;
+    color: #57606a;
+    font-size: 13px;
+    text-align: center;
+  }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+/* Inline-color index pages — override hex literals */
+[data-theme="dark"] body { background: #0f1419 !important; color: #d8dee4 !important; }
+[data-theme="dark"] h1 { border-bottom-color: #58a6ff !important; }
+[data-theme="dark"] h2 { border-left-color: #58a6ff !important; color: #d8dee4 !important; }
+[data-theme="dark"] .subtitle,
+[data-theme="dark"] .module-desc,
+[data-theme="dark"] .section-desc,
+[data-theme="dark"] .footer { color: #8b949e !important; }
+[data-theme="dark"] .intro,
+[data-theme="dark"] .quick-ref { background: #1c2a3a !important; border-color: #4485c4 !important; color: #d8dee4 !important; }
+[data-theme="dark"] .module-card,
+[data-theme="dark"] .section-card,
+[data-theme="dark"] .section-card-planned { background: #161a1f !important; border-color: #30363d !important; }
+[data-theme="dark"] .module-card:hover,
+[data-theme="dark"] .section-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.5) !important; }
+[data-theme="dark"] .module-tag,
+[data-theme="dark"] .section-num,
+[data-theme="dark"] .module-link,
+[data-theme="dark"] a.back { color: #58a6ff !important; }
+[data-theme="dark"] .module-title,
+[data-theme="dark"] .section-title { color: #d8dee4 !important; }
+[data-theme="dark"] .module-desc code,
+[data-theme="dark"] .section-desc code,
+[data-theme="dark"] .footer code { background: #2a2e35 !important; color: #ff8088 !important; }
+[data-theme="dark"] .badge { background: #161a1f !important; border-color: #30363d !important; color: #8b949e !important; }
+[data-theme="dark"] .badge-active { background: #1a2e1f !important; color: #5acc7f !important; border-color: #3a5238 !important; }
+[data-theme="dark"] .badge-planned { background: #2a2e35 !important; color: #8b949e !important; border-color: #30363d !important; }
+[data-theme="dark"] .badge-final { background: #1c2a3a !important; color: #7aa7ff !important; border-color: #4485c4 !important; }
+[data-theme="dark"] .badge-midterm { background: #3a1f2f !important; color: #f0a3c8 !important; border-color: #7a3a5a !important; }
+[data-theme="dark"] .badge.tier-1 { background: #3a1f1f !important; color: #ff8088 !important; border-color: #5a2f2f !important; }
+[data-theme="dark"] .badge.tier-2 { background: #3a2e00 !important; color: #f0e6c0 !important; border-color: #a18419 !important; }
+[data-theme="dark"] .badge.tier-3 { background: #2a2e35 !important; color: #c0c4ca !important; border-color: #30363d !important; }
+[data-theme="dark"] .footer { border-top-color: #30363d !important; }
+[data-theme="dark"] .group-header { color: #d8dee4 !important; border-bottom-color: #30363d !important; }
+[data-theme="dark"] .progress-check { color: #8b949e !important; }
+[data-theme="dark"] .progress-check.done { color: #5acc7f !important; }
+[data-theme="dark"] .stats { background: #161a1f !important; border-color: #30363d !important; color: #d8dee4 !important; }
+[data-theme="dark"] .meta-row { color: #8b949e !important; }
+[data-theme="dark"] .section-card.checked { background: #1a2e1f !important; border-color: #3a5238 !important; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+<main>
+  <p><a class="back" href="../index.html">← 回到 DSC10 总目录</a></p>
+  <h1>🛠 DSC10 Practice — Labs, Homeworks &amp; Final Project</h1>
+  <p class="subtitle">UCSD · Principles of Data Science · 13 份课堂作业的系统 walkthrough · 按复习紧迫度倒序产出</p>
+
+  <div class="intro">
+    <strong>📦 这是什么</strong>：每份 lab / hw / midterm project 一页 walkthrough，按 PDF 题目顺序逐题讲解（思路 + 代码 + 为什么 + 易错点 + 知识点回链）。
+    <br><strong>🎯 怎么用</strong>：当作复习时的系统练习——比起 section HTML 里散落的真题，整套作业讲下来更 coherent。
+    <br><strong>🗂️ 源材料</strong>：<code>Labs_HWs/</code>（原始 PDF + 简洁版答案 HTML）。
+    <br><strong>🚦 产出顺序</strong>：从用户当前复习阶段（Final）倒推 — Lab7 起步。<strong>13/13 已生成 ✅</strong>（含 Final Project）。○ 待复习 · ✓ 已学完。
+  </div>
+
+  <!-- ===== Final 阶段 ===== -->
+  <div class="group-header">🎯 当前阶段：Final（最紧迫）</div>
+
+  <a class="section-card" href="13-final-project-meteorites.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 13</span></div>
+    <div class="section-title">Final Project — Meteorites 🌠（6 Sections）</div>
+    <div class="section-desc">NASA 陨石 38094 行综合：merge/概率/TVD/permutation/bootstrap CI/CLT CI/无放回检验——<u>整学期所有讲义</u>压轴整合</div>
+    <div class="meta-row">
+      <span class="badge badge-final">Final</span>
+      <span class="badge">Lec 1-25 综合</span>
+      <span class="badge tier-1">⭐⭐⭐ 紧迫</span>
+      <span class="badge badge-active">🆕 新增</span>
+    </div>
+  </a>
+
+  <a class="section-card" href="01-lab7-regression.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 01</span></div>
+    <div class="section-title">Lab 7 — How Faithful is Old Faithful?</div>
+    <div class="section-desc">回归直线、Old Faithful、prediction、residuals、divide and conquer</div>
+    <div class="meta-row">
+      <span class="badge badge-final">Final</span>
+      <span class="badge">Lec 23-25</span>
+      <span class="badge tier-1">⭐⭐⭐ 紧迫</span>
+      <span class="badge badge-active">● 第一份</span>
+    </div>
+  </a>
+
+  <a class="section-card" href="02-hw6-hypothesis-permutation.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 02</span></div>
+    <div class="section-title">HW 6 — Smiski · Pokémon · Chocolate · Battery</div>
+    <div class="section-desc">假设检验四种玩法（单侧 / TVD / permutation / CI 法）综合</div>
+    <div class="meta-row">
+      <span class="badge badge-quiz4">Quiz 4/Final</span>
+      <span class="badge">CIT 11-12, 13.4</span>
+      <span class="badge tier-1">⭐⭐⭐ 紧迫</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <!-- ===== Quiz 4 阶段 ===== -->
+  <div class="group-header">📕 Quiz 4 阶段</div>
+
+  <a class="section-card" href="03-lab6-hypothesis-fundamentals.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 03</span></div>
+    <div class="section-title">Lab 6 — Therapeutic Touch &amp; YouTube Ads</div>
+    <div class="section-desc">Hypothesis testing 基础——双侧 vs 单侧、test stat 选 |·|？、p-value 定义</div>
+    <div class="meta-row">
+      <span class="badge badge-quiz4">Quiz 4</span>
+      <span class="badge">CIT 11 · Lec 18-20</span>
+      <span class="badge tier-1">⭐⭐⭐</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <a class="section-card" href="04-hw5-clt-normal.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 04</span></div>
+    <div class="section-title">HW 5 — CLT &amp; Normal Distribution</div>
+    <div class="section-desc">CLT 公式验证、0/1 SD、Normal-based CI（无 bootstrap）、样本量、Chebyshev vs Normal</div>
+    <div class="meta-row">
+      <span class="badge badge-quiz3">Quiz 3</span>
+      <span class="badge">CIT 14.2-14.6</span>
+      <span class="badge tier-1">⭐⭐⭐</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <!-- ===== Quiz 3 阶段 ===== -->
+  <div class="group-header">📗 Quiz 3 阶段</div>
+
+  <a class="section-card" href="05-lab5-su-chebyshev-sample-size.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 05</span></div>
+    <div class="section-title">Lab 5 — SU · Chebyshev · Normal · Sample Size</div>
+    <div class="section-desc">手算 variance/SD、SU 对比成绩、Chebyshev vs Normal、CI 宽度法选样本量</div>
+    <div class="meta-row">
+      <span class="badge badge-quiz3">Quiz 3</span>
+      <span class="badge">CIT 14.2-14.6</span>
+      <span class="badge tier-1">⭐⭐⭐</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <a class="section-card" href="06-lab4-bootstrap-german-tank.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 06</span></div>
+    <div class="section-title">Lab 4 — Bootstrap &amp; German Tank Problem</div>
+    <div class="section-desc">模拟、estimator 选择、bootstrap CI 模板、95% CI 解读、with vs without replacement</div>
+    <div class="meta-row">
+      <span class="badge badge-quiz3">Quiz 3</span>
+      <span class="badge">CIT 9.3, 10, 13.2</span>
+      <span class="badge tier-1">⭐⭐⭐</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <a class="section-card" href="07-hw4-sampling-bootstrap.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 07</span></div>
+    <div class="section-title">HW 4 — Sampling · NBA · Milk Tea · Lyft</div>
+    <div class="section-desc">Lotto 模拟、convenience vs SRS、CI 解读连击（5 道高频陷阱）、按组 bootstrap</div>
+    <div class="meta-row">
+      <span class="badge badge-midterm">Midterm</span>
+      <span class="badge badge-quiz3">Quiz 3</span>
+      <span class="badge">CIT 9-13</span>
+      <span class="badge tier-1">⭐⭐⭐</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <!-- ===== Midterm 阶段 ===== -->
+  <div class="group-header">📘 Midterm 阶段</div>
+
+  <a class="section-card" href="08-midterm-project-spotify.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 08</span></div>
+    <div class="section-title">Midterm Project — Spotify Weekly Charts (7 Sections)</div>
+    <div class="section-desc">46 题综合：groupby/merge/apply/字符串/日期/累加器/megahits 判定——babypandas 8 大限制 workaround</div>
+    <div class="meta-row">
+      <span class="badge badge-midterm">Midterm</span>
+      <span class="badge">综合</span>
+      <span class="badge tier-2">⭐⭐</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <a class="section-card" href="09-hw3-names-cereal-loans-probability.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 09</span></div>
+    <div class="section-title">HW 3 — Names · Cereal · Loans · Lotto</div>
+    <div class="section-desc">加权平均、merge 三种用法、annuity 函数 composition、累加器 for-loop、无放回概率</div>
+    <div class="meta-row">
+      <span class="badge badge-midterm">Midterm</span>
+      <span class="badge">Lec 8-11</span>
+      <span class="badge tier-2">⭐⭐</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <a class="section-card" href="10-lab3-dataframes-control-probability.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 10</span></div>
+    <div class="section-title">Lab 3 — Parks · Coffee Shop · Iteration · Probability</div>
+    <div class="section-desc">groupby rename workaround、apply、3 种累加器、complement、无放回（"3 色不同"模板）</div>
+    <div class="meta-row">
+      <span class="badge badge-midterm">Midterm</span>
+      <span class="badge">BPD 11.4, 13 · CIT 9</span>
+      <span class="badge tier-2">⭐⭐</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <a class="section-card" href="11-hw2-ikea-broadway-histograms.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 11</span></div>
+    <div class="section-title">HW 2 — IKEA · Broadway · Density Histograms</div>
+    <div class="section-desc">DataFrame 索引 & 过滤、字符串方法、groupby+sort 模板、density × width = proportion</div>
+    <div class="meta-row">
+      <span class="badge badge-midterm">Midterm</span>
+      <span class="badge">Lec 4-9</span>
+      <span class="badge tier-2">⭐⭐</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <a class="section-card" href="12-lab2-fortune500-functions.html">
+    <span class="progress-check">○</span>
+    <div><span class="section-num">PRACTICE 12</span></div>
+    <div class="section-title">Lab 2 — Fortune 500 &amp; Functions</div>
+    <div class="section-desc">字符串→数字、函数定义/composition/作为对象、.assign+.apply、% Change 反推 previous</div>
+    <div class="meta-row">
+      <span class="badge badge-midterm">Midterm</span>
+      <span class="badge">BPD 6, 11, 12</span>
+      <span class="badge tier-2">⭐⭐</span>
+      <span class="badge badge-active">📝 已生成</span>
+    </div>
+  </a>
+
+  <div class="footer">
+    💡 每页 walkthrough 末尾有「自我复述 checklist」，对 Claude 口头讲解即可检验掌握程度。<br>
+    🤖 项目由 Claude 基于 PDF 原题 + 简洁版答案 HTML 扩展生成。
+  </div>
+</main>
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

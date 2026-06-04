@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataFrame 与索引 (Section 1) - DSC10 Midterm 备考</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .nav-bottom {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+  .nav-top a, .nav-bottom a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 16px;
+    margin-top: 20px;
+    color: var(--muted);
+  }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+  }
+  .tier {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta {
+    background: #f6f8fa;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--tip-bg);
+    border-left: 4px solid var(--tip-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  details {
+    background: var(--q-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+  }
+  details[open] {
+    background: #fff;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+  }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) {
+    margin-top: 12px;
+  }
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .q-source {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .checklist {
+    background: #f0f9ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .checklist label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+  .checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 总目录</a></span>
+  <span><a href="00-python-basics.html">← 上一节: Python 基础</a> <a href="02-querying-groupby.html">下一节: 查询与 groupby →</a></span>
+</nav>
+
+<main>
+  <h1>DataFrame 与索引 (Section 1)</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 4 ｜
+    <strong>Midterm出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1 (6/6)</span> 每份midterm都考 ｜
+    <strong>预计学习时间</strong>：2-3 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <p>本节是 DSC10 midterm 的<strong>绝对核心</strong>。Lec 4 引入的 DataFrame 操作几乎是所有后续题目的基础。<strong>6 份历年 midterm 全部</strong>都在第 1-2 题考查这一节。</p>
+
+  <div class="tip">
+    <strong>本节出现率：<span class="tier tier-1">Tier 1 (6/6)</span></strong>
+    <ul>
+      <li>Fall 2024 Q1 / Q2 / Q5</li>
+      <li>Winter 2025 Q1</li>
+      <li>Spring 2024 Q2</li>
+      <li>Spring 2025 Q1</li>
+      <li>Fall 2025 Q5</li>
+      <li>Winter 2026 Q1.1 / Q2 / Q5</li>
+    </ul>
+  </div>
+
+  <h3>常见出题模式</h3>
+  <ol>
+    <li><strong>「合适的 index 选择」</strong>选择题 — 通常是 Q1，要求选出"unique identifier 列"。</li>
+    <li><strong>等价表达式判断</strong> — 给若干 <code>.iloc / .loc / .sort_values / .set_index</code> 链式表达式，判断哪些等于某个具体值（"select all that apply"）。</li>
+    <li><strong>写一行表达式取极值</strong> — "Write an expression that evaluates to the address with the highest …" 通常是 <code>.sort_values(by=, ascending=False).get('col').iloc[0]</code>。</li>
+    <li><strong>填空 <code>.loc[label]</code> / <code>.iloc[pos]</code></strong> — 给函数模板，让你填出按 label 还是按整数位置访问。</li>
+    <li><strong>计算行数</strong> — 用 <code>.shape[0]</code>、布尔过滤后 <code>.shape[0]</code>、<code>.count()</code> 等多种 idiom。</li>
+    <li><strong>babypandas vs pandas 区别</strong> — 题目假设 <code>import babypandas as bpd</code>，没有方括号直接取列。</li>
+  </ol>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. babypandas vs pandas</h3>
+  <p>UCSD 自己开发的 <code>babypandas</code> 是 <code>pandas</code> 的<strong>简化子集</strong>，目的是为了减少初学者犯错。</p>
+  <table>
+    <thead><tr><th>特性</th><th>babypandas (bpd)</th><th>pandas</th></tr></thead>
+    <tbody>
+      <tr><td>取列</td><td><code>df.get('col')</code> ✅</td><td><code>df['col']</code> ✅ <code>df.col</code> ✅</td></tr>
+      <tr><td>修改原对象</td><td>❌ 永远返回新 DataFrame</td><td>✅ 支持 <code>inplace=True</code></td></tr>
+      <tr><td>加列</td><td>只能用 <code>df.assign(...)</code></td><td>可用 <code>df['new'] = ...</code></td></tr>
+      <tr><td>错误信息</td><td>更友好</td><td>原生</td></tr>
+    </tbody>
+  </table>
+  <pre><code># DSC10 标准导入
+import babypandas as bpd
+import numpy as np
+
+states = bpd.read_csv('data/states.csv')</code></pre>
+
+  <h3>2. <code>bpd.read_csv()</code> — 读入 CSV</h3>
+  <ul>
+    <li>路径是<strong>相对于当前 notebook</strong>的字符串。</li>
+    <li>返回一个 DataFrame。</li>
+    <li>默认的行 index 是 <code>0, 1, 2, ...</code>（整数序列）。</li>
+  </ul>
+  <pre><code>states = bpd.read_csv('data/states.csv')
+# 50 rows × 6 columns: State, Region, Capital City, Population, Land Area, Party</code></pre>
+
+  <h3>3. DataFrame 结构：columns / rows / index</h3>
+  <ul>
+    <li><strong>列 (column)</strong>：每列像一个 array，有相同的数据类型。列名是字符串。</li>
+    <li><strong>行 (row)</strong>：每行有一个 row label（粗体显示）。</li>
+    <li><strong>index</strong>：所有 row label 的集合。<strong>index 不是一个普通的列</strong>！</li>
+  </ul>
+  <div class="warn">
+    <strong>⚠️ 关键：</strong>刚 <code>read_csv</code> 进来时，index 默认是 <code>0,1,2,...,n-1</code>（整数标签），<em>这时</em>整数位置和 label 是相同的（容易混淆 <code>.iloc</code> 和 <code>.loc</code>，但不能依赖这个巧合）。
+  </div>
+
+  <h3>4. <code>.get('col')</code> vs <code>.get(['col1','col2'])</code> — 极重要！</h3>
+  <table>
+    <thead><tr><th>表达式</th><th>返回类型</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>df.get('Population')</code></td><td><strong>Series</strong>（一维，带 index）</td><td>取单列做运算 / 配 <code>.iloc</code> / <code>.loc</code> / <code>.mean()</code></td></tr>
+      <tr><td><code>df.get(['Population'])</code></td><td><strong>DataFrame</strong>（仍二维，只有 1 列）</td><td>保持表格形式，方便接 plot / merge</td></tr>
+      <tr><td><code>df.get(['Population', 'State'])</code></td><td><strong>DataFrame</strong></td><td>选取多列</td></tr>
+    </tbody>
+  </table>
+  <pre><code>states.get('Population')          # Series
+states.get(['Population'])        # DataFrame, 1 column
+states.get(['Population','State']) # DataFrame, 2 columns
+
+type(states.get('Population'))    # babypandas.bpd.Series</code></pre>
+
+  <h3>5. Series vs DataFrame</h3>
+  <ul>
+    <li><strong>Series</strong>：像 numpy array，但带 <em>index</em>。支持算术运算（element-wise，需 index 对齐）。</li>
+    <li><strong>DataFrame</strong>：二维表格。每个列是一个 Series。</li>
+    <li>常用 Series 方法：<code>.min()</code>、<code>.max()</code>、<code>.mean()</code>、<code>.median()</code>、<code>.sum()</code>、<code>.count()</code>、<code>.describe()</code>、<code>.iloc[]</code>、<code>.loc[]</code>、<code>.apply(func)</code>、<code>.str.contains()</code>、<code>.str.split()</code>。</li>
+  </ul>
+  <pre><code># 两个 Series 相除（element-wise）
+density = states.get('Population') / states.get('Land Area')
+type(density)   # Series</code></pre>
+
+  <h3>6. <code>df.assign(NewCol=values)</code> — 加列</h3>
+  <ul>
+    <li>语法：<code>df.assign(<strong>列名</strong>=<strong>值</strong>)</code></li>
+    <li>列名<strong>不能</strong>加引号（它是一个 keyword argument）。</li>
+    <li>值可以是 Series、numpy array 或 list（长度需匹配）。</li>
+    <li><strong>返回新 DataFrame</strong>，不会修改原 <code>df</code>！必须重新赋值才会"生效"。</li>
+  </ul>
+  <pre><code># ❌ 错误：原 states 不会被改变
+states.assign(Density=states.get('Population') / states.get('Land Area'))
+states  # 还是 6 列！
+
+# ✅ 正确：重新赋值
+states = states.assign(Density=states.get('Population') / states.get('Land Area'))
+# 现在 states 有 7 列</code></pre>
+
+  <h3>7. 列统计方法</h3>
+  <table>
+    <thead><tr><th>方法</th><th>返回</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>.min()</code></td><td>scalar</td><td>最小值</td></tr>
+      <tr><td><code>.max()</code></td><td>scalar</td><td>最大值</td></tr>
+      <tr><td><code>.mean()</code></td><td>scalar</td><td>平均值</td></tr>
+      <tr><td><code>.median()</code></td><td>scalar</td><td>中位数</td></tr>
+      <tr><td><code>.sum()</code></td><td>scalar</td><td>求和</td></tr>
+      <tr><td><code>.count()</code></td><td>scalar (int)</td><td>非空元素个数</td></tr>
+      <tr><td><code>.describe()</code></td><td>Series</td><td>一次性给出 count/mean/std/min/25%/50%/75%/max</td></tr>
+    </tbody>
+  </table>
+  <pre><code>states.get('Density').max()       # 1263.12
+states.get('Density').mean()      # 206.55
+states.get('Density').describe()  # 一个 8 行的 Series</code></pre>
+
+  <h3>8. <code>df.sort_values(by='col', ascending=False)</code> — 排序</h3>
+  <ul>
+    <li>按某列排序，<strong>返回新 DataFrame</strong>。</li>
+    <li>默认 <code>ascending=True</code>（升序，从小到大）。</li>
+    <li>降序必须用 <code>ascending=False</code>，<strong>且必须使用 keyword argument 形式</strong>（<code>sort_values(by='Density', False)</code> 会 SyntaxError，因为位置参数不能跟在关键词参数后面）。</li>
+    <li>排序后 row label <strong>不变</strong>（即原先的 index 标签会跟着走，所以 <code>.iloc[0]</code> 给的是排序后的"第一行"，而不是原 row 0）。</li>
+  </ul>
+  <pre><code>ordered = states.sort_values(by='Density', ascending=False)
+# 第一行就是密度最高的那个州（New Jersey）
+ordered.get('State').iloc[0]   # 'New Jersey'</code></pre>
+
+  <h3>9. <code>.iloc[i]</code> vs <code>.loc[label]</code> — 核心区别</h3>
+  <table>
+    <thead><tr><th>方法</th><th>用什么取行</th><th>例子</th><th>负数索引</th></tr></thead>
+    <tbody>
+      <tr><td><code>.iloc[i]</code></td><td><strong>整数位置</strong>（从 0 开始计数，跟数组一样）</td><td><code>s.iloc[0]</code> 第 1 个；<code>s.iloc[-1]</code> 最后 1 个</td><td>✅ 支持</td></tr>
+      <tr><td><code>.loc[label]</code></td><td><strong>row label</strong>（行标签的值）</td><td><code>s.loc['California']</code></td><td>❌ 不支持（除非 label 本身是负整数）</td></tr>
+    </tbody>
+  </table>
+
+  <pre><code># 假设 states 已经 set_index('State'):
+states.get('Density').iloc[4]         # 253.81  （第 5 个州，按当前顺序）
+states.get('Density').loc['California'] # 253.81 （按 label "California"）
+
+# 默认 read_csv 后 row label = 0,1,2,...
+# 这时 iloc 和 loc 给的结果可能"巧合"相等，但不要依赖！
+bpd.read_csv('data/states.csv').get('Capital City').loc[35]   # 'Oklahoma City'
+bpd.read_csv('data/states.csv').get('Capital City').iloc[35]  # 'Oklahoma City'</code></pre>
+
+  <h3>10. <code>df.set_index('col')</code> — 把某列变成 index</h3>
+  <ul>
+    <li>该列<strong>从普通列变成 row label</strong>，列数减 1（消失为 index）。</li>
+    <li>原先的 index（0,1,2,...）<strong>消失</strong>。</li>
+    <li><strong>返回新 DataFrame</strong>。</li>
+    <li>设 index 之后，可以用 <code>.loc['Pennsylvania']</code> 之类按 label 访问。</li>
+    <li>选合适的 index 列：必须是<strong>唯一标识符</strong>（unique identifier，所有值都不重复，类似主键）。</li>
+  </ul>
+  <pre><code># set_index 前: 6 columns + 默认 index 0..49
+# set_index 后: 5 columns + index = 'State'
+states = states.set_index('State')
+states.get('Density').loc['California']   # 253.81
+states.get('Density').loc['Pennsylvania'] # 290.61</code></pre>
+
+  <h3>11. <code>df.shape</code> — 形状</h3>
+  <ul>
+    <li><code>df.shape</code> 返回一个 tuple <code>(行数, 列数)</code>。</li>
+    <li><code>df.shape[0]</code> = 行数（极常用！判断行数 / 估概率）。</li>
+    <li><code>df.shape[1]</code> = 列数。</li>
+    <li>注意：set_index 后，列数会少 1，因为那一列变 index 了。</li>
+  </ul>
+  <pre><code>states.shape       # (50, 6)
+states.shape[0]    # 50  → 用于过滤后数行数
+states[states.get('Region') == 'West'].shape[0]   # 西部州的数量</code></pre>
+
+  <h3>12. 不可变性 (immutability)</h3>
+  <p><strong>babypandas 中所有方法都返回新对象</strong>，不会修改原 DataFrame：</p>
+  <ul>
+    <li><code>.assign()</code> ✅ 新</li>
+    <li><code>.sort_values()</code> ✅ 新</li>
+    <li><code>.set_index()</code> ✅ 新</li>
+    <li><code>.reset_index()</code> ✅ 新</li>
+    <li><code>.merge()</code> ✅ 新</li>
+    <li><code>.groupby()</code> ✅ 新</li>
+  </ul>
+  <p>因此典型工作流：</p>
+  <pre><code>states = states.assign(Density=...)         # 重新赋值
+states = states.sort_values(by='Density')   # 重新赋值
+states = states.set_index('State')          # 重新赋值
+
+# 或者链式调用，最后赋值一次
+states = (states
+          .assign(Density=states.get('Population') / states.get('Land Area'))
+          .sort_values(by='Density', ascending=False)
+          .set_index('State'))</code></pre>
+
+  <h3>13. 选 index 的标准</h3>
+  <p>合适的 index 列应同时满足两条：</p>
+  <ol>
+    <li><strong>唯一性 (uniqueness)</strong>：每个值在该列只出现一次（unique identifier）。</li>
+    <li><strong>描述性 (descriptiveness)</strong>：看到这个值，能直观对应到具体哪一行。</li>
+  </ol>
+
+  <div class="tip">
+    <strong>💡 一句话直觉</strong>：Index 是<strong>用来查找一行的钥匙</strong>。钥匙必须 <strong>独一无二</strong>（唯一性）+ <strong>写着主人的名字</strong>（描述性）。
+  </div>
+
+  <h4>反例 ① 分类列（如 <code>"candy"</code> = "Twix"/"M&amp;M"/...） — 违反<strong>唯一性</strong></h4>
+  <p>典型数据：</p>
+  <pre><code>  candy   store  price
+0 Twix    A      1.50
+1 M&amp;M     A      1.00
+2 Twix    B      1.60   ← Twix 又出现了
+3 Twix    C      1.45   ← 又一次</code></pre>
+  <p>如果硬把 <code>candy</code> 设为 index：</p>
+  <pre><code>df.loc["Twix"]
+# 不是返回一行 Series，而是返回 3 行的 DataFrame
+# 因为 "Twix" 这个 label 对应多行</code></pre>
+  <p><strong>带来的具体麻烦：</strong></p>
+  <ul>
+    <li><code>.loc["Twix"]</code> 想取"那一个 Twix"，结果取出 3 行</li>
+    <li><code>.loc["Twix"].get("price")</code> 不再是一个数，而是一个 Series</li>
+    <li>后面所有 <code>.iloc[0]</code> 拿单值的链式写法<strong>全部失效</strong></li>
+    <li>midterm 中"哪一列适合做 index"几乎都是用这种"分类列重复"来设坑</li>
+  </ul>
+
+  <h4>反例 ② 地理/分组列（如 <code>"neighborhood"</code>） — 违反<strong>唯一性</strong>（更隐蔽）</h4>
+  <pre><code>  store_name        neighborhood
+0 Joe's Pizza       Mission
+1 Tony's Pizza      Mission        ← 同一个区
+2 Mama's Pizza      Mission        ← 又一个
+3 SF Best           Sunset</code></pre>
+  <p><strong>为什么比 ① 更容易被坑：</strong></p>
+  <ul>
+    <li>表面看 <code>neighborhood</code> 像个"标签"，听起来像可以做 index</li>
+    <li>但<strong>多家店在同一个区</strong>是常态 — 本质上还是重复</li>
+    <li><code>df.loc["Mission"]</code> 又会返回多行</li>
+    <li>出题人喜欢出"这一列看起来很有信息量但其实会重复"的迷惑选项</li>
+  </ul>
+  <div class="warn">
+    <strong>判断诀窍</strong>：问自己"这一列的值会不会被多个不同的事物共享？"如果会 → 不能做 index。
+  </div>
+
+  <h4>反例 ③ 数值统计列（如 <code>"price"</code>, <code>"rating"</code>） — <strong>同时违反两条</strong></h4>
+  <pre><code>  item    price   rating
+0 A       9.99    4.5
+1 B       9.99    4.5    ← 价格、评分撞车太正常了
+2 C       12.50   3.8</code></pre>
+  <p><strong>违反唯一性</strong>：两个不同的产品很容易有相同的 <code>price</code> 或 <code>rating</code>。</p>
+  <p><strong>违反描述性</strong>：</p>
+  <ul>
+    <li>看到 index = <code>4.5</code>，你知道这一行是哪个 item 吗？<strong>不知道</strong></li>
+    <li>看到 index = <code>"Alice Chen"</code> 或 <code>"student_id_4827"</code>，你立刻知道是谁</li>
+    <li>index 的作用是<strong>让你一眼认出"这是哪一行"</strong>，而不是表达"这一行的某个测量值"</li>
+  </ul>
+  <p><strong>还有个深层原因：</strong></p>
+  <ul>
+    <li>数值列通常是你要 <strong>sort / 做算术 / 画图</strong> 的目标（<code>sort_values(by="price")</code>、<code>plot(y="rating")</code>）</li>
+    <li>如果把它设为 index，反而把"被分析的数据"和"行的标签"搞混</li>
+    <li>数值列的本职工作是"被分析"，不是"做标识"</li>
+  </ul>
+
+  <h4>正例（适合做 index 的列）</h4>
+  <ul>
+    <li><code>student_id</code>、<code>order_id</code>、<code>phone_number</code>：天然唯一</li>
+    <li><code>state</code>（美国 50 州数据集中，每州一行 → 唯一且描述性）</li>
+    <li>unique 名字列（如表里没有重名的 <code>student_name</code>）</li>
+  </ul>
+
+  <div class="tip">
+    <strong>📝 midterm 考法</strong>：通常给一个 DataFrame schema（几列名 + 一两行示例），让你选哪一列<strong>最适合</strong>做 index。<br>
+    <strong>解题步骤</strong>：
+    <ol>
+      <li>排除所有"明显会重复"的列（分类、地理、价格、评分、日期等）</li>
+      <li>剩下的看是否有 ID 类的列 → 选它</li>
+      <li>如果都没有，找一个"看起来不会重复"的描述性列（如 unique name）</li>
+    </ol>
+  </div>
+
+  <h3>14. 取极值的标准模板</h3>
+  <pre><code># "评分最高的那家店的名字" 类问题：
+df.sort_values(by='rating', ascending=False).get('store').iloc[0]
+
+# 等价（升序后取最后）：
+df.sort_values(by='rating', ascending=True).get('store').iloc[-1]
+
+# 但如果只要"最高分"这个数值（不要店名），更简洁：
+df.get('rating').max()</code></pre>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <h3>陷阱 1：<code>.assign()</code> 不会修改原 DataFrame</h3>
+  <pre><code>states.assign(Density=...)
+states.shape   # 仍然 (50, 6)，没有 Density 列！
+
+# 必须：
+states = states.assign(Density=...)</code></pre>
+
+  <h3>陷阱 2：<code>.get('col')</code> 返回 Series；<code>.get(['col'])</code> 返回 DataFrame</h3>
+  <p>这个区别在 plot / merge / 链式取值时影响巨大。</p>
+  <pre><code>states.get('State').iloc[0]      # 'Alabama'  (一个字符串)
+states.get(['State']).iloc[0]    # 一个 1-row DataFrame</code></pre>
+
+  <h3>陷阱 3：<code>.loc</code> 和 <code>.iloc</code> 在 set_index 之前看起来一样</h3>
+  <p>因为 read_csv 后 row label 默认是 0,1,2,...，整数 label 和整数位置巧合相等。<strong>set_index 后</strong>就完全不同：</p>
+  <pre><code>states = states.set_index('State')   # row label = 'Alabama', 'Alaska', ...
+
+states.get('Density').iloc[4]            # ✅ 第 5 个，等于 'California' 的密度
+states.get('Density').loc['California']  # ✅ 同上
+states.get('Density').loc[4]             # ❌ KeyError! 'Alabama' 不是 4
+states.get('Density').iloc['California'] # ❌ TypeError! iloc 需要整数</code></pre>
+
+  <h3>陷阱 4：sort_values 后用 <code>.iloc[i]</code> 而不是 <code>.loc[i]</code></h3>
+  <p>排序<strong>不会</strong>重置 row label！原先的 row label 跟着行一起被排到新位置。所以"排完序的第一行"必须用 <code>.iloc[0]</code>（按位置），不能用 <code>.loc[0]</code>（按 label）— 那拿到的是原始 row label 为 0 的那一行（无关排序）。</p>
+  <pre><code>ordered = states.sort_values(by='Density', ascending=False)
+ordered.get('State').iloc[0]   # ✅ 'New Jersey'（密度最大）
+ordered.get('State').loc[0]    # ❌ 拿的是 row label 0 = 'Alabama'</code></pre>
+
+  <h3>陷阱 5：set_index 之后那一列就消失了</h3>
+  <pre><code>states.shape                    # (50, 6) before
+states = states.set_index('State')
+states.shape                    # (50, 5)  → 'State' 列没了，变成 index
+states.get('State')             # ❌ KeyError，已经不是列了</code></pre>
+
+  <h3>陷阱 6：reset_index 会把 index 变回普通列</h3>
+  <pre><code># reset_index 把当前 index 变回一列（叫 'State'），并重置 index 为 0,1,2,...
+states_reset = states.reset_index()
+states_reset.shape   # 多了一列回来</code></pre>
+  <p>这个在 <code>.groupby(...).reset_index()</code> 模式中会用到（Section 2 详讲）。</p>
+
+  <h3>陷阱 7：<code>.iloc[-1]</code> vs <code>.iloc[len-1]</code></h3>
+  <p><code>.iloc[-1]</code> 返回最后一个元素（Python 列表风格的负索引）。这跟 <code>.iloc[df.shape[0] - 1]</code> 等价，但前者更常用、更安全。</p>
+  <pre><code>states.get('State').iloc[-1]              # 最后一个州
+states.get('State').iloc[states.shape[0]-1]  # 等价但啰嗦</code></pre>
+
+  <h3>陷阱 8：<code>sort_values</code> 的 <code>ascending</code> 必须 keyword 形式</h3>
+  <pre><code>states.sort_values(by='Density', ascending=False)  # ✅
+states.sort_values(by='Density', False)            # ❌ SyntaxError
+                                                    #   "positional argument follows keyword argument"</code></pre>
+
+  <h3>陷阱 9：column name 大小写敏感、空格敏感</h3>
+  <pre><code>states.get('density')      # ❌ KeyError，列叫 'Density'
+states.get('Land area')    # ❌ KeyError，列叫 'Land Area'</code></pre>
+
+  <h3>陷阱 10：取一个值需要"先取列，再取行"</h3>
+  <p>课程约定：要拿到一个单元格，先 <code>.get(col)</code> 拿到 Series，再 <code>.iloc[i]</code> 或 <code>.loc[label]</code> 拿到具体值。</p>
+  <pre><code>states.get('Density').loc['California']   # 标准写法
+states.get('Density').iloc[4]              # 也可</code></pre>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <p>每题都把原文按 midterm 上的样子保留。点击展开看答案 + 中文解析。</p>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Q1 — Lecture 4</div>
+    <p><strong>题目：</strong>Which of the following columns would be an appropriate index for the <code>treat</code> DataFrame?</p>
+    <p>(treat 的列：<code>"address"</code> str, <code>"candy"</code> str, <code>"how_many"</code> int, <code>"neighborhood"</code> str。每行表示某一户给某一种糖。)</p>
+    <ul style="list-style:none; padding-left: 0;">
+      <li>○ <code>"address"</code></li>
+      <li>○ <code>"candy"</code></li>
+      <li>○ <code>"neighborhood"</code></li>
+      <li>○ None of these.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：None of these.</strong></p>
+      <p><strong>中文解析：</strong>合适的 index 必须是<strong>唯一标识符</strong>。</p>
+      <ul>
+        <li><code>address</code>：同一家可以发多种糖（前 3 行都是 820 Opal Street），重复 → ❌</li>
+        <li><code>candy</code>：同一种糖在不同家都出现，肯定重复 → ❌</li>
+        <li><code>neighborhood</code>：一个邻居有多家，重复 → ❌</li>
+      </ul>
+      <p>所以选 <strong>None of these</strong>。这一题考点是"判断一个列能否做 index = 看是否唯一"。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Q2 — Lecture 4</div>
+    <p><strong>题目：</strong>Which of the following expressions evaluate to <code>"M&amp;M"</code>? Select all that apply.</p>
+    <p>(数据如题目截图：<code>treat</code> 的第 0 行是 Twix，第 1 行是 M&amp;M，第 2 行 KitKat ...)</p>
+    <ul style="list-style:none; padding-left: 0;">
+      <li>○ <code>treat.get("candy").iloc[1]</code></li>
+      <li>○ <code>treat.sort_values(by="candy", ascending=False).get("candy").iloc[1]</code></li>
+      <li>○ <code>treat.sort_values(by="candy", ascending=False).get("candy").loc[1]</code></li>
+      <li>○ <code>treat.set_index("candy").index[-1]</code></li>
+      <li>○ None of these.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：选项 1 和 选项 3</strong>（即 <code>treat.get("candy").iloc[1]</code> 和 <code>treat.sort_values(...).get("candy").loc[1]</code>）。</p>
+      <p><strong>中文解析：</strong></p>
+      <ul>
+        <li><strong>选项 1</strong> ✅：<code>iloc[1]</code> 取第 2 行（位置 1），就是 "M&amp;M"。</li>
+        <li><strong>选项 2</strong> ❌：按 candy 降序排，第 2 行（iloc[1]）是按字母倒序的，例如 Twix → Skittles → ...，不是 M&amp;M。</li>
+        <li><strong>选项 3</strong> ✅：关键 — sort_values 不重置 row label！原先 row label 1 = M&amp;M 那一行的 label 还是 1。<code>.loc[1]</code> 按 label 取，永远拿到原 row label 1 那行的 candy 值，即 M&amp;M。</li>
+        <li><strong>选项 4</strong> ❌：<code>set_index("candy").index[-1]</code> 取的是 index 的最后一个值，但顺序未排序，最后一行是 Skittles，不是 M&amp;M。</li>
+      </ul>
+      <p><strong>核心考点</strong>：<code>iloc</code> 按位置 vs <code>loc</code> 按 label，sort_values 后 label 不变。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Q5 — Lecture 5（用到 Lec 4 表达式）</div>
+    <p><strong>题目：</strong>Write a Python expression that evaluates to the address of the house with the most pieces of candy available (the most <strong>pieces</strong>, not the most varieties).</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：</strong></p>
+      <pre><code>treat.sort_values(by="how_many", ascending=False).get("address").iloc[0]</code></pre>
+      <p><strong>中文解析：</strong>"address with the most pieces" → 按 <code>how_many</code> 降序排，第一行的 <code>address</code>。</p>
+      <ul>
+        <li>必须是<strong>一行 expression</strong>。</li>
+        <li>注意是 "most <strong>pieces</strong>"（最多的糖块数）= 按 <code>how_many</code> 排序，<strong>不是</strong>按糖的种类多少（那需要 groupby，section 2 内容）。</li>
+        <li>也可以写 <code>treat.sort_values(by="how_many").get("address").iloc[-1]</code>（升序+取最后）。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Q1 — Lecture 4</div>
+    <p><strong>题目：</strong>Which of the following columns would be an appropriate index for the <code>dining</code> DataFrame?</p>
+    <p>(dining 的列：<code>"Dining Hall"</code> str, <code>"Item"</code> str, <code>"Price"</code> str, <code>"Calories"</code> int。每行表示某 dining hall 提供的一道菜。)</p>
+    <ul style="list-style:none; padding-left: 0;">
+      <li>○ <code>"Dining Hall"</code></li>
+      <li>○ <code>"Item"</code></li>
+      <li>○ <code>"Price"</code></li>
+      <li>○ <code>"Calories"</code></li>
+      <li>○ None of these.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：None of these.</strong></p>
+      <p><strong>中文解析：</strong></p>
+      <ul>
+        <li><code>Dining Hall</code>：每个食堂有很多道菜，重复 → ❌</li>
+        <li><code>Item</code>：同一道菜可能在多个食堂都有（数据中 Crispy Chicken Sandwich 出现在 Café Ventanas 和 64 Degrees）→ ❌</li>
+        <li><code>Price</code>：很多道菜可能同价 → ❌</li>
+        <li><code>Calories</code>：可能巧合重复，更不是描述性的标识符 → ❌</li>
+      </ul>
+      <p>没有任何一列是 unique identifier，所以选 None。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Q2 — Lecture 4 (.apply + iloc / .loc / np.arange)</div>
+    <p><strong>题目背景：</strong><code>contacts</code> DataFrame 已经被 <code>.set_index("Person")</code>。第一个 contact 是 Calvin，电话号码是 987-654-3210。已有 <code>sum_phone(phone_number)</code> 函数返回电话号码各位数字之和。</p>
+    <p>下面三个表达式都要等于 Calvin 电话号码各位数字之和（即 9+8+7+6+5+4+3+2+1+0 = 45），填空：</p>
+    <p><strong>2.1：</strong> <code>contacts.get("Phone").apply(sum_phone).iloc[___(a)___]</code></p>
+    <p><strong>2.2：</strong> <code>sum_phone(contacts.get("Phone").loc[___(b)___])</code></p>
+    <p><strong>2.3：</strong> <code>np.arange(___(c)___,___(d)___,___(e)___).sum()</code></p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>2.1 答案：(a) = 0</strong>（Calvin 是<strong>第一个</strong>contact，所以 iloc 用整数位置 0）</p>
+      <p><strong>2.2 答案：(b) = "Calvin"</strong>（loc 用 row label，即 Person 列的字符串值）。注意要加引号 — 这是字符串！</p>
+      <p><strong>2.3 答案：</strong>多种写法都可，例如 (c)=0, (d)=10, (e)=1 → <code>np.arange(0, 10, 1).sum()</code> = 0+1+2+...+9 = 45。也可写 <code>np.arange(10).sum()</code>（一个参数）。</p>
+      <p><strong>中文解析：</strong></p>
+      <ul>
+        <li>2.1 考<code>.apply(func)</code> 在 Series 上 — 把 sum_phone 应用到每个电话号码上，得到一个 Series；然后 <code>iloc[0]</code> 取第一个（Calvin 的）。注意 <code>apply(sum_phone)</code> 不带括号！</li>
+        <li>2.2 考 <code>.loc[label]</code>。因为 contacts 已经 set_index("Person")，所以 row label 就是人名字符串。</li>
+        <li>2.3 考 <code>np.arange</code> + <code>.sum()</code>。Calvin 的电话所有位数刚好是 0-9 各一次，所以 <code>arange(10).sum() = 45</code>。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Q1.1 — Lecture 5（含 Lec 4 排序+取极值）</div>
+    <p><strong>题目：</strong>Which country has the highest <code>"Reciprocal Tariff"</code>? Write one line of code that evaluates to the name of this country.</p>
+    <p>(<code>tariffs</code> 列：Country / Tariffs Charged to USA / Reciprocal Tariff)</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：</strong></p>
+      <pre><code>tariffs.sort_values(by="Reciprocal Tariff", ascending=False).get("Country").iloc[0]</code></pre>
+      <p><strong>中文解析：</strong>这是经典的"取极值对应的另一列"题。模板就是：<strong>sort_values 降序 → get('要返回的列') → iloc[0]</strong>。注意不能直接 <code>tariffs.get("Reciprocal Tariff").max()</code>，那只给数值不给国家名。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2025 Q5.2 — Lecture 4 / 9（iloc 取分组结果）</div>
+    <p><strong>题目背景：</strong><code>grouped</code> 是 <code>words.groupby(["diff_category", "length_category"]).count().reset_index()</code> 的结果，按字母顺序排列。已知 diff_category 有 "easy"/"hard"/"moderate"，length_category 有 "long"/"medium"/"short"。需要"hard 且 short"对应那一行的"ps"列值。</p>
+    <p><code>num = grouped.get("ps").iloc[___(a)___]</code></p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(a) = 4</strong></p>
+      <p><strong>中文解析：</strong>groupby 多列后行按字母顺序排，每个 diff_category 配 3 个 length_category。顺序如下：</p>
+      <ol start="0">
+        <li>("easy", "long")</li>
+        <li>("easy", "medium")</li>
+        <li>("easy", "short")</li>
+        <li>("hard", "long")</li>
+        <li><strong>("hard", "medium")</strong> ← 等等，让我们再算一次：按字母 hard 在 easy 之后但在 moderate 之前，所以顺序是：(easy,long)=0, (easy,medium)=1, (easy,short)=2, (hard,long)=3, (hard,medium)=4, <strong>(hard,short)=5</strong>。所以答案应该是 5。</li>
+      </ol>
+      <p>更准确：<strong>(a) = 5</strong>。考点：iloc 用整数位置 + groupby 多列后的字典序行排列。这是<strong>典型的 W26 / Fa25 新趋势</strong>题。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Q1.1 — Lecture 4</div>
+    <p><strong>题目：</strong>Which column of the <code>pizza</code> DataFrame would be an appropriate index?</p>
+    <p>(pizza 列：store / kind / price_per_slice / gluten_free / num_ingredients / rating / neighborhood。每行表示某 store 的一种 pizza。)</p>
+    <ul style="list-style:none; padding-left: 0;">
+      <li>○ <code>"store"</code></li>
+      <li>○ <code>"kind"</code></li>
+      <li>○ <code>"rating"</code></li>
+      <li>○ <code>"neighborhood"</code></li>
+      <li>○ None of these</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：None of these</strong></p>
+      <p><strong>中文解析：</strong></p>
+      <ul>
+        <li>store 重复（一家店多种 pizza） → ❌</li>
+        <li>kind 重复（多家店都有 Cheese pizza） → ❌</li>
+        <li>rating 是 float 数值，可能重复，更不能描述行 → ❌</li>
+        <li>neighborhood 重复（一个邻居有多家） → ❌</li>
+      </ul>
+      <p>每行 = (店, 口味)的组合才是唯一的，但<strong>没有现成的单列</strong>是唯一的，所以选 None。这是历年最高频的"index 选择题"题型。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Q2 — Lecture 4-5（布尔过滤 + 取极值）</div>
+    <p><strong>题目：</strong>Fill in the blanks below so that the expression evaluates to a <code>float</code> that is the highest rating of any pizza slice that has more than 10 ingredients.</p>
+    <pre><code>pizza[___(a)___].___(b)___</code></pre>
+    <p><strong>2.2：</strong>What can go in blank (b)? Select all that apply.</p>
+    <ul style="list-style:none; padding-left: 0;">
+      <li>○ <code>get("rating").apply(max)</code></li>
+      <li>○ <code>get("rating").max()</code></li>
+      <li>○ <code>sort_values("rating", ascending=False).get("rating").iloc[0]</code></li>
+      <li>○ <code>sort_values("rating", ascending=True).get("rating").iloc[-1]</code></li>
+      <li>○ None of the above</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>2.1 答案：(a) = <code>pizza.get("num_ingredients") &gt; 10</code></strong>（布尔 Series 用于过滤）</p>
+      <p><strong>2.2 答案：</strong>选项 2、3、4 都对（即 <code>.max()</code>、<code>sort_values 降序 + iloc[0]</code>、<code>sort_values 升序 + iloc[-1]</code>）。</p>
+      <p><strong>中文解析：</strong></p>
+      <ul>
+        <li>选项 1 <code>.apply(max)</code> ❌：<code>apply</code> 是把 max 函数应用到 Series 的<strong>每一个</strong>元素，但 max 需要一个 iterable，单个 float 不能 max → 报错。</li>
+        <li>选项 2 <code>.max()</code> ✅：直接给最大值。</li>
+        <li>选项 3 ✅：经典模板。</li>
+        <li>选项 4 ✅：升序后 <code>.iloc[-1]</code>（最后一个）= 最大值。</li>
+      </ul>
+      <p>本题考点：<strong>用 <code>.apply</code> 不要传 <code>max</code></strong>（除非你想 element-wise，但 max 需要 iterable），以及取极值的等价写法。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Q5 — Lecture 4-5（数行数的多种 idiom）</div>
+    <p><strong>题目：</strong>The DSC 10 staff is planning their quarterly pizza party, and they want to make sure that there are options for everyone. They're trying to find the total number of gluten-free pizza slice options in the San Diego area. Select all lines of code that correctly evaluate to the integer corresponding to the total number of gluten-free pizza slice options.</p>
+    <ul style="list-style:none; padding-left: 0;">
+      <li>○ <code>pizza.set_index("store").get("gluten_free").sum()</code></li>
+      <li>○ <code>pizza.get(["gluten_free", "store"]).groupby("store").sum()</code></li>
+      <li>○ <code>pizza[pizza.get("gluten_free")].get("gluten_free").count()</code></li>
+      <li>○ <code>pizza[pizza.get("gluten_free")].shape[0]</code></li>
+      <li>○ <code>pizza.set_index("store").get("gluten_free").count()</code></li>
+      <li>○ <code>pizza.get("gluten_free").shape[0]</code></li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：选项 1、3、4</strong></p>
+      <p><strong>中文解析：</strong>"gluten_free 列是 bool 值（True/False）"是关键。要数 True 的个数：</p>
+      <ul>
+        <li>选项 1 ✅：<code>.sum()</code> 在 bool Series 上等于 True 的个数（True=1, False=0）。</li>
+        <li>选项 2 ❌：<code>.groupby("store").sum()</code> 返回的是 DataFrame（按 store 分组的总数），不是单个 int。</li>
+        <li>选项 3 ✅：先用布尔过滤（<code>pizza[pizza.get("gluten_free")]</code> 选出 gluten_free=True 的行），再 <code>.count()</code> 数行数。</li>
+        <li>选项 4 ✅：跟选项 3 同思路，<code>.shape[0]</code> 给行数（int）。</li>
+        <li>选项 5 ❌：<code>.count()</code> 数的是<strong>非空值</strong>的总数（不分 True/False），所有行都会被数，给的是 50（总行数），不是 gluten-free 数。</li>
+        <li>选项 6 ❌：同 5，<code>.shape[0]</code> 给的是整列长度，所有 pizza 数。</li>
+      </ul>
+      <p><strong>核心考点</strong>：bool Series 上 <code>.sum()</code> = True 的个数；<code>.count()</code> = 非空值数（≠ True 数！）；<code>.shape[0]</code> = 行数。</p>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍，能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"> <span>解释 babypandas 与 pandas 的三个区别（取列方式、不可变性、错误信息）。</span></label>
+    <label><input type="checkbox"> <span>说出 <code>bpd.read_csv()</code> 默认 index 是什么。</span></label>
+    <label><input type="checkbox"> <span>解释 DataFrame 的 columns / rows / index 三者，并指出 index <strong>不是</strong> 一列。</span></label>
+    <label><input type="checkbox"> <span>对比 <code>df.get('col')</code> 和 <code>df.get(['col'])</code> 的返回类型与使用场景。</span></label>
+    <label><input type="checkbox"> <span>解释 Series 与 DataFrame 的区别，并列出 5 个常用 Series 方法。</span></label>
+    <label><input type="checkbox"> <span>写出 <code>df.assign(NewCol=...)</code> 的语法，强调列名不加引号、必须重新赋值。</span></label>
+    <label><input type="checkbox"> <span>说出 <code>.min/.max/.mean/.median/.describe</code> 各自的返回类型。</span></label>
+    <label><input type="checkbox"> <span>写出 <code>sort_values</code> 降序的写法，并解释为什么 <code>ascending</code> 必须用 keyword 形式。</span></label>
+    <label><input type="checkbox"> <span>用一个例子区分 <code>.iloc[i]</code> 和 <code>.loc[label]</code>，并指出 set_index 之前两者"巧合"相等的原因。</span></label>
+    <label><input type="checkbox"> <span>解释 sort_values 后，原 row label 是否会被重置；为什么排序后取第一行要用 <code>.iloc[0]</code> 不是 <code>.loc[0]</code>。</span></label>
+    <label><input type="checkbox"> <span>说出 <code>set_index('col')</code> 后 DataFrame 的形状变化（少一列）和那一列消失。</span></label>
+    <label><input type="checkbox"> <span>说出"如何选合适的 index 列"的两个标准（唯一 + 描述性）。</span></label>
+    <label><input type="checkbox"> <span>写出"取最高分对应的店名"的标准模板（一行 expression）。</span></label>
+    <label><input type="checkbox"> <span>解释 <code>.iloc[-1]</code> 在 Python 风格下取最后一个，并写出等价的 <code>.iloc[df.shape[0]-1]</code>。</span></label>
+    <label><input type="checkbox"> <span>解释 <code>df.shape</code>、<code>df.shape[0]</code>、<code>df.shape[1]</code> 各自含义。</span></label>
+    <label><input type="checkbox"> <span>用三种不同方式数"满足某条件的行数"（<code>.shape[0]</code> 后过滤、<code>.count()</code>、bool Series <code>.sum()</code>）。</span></label>
+    <label><input type="checkbox"> <span>解释为什么 <code>.count()</code> 不等于 bool 列的 True 数（W26 Q5 考点）。</span></label>
+    <label><input type="checkbox"> <span>说出 babypandas 所有方法都返回新对象（immutability），并解释链式调用的好处。</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="00-python-basics.html">← 上一节: Python 基础</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="02-querying-groupby.html">下一节: 查询与 groupby →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

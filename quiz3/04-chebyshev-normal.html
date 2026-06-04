@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 4 · Chebyshev & Normal - DSC10 Quiz3</title>
+<style>
+  :root {
+    --bg: #fafaf7; --text: #1f2328; --muted: #57606a;
+    --accent: #0969da; --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e; --code-text: #cdd6f4;
+    --warn-bg: #fff8c5; --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff; --tip-border: #54aeff;
+    --danger-bg: #ffebe9; --danger-border: #cf222e;
+    --ok-bg: #dafbe1; --ok-border: #1a7f37;
+    --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781;
+    --border: #d0d7de; --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 10px 16px; margin: 12px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .cmp-table th { font-size: 13px; }
+  .cmp-table td.cheb { background: #fff8c5; }
+  .cmp-table td.norm { background: #ddf4ff; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 Quiz3 总目录</a></span>
+  <span><a href="03-ci-interpretation-spread.html">← 上一节</a> <a href="05-clt-clt-ci.html">下一节: CLT & CLT-CI →</a></span>
+</nav>
+
+<main>
+  <h1>Section 4 · Chebyshev & Normal Distribution</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 16（Standardization and the Normal Distribution）｜
+    <strong>Quiz3 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1（W26 新趋势）</span>｜
+    <strong>预计学习时间</strong>：2 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+  <p>本节是 <strong>Sp25/W25/W26 三连考的新趋势</strong>。Chebyshev 给定 mean+SD → 反推区间，再问"如果数据 normal 那是多少 %"。<code>scipy.stats.norm.cdf</code> 几乎每年都考。</p>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>形式</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Chebyshev's inequality 反推 SD 或区间</strong></td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>Sp25, W25, W26 都考。常见 75% / 88.8% / 15/16</td></tr>
+      <tr><td><strong>给定区间 + normal 假设 → 估 %</strong></td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>常与 Chebyshev 配套</td></tr>
+      <tr><td><strong><code>scipy.stats.norm.cdf(z)</code> 计算与组合</strong></td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>W24, F24 直接考</td></tr>
+      <tr><td><strong>标准单位（standard units）转换</strong></td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>z = (x − mean) / SD</td></tr>
+      <tr><td>68 / 95 / 99.7 经验法则</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>背熟，可手算 norm.cdf(-2)=2.5%</td></tr>
+      <tr><td>区分"数据 normal" vs "sample mean normal"（CLT 铺垫）</td><td><span class="tier tier-2">⭐⭐</span></td><td>F24 Q2.3, W26 Q1.2</td></tr>
+      <tr><td>Inflection point at ±1 SD</td><td><span class="tier tier-3">⭐</span></td><td>偶尔出（用于看 histogram 估 SD）</td></tr>
+      <tr><td>Pooling normals 不一定 normal</td><td><span class="tier tier-3">⭐</span></td><td>W26 Q1.4 新趋势</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. Chebyshev's Inequality <span class="highlight">（必背）</span></h3>
+  <p><strong>核心命题</strong>：对<strong>任何</strong>数值分布，在 "mean ± z SDs" 范围内的比例 <strong>至少</strong> 是：</p>
+  <div class="formula">
+    P(|x − mean| ≤ z · SD) ≥ 1 − 1/z²
+  </div>
+
+  <h4>常用 z 值（必背）</h4>
+  <table>
+    <thead><tr><th>范围</th><th>1 − 1/z²</th><th>百分比</th><th>= 分数</th></tr></thead>
+    <tbody>
+      <tr><td>mean ± 2 SDs</td><td>1 − 1/4 = 3/4</td><td>≥ 75%</td><td>3/4</td></tr>
+      <tr><td>mean ± 3 SDs</td><td>1 − 1/9 = 8/9</td><td>≥ 88.88%</td><td>8/9</td></tr>
+      <tr><td>mean ± 4 SDs</td><td>1 − 1/16 = 15/16</td><td>≥ 93.75%</td><td>15/16</td></tr>
+      <tr><td>mean ± 5 SDs</td><td>1 − 1/25 = 24/25</td><td>≥ 96%</td><td>24/25</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip">
+    <strong>📌 反向用</strong>：题目给比例 → 求 z。<br>
+    "至少 75%" → z=2　"至少 8/9" → z=3　"至少 15/16" → z=4　"至少 24/25" → z=5
+  </div>
+
+  <h4>例题 (Lec16 Activity)</h4>
+  <p>题：Chebyshev 告诉我们至少 8/9 的数据在 [−20, 40] 内。求 SD。</p>
+  <p>解：8/9 → z=3。区间是 mean ± 3·SD。区间宽度 = 60 = 2 · 3 · SD = 6·SD → <strong>SD = 10</strong>。mean = (−20+40)/2 = 10。</p>
+
+  <h3>2. 关键性质：Chebyshev 给 <span class="highlight">下界</span></h3>
+  <ul>
+    <li>"<strong>at least</strong>" 1 − 1/z²，意思是<strong>不会更少</strong>，但可能更多。</li>
+    <li>对任何分布都成立——无论是不是 normal、是不是 skewed。</li>
+    <li>真实比例往往远超下界。例如 flight delays 在 mean ± 2 SDs 内的实际比例 ≈ 95.6%（远超 Chebyshev 保证的 75%）。</li>
+  </ul>
+
+  <h3>3. Standardization（标准化）</h3>
+  <div class="formula">
+    x<sub>i (su)</sub> = (x<sub>i</sub> − mean of x) / SD of x
+  </div>
+
+  <p><strong>含义</strong>：x<sub>i</sub> 在 standard units 下，表示它<strong>比 mean 高出几个 SD</strong>。</p>
+
+  <h4>性质</h4>
+  <ul>
+    <li>标准化后的变量 mean = 0，SD = 1。</li>
+    <li>标准化后保持<strong>分布形状不变</strong>（只是平移 + 缩放）—— skewed 的依然 skewed！标准化<strong>不</strong>把分布变成 normal。</li>
+  </ul>
+
+<pre><code>def standard_units(col):
+    return (col - col.mean()) / np.std(col)</code></pre>
+
+  <h3>4. The Standard Normal Distribution</h3>
+  <p>钟形曲线 (bell curve)，定义在 z 轴 (标准单位) 上：</p>
+  <div class="formula">
+    φ(z) = 1/√(2π) · e^(−z²/2)
+  </div>
+  <div class="warn"><strong>不用背公式</strong>，但要知道<strong>形状</strong>。</div>
+
+  <h4>关键性质</h4>
+  <ul>
+    <li>对称，mean = median = 0。</li>
+    <li>总面积 = 1。</li>
+    <li><strong>Inflection points 在 z = ±1</strong>（即 ±1 SD）—— 可用来从图上目测 SD。</li>
+    <li>"区间 [a, b] 下的面积" = "数据落在 [a, b] 内的比例"。</li>
+  </ul>
+
+  <h3>5. <code>scipy.stats.norm.cdf(z)</code></h3>
+  <p><strong>定义</strong>：返回 standard normal curve 上 z 左边的面积。</p>
+
+  <table>
+    <thead><tr><th>想求...</th><th>用</th></tr></thead>
+    <tbody>
+      <tr><td>面积在 z 左边 (≤ z)</td><td><code>stats.norm.cdf(z)</code></td></tr>
+      <tr><td>面积在 z 右边 (≥ z)</td><td><code>1 - stats.norm.cdf(z)</code></td></tr>
+      <tr><td>面积在 [a, b] 之间</td><td><code>stats.norm.cdf(b) - stats.norm.cdf(a)</code></td></tr>
+    </tbody>
+  </table>
+
+  <h4>常用值（背熟）</h4>
+<pre><code>stats.norm.cdf(0)    ≈ 0.5
+stats.norm.cdf(1)    ≈ 0.8413  (1 SD 左边 ≈ 84%)
+stats.norm.cdf(-1)   ≈ 0.1587  (1 SD 左边对称：16%)
+stats.norm.cdf(2)    ≈ 0.9772  → 1 - 0.9772 = 2.28%
+stats.norm.cdf(-2)   ≈ 0.0228  → ≈ 2.5%
+stats.norm.cdf(1.96) - stats.norm.cdf(-1.96) ≈ 0.95</code></pre>
+
+  <h3>6. 68 / 95 / 99.7 经验法则（必背）</h3>
+  <p>仅对<strong>近似 normal</strong> 的分布成立。</p>
+
+  <table class="cmp-table">
+    <thead><tr><th>范围</th><th>任何分布<br>(Chebyshev 下界)</th><th>Normal 分布<br>(精确)</th></tr></thead>
+    <tbody>
+      <tr><td>mean ± 1 SD</td><td class="cheb">≥ 0%（无意义）</td><td class="norm">≈ 68%</td></tr>
+      <tr><td>mean ± 2 SDs</td><td class="cheb">≥ 75%</td><td class="norm">≈ 95%</td></tr>
+      <tr><td>mean ± 3 SDs</td><td class="cheb">≥ 88.8%</td><td class="norm">≈ 99.73%</td></tr>
+      <tr><td>mean ± 4 SDs</td><td class="cheb">≥ 93.75%</td><td class="norm">≈ 99.99%（约 100%）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7. 用 Normal 估非标准化分布的比例</h3>
+  <p><strong>思路</strong>：原分布如果 roughly normal，把值标准化后查 <code>stats.norm.cdf</code>。</p>
+
+  <h4>例（Lec16）：身高 weight ~ Normal(187, 19.78)，求 weight 在 [200, 225] 的比例</h4>
+<pre><code>weight_mean = 187.02
+weight_std = 19.78
+
+left  = (200 - weight_mean) / weight_std   # 0.656
+right = (225 - weight_mean) / weight_std   # 1.92
+
+approx = stats.norm.cdf(right) - stats.norm.cdf(left)
+# ≈ 0.228</code></pre>
+  <p>实际比例 ≈ 0.2294 — 非常接近！</p>
+
+  <h3>8. Inflection Point → SD 估计</h3>
+  <p>对 roughly normal 的分布，从 histogram 上找 inflection point（曲线由凸变凹的点），其与 mean 的距离就是 SD。</p>
+  <p>例：身高 histogram center ≈ 69，inflection point ≈ 66 与 72，<strong>SD ≈ 3</strong>（实际 ≈ 2.86）。</p>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="danger">
+    <strong>陷阱 1 · Chebyshev 是<u>下界</u>，不是精确值</strong><br>
+    "Chebyshev 告诉我们 mean ± 2 SDs 内的比例 = 75%" → <strong>错</strong>。正确是"<strong>至少</strong> 75%"。<br>
+    "Chebyshev 告诉我们 mean ± 1 SD 内有多少？" → ≥ 0%（无意义下界）。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 2 · Standardization ≠ Normalization</strong><br>
+    标准化只是平移 + 缩放，<strong>分布形状不变</strong>。Skewed 的标准化后还是 skewed，<strong>不会</strong>变成 normal。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 3 · norm.cdf 的方向</strong><br>
+    <code>norm.cdf(z)</code> 返回 z <strong>左边</strong>的面积。要右边的面积要 <code>1 - cdf(z)</code>。要区间 [a, b] 要 <code>cdf(b) - cdf(a)</code>，<strong>顺序不能反</strong>。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 4 · 区分"数据 normal" 与 "sample mean normal" (CLT)</strong><br>
+    数据本身 normal → 才能用 norm.cdf 估个体值的比例。<br>
+    数据<strong>不</strong> normal 但 sample mean 仍 normal（CLT）→ 用于 CI / mean。<br>
+    F24 Q2.3 直接考：哪些子题需要"分布 normal"假设？只有"个体值比例"那道需要；CI for mean 不需要（CLT 已保证）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5 · "approximately 95% within 2 SDs" 的对象</strong><br>
+    经验法则 95% 指的是<strong>数据值</strong>在 mean ± 2 SD 内（前提分布 normal）。<br>
+    <strong>不是</strong>说"95% 的样本均值在 ± 2 SD 内"（那是 Section 5 CLT 的事）。<br>
+    W26 Q1.1 vs Q1.2 直接对比这两种情形。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6 · 「至少 100%」是可能的吗？</strong><br>
+    Chebyshev 1 − 1/z² 总是 &lt; 1 (z 有限时)。所以 Chebyshev 永远给不出 100%。但若数据 normal 且 z 较大（如 z=4 → 99.99%），可视为约 100%。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7 · 「Pool 两个 normal → 一定 normal」是错的</strong><br>
+    Mixture of two normals (不同 mean) → 可能 bimodal，<strong>不</strong>是 normal。W26 Q1.4 直接考。
+  </div>
+
+  <div class="tip">
+    <strong>💡 Chebyshev 题模板</strong>：
+    <ol>
+      <li>题给比例（75% / 88.8% / 15/16）→ 解出 z</li>
+      <li>区间端点 = mean ± z · SD</li>
+      <li>如果反过来题给区间宽度求 SD：SD = (区间宽度 / 2) / z</li>
+    </ol>
+  </div>
+
+  <div class="tip">
+    <strong>💡 norm.cdf 题模板</strong>：
+    <ol>
+      <li>把题问的真实值标准化：z = (x − mean) / SD</li>
+      <li>选 cdf 公式：<br>
+        左尾 → <code>cdf(z)</code><br>
+        右尾 → <code>1 - cdf(z)</code><br>
+        区间 [a, b] → <code>cdf((b−mean)/SD) - cdf((a−mean)/SD)</code></li>
+    </ol>
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2024 Quiz 4 · Problem 1（norm.cdf 简单计算）</div>
+    <p>Suppose we've imported the <code>scipy</code> module. To the nearest 0.5, what does the following expression evaluate to?</p>
+<pre><code>scipy.stats.norm.cdf(-2) * 100</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：2.5</strong></p>
+      <p>由 95% rule：mean ± 2 SD 包含 ≈95%，所以两尾各 ≈2.5%。即 z = −2 左边的面积 ≈ 2.5%。乘 100 = 2.5。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Quiz 3 · Problem 1.4（Chebyshev 15/16）</div>
+    <p>You are told that the data in the <code>"attendance"</code> column of <code>concerts</code> has a mean of <strong>19000</strong> and a standard deviation of <strong>3000</strong>. Find the endpoints of the smallest interval which is guaranteed to contain at least <strong>15/16</strong> of the data. Both endpoints should be given as integers.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：[7000, 31000]</strong></p>
+<pre><code>15/16 = 1 - 1/16 → 1/z² = 1/16 → z = 4
+区间 = mean ± 4·SD = 19000 ± 12000
+     = [7000, 31000]</code></pre>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Quiz 3 · Problem 1.5（同区间 normal 下的 %）</div>
+    <p>You are now told that the data is <strong>normally distributed</strong>. Approximately what percentage of the data is included in the interval [7000, 31000]? Give your answer to the nearest integer.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：100（或 ≈ 99.99%）</strong></p>
+      <p>该区间是 mean ± 4 SD。在 normal 分布中，±4 SD 包含约 99.99%，舍入到整数 = 100。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 3 · Problem 3.1（Chebyshev 75%）</div>
+    <p>Your friend at SDSU records the number of students who visit their library each day, for 100 days. They tell you the average is <strong>6,000</strong> and the SD is <strong>500</strong>. Without knowing anything about the distribution, find the smallest interval guaranteed to contain at least <strong>75%</strong> of the data. Both endpoints integers.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：[5000, 7000]</strong></p>
+<pre><code>75% = 1 - 1/4 → z = 2
+6000 ± 2·500 = [5000, 7000]</code></pre>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 3 · Problem 3.2（同区间 normal 下的 %）</div>
+    <p>If you then learn that the data is normally distributed, approximately what percentage of the data is in [5000, 7000]? Give answer as integer.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：95</strong></p>
+      <p>该区间是 mean ± 2 SD。normal 下 ≈ 95%（经验法则）。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 3 · Problem 2.2（norm.cdf 估比例）</div>
+    <p>Whingdingdilly heights are <strong>normally distributed</strong> with mean 30m and SD 4m. Find <code>v, w</code> in:</p>
+<pre><code>wdd_prop = stats.norm.cdf(v) - stats.norm.cdf(w)</code></pre>
+    <p>so that <code>wdd_prop</code> approximates the proportion of whingdingdillies with heights between 30m and 33m.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>v = 0.75, w = 0</strong></p>
+<pre><code># 标准化两个端点
+v = (33 - 30) / 4 = 0.75
+w = (30 - 30) / 4 = 0
+
+# 区间 [0, 0.75] 下 normal 的面积
+# = cdf(0.75) - cdf(0)
+# 注意 v 在前（大值），w 在后（小值），cdf 单调递增</code></pre>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 3 · Problem 2.3（normality 必要性）</div>
+    <p>2.1 = CLT-based 95% CI for mean height (sample n=400, mean=30, SD=4).<br>
+    2.2 = use normal to estimate proportion of individuals in [30, 33].<br>
+    "For which part(s) did we need the assumption that whingdingdilly heights are normally distributed?"</p>
+    <ul>
+      <li>(A) 2.1 only　(B) 2.2 only　(C) both　(D) neither</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(B) 2.2 only</strong></p>
+      <ul>
+        <li>2.1 CLT-based CI 不需要 population normal——CLT 保证 sample mean 的分布近似 normal（即便 population 不 normal）。</li>
+        <li>2.2 估"个体值"在某区间内的比例 → 需要个体值分布本身近似 normal。</li>
+      </ul>
+      <p>这是 quiz 经常出的<strong>CLT vs population normality</strong>对照题。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 1.1（Chebyshev 概念）</div>
+    <p>We expect that at least 75% of all of the sampled values of <code>plays_minchan</code> lie within 2 standard deviations of the population mean.</p>
+    <ul>
+      <li>(A) Yes, due to CLT</li>
+      <li>(B) Yes, due to Chebyshev's</li>
+      <li>(C) No, due to CLT</li>
+      <li>(D) No, due to Chebyshev's</li>
+      <li>(E) Yes, but for reasons unrelated to Chebyshev's or CLT</li>
+      <li>(F) No, but for reasons unrelated to Chebyshev's or CLT</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(B) Yes, due to Chebyshev's</strong></p>
+      <p>Chebyshev: 至少 1 − 1/2² = 75% 的<strong>个体数据值</strong>在 mean ± 2 SD 内。对任何分布都成立。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 1.2（Chebyshev vs CLT 对照）</div>
+    <p>We expect that approximately 95% of all <strong>sample means</strong> lie within 2 standard deviations of the population mean.</p>
+    <ul>
+      <li>(A) Yes, due to CLT　(B) Yes, due to Chebyshev's　(C) No, due to CLT　(D) No, due to Chebyshev's　(E)/(F) 其他</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(A) Yes, due to CLT</strong>（⚠️ 措辞极微妙，见下）</p>
+      <p><strong>官方解读</strong>：CLT 告诉我们 sample means 的分布（sampling distribution）近似 normal；对于 normal 分布，约 95% 的值落在距其 mean ± 2 个 SD 内。题目里的"2 standard deviations"指的是 <strong>sample means 这个分布的 SD</strong>（即 SE = pop_SD/√n），不是 population SD。所以 95% 的 sample means 在 population mean ± 2 SE 内 → 答 Yes, due to CLT。</p>
+      <p class="warn"><strong>⚠️ 陷阱 / 常见错答</strong>：很多人（含第一直觉）会答 (C) No, due to CLT，理由是把"2 SDs"理解成 2 个 <em>population</em> SD：那样 95% 的 sample means 远不需要 2 个 pop SD（只在 2 SE 内）。但官方按"the relevant SD for the variable being discussed"（讨论 sample means 时 SD 指 SE）解读，于是答 Yes。<strong>记住这道题的官方答案是 Yes</strong>。</p>
+      <p>核心考点：<strong>sampling distribution 的 SD = SE</strong>，CLT 保证 sample means 在 pop mean ± 2 SE 内有 ~95% 概率。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 1.4（Pool 两 normal）</div>
+    <p>If both Minchan's and Ray's plays distributions are normal, will the distribution formed by pooling both their plays into one combined dataset be approximately normal?</p>
+    <ul>
+      <li>(A) Always　(B) Sometimes　(C) Never</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(B) Sometimes</strong></p>
+      <p>两个 normal mix 后只有<strong>当 mean 和 SD 都相同</strong>时才仍是 normal。否则可能 bimodal、偏态或宽。比如 N(0,1) 和 N(10, 1) pool → 双峰，<strong>不</strong> normal。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Lec16 Activity（概念题）</div>
+    <p>For a particular set of data points, Chebyshev's inequality states that at least <strong>8/9</strong> of the data points are between <strong>−20</strong> and <strong>40</strong>. What is the standard deviation of the data? (Assume the interval is centered at the mean.)</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：SD = 10（mean = 10）</strong></p>
+<pre><code>8/9 = 1 - 1/9 → z = 3
+mean = (-20 + 40) / 2 = 10
+区间宽度 = 40 - (-20) = 60
+60 = 2 · 3 · SD → SD = 10</code></pre>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍，能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>陈述 <strong>Chebyshev's inequality</strong>：mean ± z SDs 内至少 1 − 1/z²。</span></label>
+    <label><input type="checkbox"><span>背出 z=2/3/4/5 对应的下界：75% / 88.8% / 93.75% (15/16) / 96% (24/25)。</span></label>
+    <label><input type="checkbox"><span>反过来：题给 "至少 X%"，能算出对应的 z。</span></label>
+    <label><input type="checkbox"><span>解释 Chebyshev 是"<strong>下界</strong>"——真实比例可以更大。</span></label>
+    <label><input type="checkbox"><span>解释 Chebyshev 对<strong>任何</strong>分布都成立——这是它最大的卖点。</span></label>
+    <label><input type="checkbox"><span>写出 standard units 公式：z = (x − mean) / SD。</span></label>
+    <label><input type="checkbox"><span>标准化后变量的 mean、SD 是什么？（0 和 1）</span></label>
+    <label><input type="checkbox"><span>判断: "标准化把分布变成 normal" —— True or False？</span></label>
+    <label><input type="checkbox"><span>背出 normal 分布的 68 / 95 / 99.7 法则。</span></label>
+    <label><input type="checkbox"><span>解释 <code>stats.norm.cdf(z)</code> 返回什么。</span></label>
+    <label><input type="checkbox"><span>能用 <code>stats.norm.cdf</code> 表达：z 左边 / z 右边 / 区间 [a, b] 的面积。</span></label>
+    <label><input type="checkbox"><span>写出"求 weight 在 [200, 225] 比例"的代码（先标准化端点再 cdf 相减）。</span></label>
+    <label><input type="checkbox"><span>解释为什么 CLT-based CI for mean <strong>不需要</strong> population normal 假设。</span></label>
+    <label><input type="checkbox"><span>解释为什么"估个体值在某区间的比例"<strong>需要</strong> population normal 假设。</span></label>
+    <label><input type="checkbox"><span>判断: "Pool 两个 normal 一定 normal" —— True or False？</span></label>
+    <label><input type="checkbox"><span>能从 roughly normal 的 histogram 上找 inflection point 估 SD。</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="03-ci-interpretation-spread.html">← 上一节</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="05-clt-clt-ci.html">下一节: CLT & CLT-CI →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

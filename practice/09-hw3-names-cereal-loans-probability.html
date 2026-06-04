@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 09 · HW 3 — Names · Cereal · Loans · Lotto · DSC10</title>
+<style>
+  :root { --bg:#fafaf7; --text:#1f2328; --muted:#57606a; --accent:#0969da; --code-bg:#1e1e2e; --code-text:#cdd6f4; --warn-bg:#fff8c5; --warn-border:#d4a72c; --tip-bg:#ddf4ff; --tip-border:#54aeff; --ok-bg:#dafbe1; --ok-border:#1a7f37; --tier-1:#cf222e; --tier-2:#bf8700; --tier-3:#6e7781; --border:#d0d7de; }
+  * { box-sizing: border-box; } html { scroll-behavior: smooth; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.7; font-size:16px; }
+  .nav-top, .nav-bottom { background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:14px; flex-wrap:wrap; gap:8px; }
+  .nav-bottom { border-bottom:none; border-top:1px solid var(--border); margin-top:60px; }
+  .nav-top a, .nav-bottom a { color:var(--accent); text-decoration:none; margin-right:16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration:underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color:var(--muted); cursor:not-allowed; text-decoration:none; }
+  main { max-width:880px; margin:0 auto; padding:32px 24px 60px; }
+  h1 { font-size:28px; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:22px; margin-top:48px; border-left:4px solid var(--accent); padding-left:12px; }
+  h3 { font-size:18px; margin-top:28px; }
+  p, ul, ol { margin:12px 0; } ul, ol { padding-left:28px; } li { margin:4px 0; }
+  code { font-family:"Menlo","Monaco","Consolas",monospace; background:#eef0f2; padding:2px 6px; border-radius:4px; font-size:14px; color:#cf222e; }
+  pre { background:var(--code-bg); color:var(--code-text); padding:16px; border-radius:8px; overflow-x:auto; font-size:14px; line-height:1.5; margin:16px 0; }
+  pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:14px; }
+  .tier { display:inline-block; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:600; margin-right:8px; }
+  .tier-1 { background:#ffebe9; color:var(--tier-1); border:1px solid #ffcecb; }
+  .tier-2 { background:#fff8c5; color:var(--tier-2); border:1px solid #d4a72c; }
+  .meta { background:#f6f8fa; border-left:4px solid var(--accent); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .warn { background:var(--warn-bg); border-left:4px solid var(--warn-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .tip { background:var(--tip-bg); border-left:4px solid var(--tip-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .ok { background:var(--ok-bg); border-left:4px solid var(--ok-border); padding:10px 14px; margin:12px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .q-block { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:18px 0; }
+  .q-id { display:inline-block; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:4px; margin-right:10px; letter-spacing:0.5px; }
+  .q-title { font-size:15px; font-weight:600; }
+  .why { margin:8px 0; font-size:14px; }
+  .why strong { color:#1f883d; }
+  .checklist { background:#f0f9ff; border:1px solid #54aeff; border-radius:8px; padding:16px 20px; }
+  .checklist label { display:block; margin:8px 0; cursor:pointer; user-select:none; }
+  .checklist input[type="checkbox"] { margin-right:8px; transform:scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration:line-through; color:var(--muted); }
+  .toc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:24px 0; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { margin:4px 0; } .toc a { color:var(--accent); text-decoration:none; }
+  .crosslink { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:20px 0; font-size:14px; }
+  .crosslink h4 { margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600; }
+  .crosslink ul { margin:4px 0; padding-left:20px; } .crosslink a { color:var(--accent); text-decoration:none; }
+  table { border-collapse:collapse; width:100%; margin:16px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 12px; text-align:left; } th { background:#f6f8fa; font-weight:600; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="08-midterm-project-spotify.html">⬅ 上一份：Midterm Project</a> | <a href="10-lab3-dataframes-control-probability.html">下一份 ➡：Lab 3</a></span>
+</nav>
+
+<main>
+  <h1>Practice 09 · HW 3 — Names, Cereal, Loans &amp; Lotto</h1>
+  <p class="meta">
+    <strong>对应模块</strong>：Midterm ｜
+    <strong>主题</strong>：加权平均、merge 三种用法、函数 composition、for-loop with step、概率（无放回 + 独立）｜
+    <strong>预计时长</strong>：2.5 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#overview">📋 作业概览</a></li>
+      <li><a href="#sec1">📚 Section 1 — 100 Years of "C" Baby Names（Q1.1–1.3）加权平均</a></li>
+      <li><a href="#sec2">📚 Section 2 — Cerealsly?!（Q2.1–2.3）merge 三种用法</a></li>
+      <li><a href="#sec3">📚 Section 3 — Tritonmobile（Q3.1–3.3）函数 composition</a></li>
+      <li><a href="#sec4">📚 Section 4 — Alternating Products（Q4.1–4.2）for-loop tricks</a></li>
+      <li><a href="#sec5">📚 Section 5 — Lucky Triton Lotto（Q5.1–5.4）概率</a></li>
+      <li><a href="#pitfalls">⚠️ 典型陷阱</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 作业概览</h2>
+  <p>HW 3 是 Midterm 范围内的<strong>综合 HW</strong>。每节练一个独立技术：</p>
+  <ul>
+    <li><strong>Section 1</strong>：加权平均（Q1.3 经典模板）。</li>
+    <li><strong>Section 2</strong>：merge 三种 case—— <code>left_on/right_on</code>、计算 set difference、<code>on=同名列</code> 产生 _x/_y 后缀。</li>
+    <li><strong>Section 3</strong>：用 <code>monthly_payment</code> 组合 <code>calculate_interest</code> 和 <code>calculate_principal</code>。</li>
+    <li><strong>Section 4</strong>：for-loop with step / sign 翻转——考<u>累加器</u>变体。</li>
+    <li><strong>Section 5</strong>：彩票概率——独立事件相乘 + 无放回。</li>
+  </ul>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链：</h4>
+    <ul>
+      <li>Multi-col groupby + merge → <a href="../midterm/05-multi-groupby-merge.html">midterm/05-multi-groupby-merge</a></li>
+      <li>条件函数 / for-loop / 累加器 → <a href="../midterm/06-conditionals-loops.html">midterm/06-conditionals-loops</a></li>
+      <li>概率规则、无放回 → <a href="../midterm/07-probability-simulation.html">midterm/07-probability-simulation</a></li>
+    </ul>
+  </div>
+
+  <h2 id="sec1">📚 Section 1 — 100 Years of "C" Baby Names</h2>
+
+  <div class="q-block"><span class="q-id">Q 1.1</span><span class="q-title">男性 Charles 折线 + 峰值年份</span>
+<pre><code>male_charles = baby[(baby.get('Name') == 'Charles') & (baby.get('Gender') == 'M')]
+male_charles.groupby('Year').sum().plot(kind='line', y='Count')
+
+male_charles_peak = 2   # 1950</code></pre>
+    <p class="why"><strong>💡 先 filter 再 groupby</strong>：双条件用 <code>&</code>，每条件外加括号（<code>==</code> 优先级低于 <code>&</code>）。groupby + sum 因为同名可能多 state，每年总和才是真实流行度。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.2</span><span class="q-title"><code>num_babies</code>：(State, Gender) 组合 (102 × 3)</span>
+<pre><code>num_babies = baby.groupby(['State', 'Gender']).sum().reset_index().get(['State', 'Gender', 'Count'])</code></pre>
+    <p class="why"><strong>💡 51 state × 2 gender = 102 行</strong>。reset_index 把 multi-index 拆回普通列。<code>.get([...])</code> 选回需要的 3 列（sum 会聚合所有数字列，可能多出 Year 等）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.3</span><span class="q-title"><code>avg_age</code>：加权平均（高频考点）</span>
+<pre><code>with_age = baby.assign(TotalAge=(2024 - baby.get('Year')) * baby.get('Count'))
+grouped  = with_age.groupby(['Gender', 'Name']).sum()
+avg_age  = (grouped
+    .assign(Average_Age=grouped.get('TotalAge') / grouped.get('Count'))
+    .reset_index()
+    .get(['Gender', 'Name', 'Average_Age']))</code></pre>
+    <p class="why"><strong>💡 必须加权</strong>：每行已聚合（Count 个 baby in Year y）。直接 <code>.mean()</code> 算 Year 会把<u>1 个 baby</u>和<u>1000 个 baby</u>当成同权重，错。<br>
+      <strong>模板</strong>：<code>weighted_mean = Σ(x · w) / Σ(w)</code>。这里 x = (2024 − Year)，w = Count。
+    </p>
+    <div class="warn"><strong>⚠️ 这是 Midterm 的高频考点</strong>——"给定有 Count 列的数据，求每组的加权 mean / median"。任何"avg age"题目都要先想 "weighted by Count?"</div>
+  </div>
+
+  <h2 id="sec2">📚 Section 2 — Cerealsly?!</h2>
+
+  <div class="q-block"><span class="q-id">Q 2.1</span><span class="q-title">merge 不同列名（<code>left_on</code> + <code>right_on</code>）</span>
+<pre><code>states_and_varieties = (states
+    .merge(varieties, left_on='Favorite Cereal', right_on='name')
+    .drop(columns=['name'])
+    .sort_values(by='State')
+    .reset_index(drop=True))</code></pre>
+    <p class="why"><strong>💡 列名不同的 merge</strong>：用 <code>left_on=</code> 和 <code>right_on=</code> 指定。merge 后两列都保留——把 <code>'name'</code> 重复列 <code>.drop</code> 掉。<br>
+      states 2 列 + varieties 16 列 − 1 重复 = 17 列 ✓
+    </p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.2</span><span class="q-title">set difference（merge 之后看哪些没出现）</span>
+<pre><code>states_not_varieties = (len(states.get('Favorite Cereal').unique())
+                        - len(states_and_varieties.get('Favorite Cereal').unique()))
+varieties_not_states = (len(varieties.get('name').unique())
+                        - len(states_and_varieties.get('Favorite Cereal').unique()))</code></pre>
+    <p class="why"><strong>💡 inner join 后剩下的 = 双方都有</strong>。所以 "只在 states 不在 varieties" = states 总 distinct − merged distinct。Quiz 3 常考集合的关系。</p>
+    <div class="ok"><strong>✅ 反推</strong>：states_not_varieties = 2，varieties_not_states = 63。</div>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.3</span><span class="q-title">同名列 merge → _x/_y 后缀</span>
+<pre><code>both = states.merge(states_alt, on='State')
+same_cereal = (both.get('Favorite Cereal_x') == both.get('Favorite Cereal_y')).sum()</code></pre>
+    <p class="why"><strong>💡 自动后缀</strong>：当两表有同名列 + 用 <code>on='State'</code> merge → 'Favorite Cereal' 列会变成 <code>Favorite Cereal_x</code>（来自 left）和 <code>Favorite Cereal_y</code>（来自 right）。用 <code>== </code> 比对得到 bool Series，<code>.sum()</code> 数 True。</p>
+  </div>
+
+  <h2 id="sec3">📚 Section 3 — Tritonmobile</h2>
+
+  <div class="q-block"><span class="q-id">Q 3.1</span><span class="q-title"><code>calculate_interest(score)</code>：分段</span>
+<pre><code>def calculate_interest(score):
+    if   score &gt;= 781: return 0.056
+    elif score &gt;= 661: return 0.069
+    elif score &gt;= 601: return 0.093
+    elif score &gt;= 501: return 0.119
+    else:               return 0.142</code></pre>
+    <p class="why"><strong>💡 从高到低排</strong>：每个 elif 把<u>剩下的范围</u>检查"是否 ≥ 下一个阈值"。顺序反了会出错——比如把 <code>&gt;= 501</code> 放最前面会让 score=900 也返回 0.119。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.2</span><span class="q-title"><code>calculate_principal(price, down)</code></span>
+<pre><code>def calculate_principal(price, down_payment):
+    pct = down_payment / price
+    if   pct &lt; 0.10: discount = 0.02
+    elif pct &lt; 0.20: discount = 0.05
+    elif pct &lt; 0.30: discount = 0.09
+    elif pct &lt; 0.40: discount = 0.14
+    else:             discount = 0.20
+    return (price - down_payment) * (1 - discount)</code></pre>
+    <p class="why"><strong>💡 这次从低到高排</strong>（因为用 <code>&lt;</code>）。等价于"小于 10% → 折扣 2%；落在 [10%, 20%) → 5%"。顺序反了又会错。<br>
+      <strong>验证</strong>：(50000−11250) × (1 − 0.09) = 38750 × 0.91 = 35262.5 ✓
+    </p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.3</span><span class="q-title">函数 composition：<code>monthly_payment(price, down, score)</code></span>
+<pre><code>def monthly_payment(price, down_payment, score):
+    interest  = calculate_interest(score)
+    principal = calculate_principal(price, down_payment)
+    monthly   = principal * (interest / 12) / (1 - (1 + interest / 12) ** (-60))
+    return round(monthly)</code></pre>
+    <p class="why"><strong>💡 annuity 公式</strong>：<code>M = P × r / (1 − (1+r)^(-n))</code>，其中 r = monthly interest = interest/12，n = months = 60（5 年）。<u>指数是负</u>——常错写成正。</p>
+    <p class="why"><strong>💡 函数 composition</strong>：monthly_payment 复用前两个函数。这是 OOP 的精神——把复杂逻辑拆成小块，组合调用。考试常考"看代码理解 composition"。</p>
+  </div>
+
+  <h2 id="sec4">📚 Section 4 — Alternating Products</h2>
+
+  <div class="q-block"><span class="q-id">Q 4.1</span><span class="q-title"><code>alternating_product(values)</code>：每隔一个相乘</span>
+<pre><code>def alternating_product(values):
+    product = 1
+    for i in np.arange(0, len(values), 2):
+        product = product * values[i]
+    return product</code></pre>
+    <p class="why"><strong>💡 <code>np.arange(0, n, 2)</code></strong> = [0, 2, 4, …]。step 参数控制间隔。这是<u>取偶数位</u>的标准模板。</p>
+    <p class="why"><strong>💡 累加器初值 = 1</strong>（乘法的 identity）。加法累加器初值 = 0。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.2</span><span class="q-title"><code>alternating_sign_product</code>：符号交替</span>
+<pre><code>def alternating_sign_product(values):
+    product = 1
+    for i in np.arange(len(values)):
+        if i % 2 == 0:
+            product = product * values[i]
+        else:
+            product = product * (-values[i])
+    return product</code></pre>
+    <p class="why"><strong>💡 <code>i % 2 == 0</code></strong>：检查偶数位（包括 0）。<u>所有</u>元素都参与（不是每隔一个），但奇数位<u>取负</u>。<br>
+      <strong>验证</strong>：[2, 3.5, 1] → 2 × (−3.5) × 1 = −7 ✓</p>
+  </div>
+
+  <h2 id="sec5">📚 Section 5 — Lucky Triton Lotto</h2>
+
+  <div class="q-block"><span class="q-id">Q 5.1</span><span class="q-title"><code>tritonball_chance</code></span>
+<pre><code>tritonball_chance = 1 / 8</code></pre>
+    <p class="why"><strong>💡 单选</strong>：从 1–8 等概率，匹配某固定数字 = 1/8。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.2</span><span class="q-title"><code>first_three_chance</code>：无放回</span>
+<pre><code>first_three_chance = (1 / 29) * (1 / 28) * (1 / 27)</code></pre>
+    <p class="why"><strong>💡 按顺序无放回</strong>：第 1 个从 29 选 → 1/29；第 2 个从剩下 28 选 → 1/28；第 3 个 1/27。<u>分母递减</u>是无放回的标志。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.3</span><span class="q-title"><code>free_housing_chance</code></span>
+<pre><code>free_housing_chance = (1/29) * (1/28) * (1/27) * (1/26) * (1/25) * (1/8)</code></pre>
+    <p class="why"><strong>💡 独立事件相乘</strong>：白球抽取（5 个数无放回） + Tritonball（独立的另一组）。两者独立——所以总概率 = 白球全中 × Tritonball 匹配。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.4</span><span class="q-title">"complement"：不中的概率</span>
+<pre><code>no_free_housing_chance = 1 - free_housing_chance</code></pre>
+    <p class="why"><strong>💡 P(not A) = 1 − P(A)</strong>。Quiz 3 / Midterm 必备。"至少一次"也常用 1 − P(从来没有)。</p>
+  </div>
+
+  <h2 id="pitfalls">⚠️ 典型陷阱</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：加权平均不能用 <code>.mean()</code></strong><br>
+    Q1.3：如果有 Count 列代表 frequency，直接 mean 会忽略权重。要用 <code>Σ(x·w) / Σw</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：merge 不同列名要 <code>left_on/right_on</code></strong><br>
+    Q2.1。merge 后两列都保留，记得 drop 重复的那个。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：merge 同名列产生 _x/_y</strong><br>
+    Q2.3。访问时要用 <code>'Favorite Cereal_x'</code>、<code>'Favorite Cereal_y'</code>，不能再用原名。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：if/elif 顺序方向（&gt;=  vs  &lt;）</strong><br>
+    Q3.1（高分→低分用 &gt;=）vs Q3.2（小折扣→大折扣用 &lt;）。<u>方向反了</u>结果完全错。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：annuity 公式指数是<u>负</u></strong><br>
+    Q3.3：(1+r)^(-n)。常错写成正——结果会差好几个数量级。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：乘法累加器初值是 1，不是 0</strong><br>
+    Q4.1：<code>product = 1</code>。0 会让结果永远是 0。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7：无放回的分母递减</strong><br>
+    Q5.2：1/29 × 1/28 × 1/27（不是 1/29³）。每抽走一个，pool 少 1。
+  </div>
+
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① Q1.3 加权平均怎么推导？什么时候<u>不</u>能直接 <code>.mean()</code>？</span></label>
+    <label><input type="checkbox"><span>② merge 不同列名要怎么写？merge 同名列会发生什么？</span></label>
+    <label><input type="checkbox"><span>③ Q2.2 "states 中不在 varieties 中" 怎么用 merge 后的 distinct 反推？</span></label>
+    <label><input type="checkbox"><span>④ if/elif 的<u>顺序方向</u>规则：用 <code>&gt;=</code> 时从高到低 vs <code>&lt;</code> 从低到高？</span></label>
+    <label><input type="checkbox"><span>⑤ 函数 composition：Q3.3 怎么复用 3.1 和 3.2？</span></label>
+    <label><input type="checkbox"><span>⑥ <code>np.arange(0, n, 2)</code> 的 step 参数？取偶数位的标准用法？</span></label>
+    <label><input type="checkbox"><span>⑦ 乘法累加器初值为什么是 1？加法累加器初值为什么是 0？</span></label>
+    <label><input type="checkbox"><span>⑧ Q5.2 无放回概率为什么分母递减？跟有放回（1/29³）的差别？</span></label>
+    <label><input type="checkbox"><span>⑨ Q5.4 complement 规则：P(not A) = 1 − P(A)？什么时候用这个 trick？</span></label>
+    <label><input type="checkbox"><span>⑩ 独立事件相乘（Q5.3）：白球抽和 Tritonball 为什么独立？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="08-midterm-project-spotify.html">⬅ 上一份：Midterm Project</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="10-lab3-dataframes-control-probability.html">下一份 ➡：Lab 3</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

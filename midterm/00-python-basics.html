@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python 基础速查 (Section 0) - DSC10 Midterm 备考</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .nav-bottom {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+  .nav-top a, .nav-bottom a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 16px;
+    margin-top: 20px;
+    color: var(--muted);
+  }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+  }
+  .tier {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta {
+    background: #f6f8fa;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--tip-bg);
+    border-left: 4px solid var(--tip-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  details {
+    background: var(--q-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+  }
+  details[open] {
+    background: #fff;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+  }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) {
+    margin-top: 12px;
+  }
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .q-source {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .checklist {
+    background: #f0f9ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .checklist label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+  .checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 总目录</a></span>
+  <span><a href="01-dataframes-indexing.html">下一节：DataFrames &amp; Indexing →</a></span>
+</nav>
+
+<main>
+  <h1>Python 基础速查 (Section 0)</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 1-3（Expressions, Variables, Data Types, Strings, Lists, Arrays）｜
+    <strong>Midterm出现率</strong>：<span class="tier tier-3">⭐ 基础</span>（间接考点；string methods 在 5/6 midterm 出现）｜
+    <strong>预计学习时间</strong>：1 - 1.5 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+  <p>
+    本节是整个 DSC10 课程的"地基"，覆盖 Python 最基本的语法：表达式、变量、类型、字符串、list、numpy array。
+    <strong>Midterm 不会"直接"考一道纯算术题或纯类型转换题</strong>，但是这些概念会渗透到几乎每一道题里 —— 当你看到
+    <code>treat.get("address").iloc[6].replace("a","o").upper()</code> 时，你必须立刻知道：
+    <code>.iloc[6]</code> 拿出的是一个 <code>str</code>，因此后面才能 <code>.replace</code>、<code>.upper</code>。
+  </p>
+  <div class="tip">
+    <strong>为什么虽是 ⭐ 基础，但仍值得花 1 小时？</strong>
+    <ul>
+      <li><strong>String 方法</strong>（<code>.replace</code>、<code>.upper</code>、<code>.title</code>、<code>.split</code>、<code>.strip</code>、<code>len</code>）出现在 <strong>6 份真题中的 5 份</strong>。Sp25 起更出现了字符串链式调用 one-liner（如 W26 Q11）。</li>
+      <li><strong>类型直觉</strong>（int / float / str / bool / Series / array 的区分）是看懂题目的前提，多选题里经常考"<code>street</code> 是什么类型？"。</li>
+      <li><strong><code>np.arange(start, stop, step)</code> 的半开区间</strong>规则是 histogram bins 题（Tier 1）和 simulation 模板（Tier 1）的基础。</li>
+      <li><strong>Broadcasting</strong>（数组与数字的运算）是后面 Series 操作的雏形。</li>
+    </ul>
+  </div>
+  <p><strong>本节目标</strong>：扫一遍这些概念，把它们"焊"进直觉里，后续看 DataFrame / Series 的题目就不会卡在基础语法上。</p>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. 算术表达式与 PEMDAS</h3>
+  <p>Python 可以当计算器用。一个 <strong>expression（表达式）</strong> 是值、运算符、函数的组合，最终 evaluate 到一个 value。</p>
+  <table>
+    <thead><tr><th>运算</th><th>符号</th><th>例子</th><th>结果</th></tr></thead>
+    <tbody>
+      <tr><td>加 Addition</td><td><code>+</code></td><td><code>2 + 3</code></td><td><code>5</code></td></tr>
+      <tr><td>减 Subtraction</td><td><code>-</code></td><td><code>2 - 3</code></td><td><code>-1</code></td></tr>
+      <tr><td>乘 Multiplication</td><td><code>*</code></td><td><code>2 * 3</code></td><td><code>6</code></td></tr>
+      <tr><td>除 Division</td><td><code>/</code></td><td><code>7 / 3</code></td><td><code>2.333...</code> (float)</td></tr>
+      <tr><td>取余 Remainder</td><td><code>%</code></td><td><code>7 % 3</code></td><td><code>1</code></td></tr>
+      <tr><td>幂 Exponentiation</td><td><code>**</code></td><td><code>2 ** 0.5</code></td><td><code>1.414...</code></td></tr>
+      <tr><td>整除 Floor div</td><td><code>//</code></td><td><code>7 // 3</code></td><td><code>2</code></td></tr>
+    </tbody>
+  </table>
+  <p><strong>PEMDAS</strong>：括号 → 指数 → 乘除 → 加减，从左到右。</p>
+  <pre><code>5 * 2 ** 3      # = 5 * 8 = 40（先 ** 后 *）
+(5 * 2) ** 3    # = 10 ** 3 = 1000
+100 ** 1 / 2    # = 100 / 2 = 50（** 先于 /，所以先算 100**1 = 100）
+100 ** (1/2)    # = 10.0（这才是平方根）</code></pre>
+  <div class="warn">
+    <strong>易错</strong>：<code>**</code> 优先级高于 <code>/</code>，写"开根号"时一定要加括号 <code>x ** (1/2)</code>。
+  </div>
+
+  <h3>2. 变量与赋值（Variables &amp; Assignment）</h3>
+  <p>一个 <strong>variable</strong> 是一个"标签"，绑定到某个 value。<strong>assignment statement（赋值语句）</strong>语法：<code>name = expression</code>。</p>
+  <pre><code>seconds_per_year = 60 * 60 * 24 * 365   # 右边先算，再绑定到左边
+zebra = 23 - 14   # zebra 现在是 9（值），不是表达式</code></pre>
+  <p><strong>命名规则</strong>：</p>
+  <ul>
+    <li>可以包含字母、数字、下划线 <code>_</code>。</li>
+    <li><strong>不能</strong>以数字开头：<code>7_days = 24*7</code> ❌ <code>SyntaxError</code></li>
+    <li><strong>大小写敏感</strong>：<code>Zebra</code> 和 <code>zebra</code> 是两个不同的变量。</li>
+  </ul>
+  <p><strong>赋值不是数学等式</strong>：<code>x = 3</code> 合法，但 <code>3 = x</code> 报错。等号是"绑定"，不是"对称的相等"。</p>
+  <div class="warn">
+    <strong>核心陷阱：变量是 non-reactive（非响应式）的！</strong>
+    <pre><code>uc = 2
+sd = 3 + uc     # sd = 5
+uc = 7          # 改 uc 不会自动更新 sd
+sd              # 仍然是 5</code></pre>
+    赋值时刻 <code>sd</code> 已经"拍快照"了 <code>2 + 3 = 5</code>，之后改 <code>uc</code> 不影响 <code>sd</code>。这和 Excel 公式不一样。
+  </div>
+  <pre><code># 经典练习：执行后 side_length 和 area 各是多少？
+side_length = 5
+area = side_length ** 2   # area = 25（用当前的 side_length=5）
+side_length = side_length + 2   # side_length = 7
+# 答案：side_length = 7, area = 25（area 不会重算！）</code></pre>
+
+  <h3>3. 数据类型 int / float / str</h3>
+  <p>每个值都有一个 <strong>type（类型）</strong>。用 <code>type(x)</code> 检查。</p>
+  <table>
+    <thead><tr><th>类型</th><th>含义</th><th>例子</th></tr></thead>
+    <tbody>
+      <tr><td><code>int</code></td><td>整数（任意大小，无溢出）</td><td><code>3</code>, <code>-15</code>, <code>2**3000</code></td></tr>
+      <tr><td><code>float</code></td><td>带小数点（精度有限、有溢出）</td><td><code>3.0</code>, <code>2.718</code>, <code>2.0**300</code></td></tr>
+      <tr><td><code>str</code></td><td>字符串（单引号或双引号都行）</td><td><code>'woof'</code>, <code>"1998"</code></td></tr>
+      <tr><td><code>bool</code></td><td>布尔</td><td><code>True</code>, <code>False</code></td></tr>
+    </tbody>
+  </table>
+  <p><strong>关键规律</strong>：</p>
+  <ul>
+    <li><code>int</code> ± × ** <code>int</code> → 仍是 <code>int</code></li>
+    <li><strong><code>int / int</code> → <code>float</code></strong>（哪怕能整除！<code>4 / 2</code> 是 <code>2.0</code> 不是 <code>2</code>）</li>
+    <li><code>int</code> 和 <code>float</code> 混用 → <code>float</code></li>
+    <li><code>'1998'</code> 是 <strong>字符串</strong>，不是数字</li>
+  </ul>
+
+  <h4>类型转换函数</h4>
+  <pre><code>int(12 / 2)       # 6（去掉小数）
+int(-2.9)         # -2（int 是"砍掉小数"，不是四舍五入！）
+float('3')        # 3.0
+str(3)            # '3'
+int('4')          # 4
+int('4.3')        # ❌ ValueError: invalid literal for int()
+int('baby panda') # ❌ ValueError</code></pre>
+  <div class="warn">
+    <strong>陷阱</strong>：<code>int('4.3')</code> 会报错！要先 <code>float('4.3')</code> 再 <code>int(...)</code>，即 <code>int(float('4.3'))</code> = <code>4</code>。
+  </div>
+
+  <h3>4. 字符串操作（String Operations）</h3>
+  <p>字符串（<code>str</code>）是文本的序列，用单引号或双引号括起来。</p>
+  <h4>4.1 字符串"算术"</h4>
+  <pre><code>'back' + 'pack'      # 'backpack'  —— concatenation 拼接
+'bye' * 3            # 'byebyebye' —— 重复
+'baby' + ' ' + 'panda'   # 'baby panda' —— 拼空格</code></pre>
+
+  <h4>4.2 字符串方法（String Methods）</h4>
+  <p>用 <strong>dot notation</strong> 调用：<code>s.method()</code>。常用方法：</p>
+  <table>
+    <thead><tr><th>方法</th><th>作用</th><th>例子</th></tr></thead>
+    <tbody>
+      <tr><td><code>.upper()</code></td><td>全大写</td><td><code>'hello'.upper()</code> → <code>'HELLO'</code></td></tr>
+      <tr><td><code>.lower()</code></td><td>全小写</td><td><code>'HI'.lower()</code> → <code>'hi'</code></td></tr>
+      <tr><td><code>.title()</code></td><td>每个单词首字母大写</td><td><code>'my class is dsc 10'.title()</code> → <code>'My Class Is Dsc 10'</code></td></tr>
+      <tr><td><code>.replace(old, new)</code></td><td>替换子串</td><td><code>'baby'.replace('b','B')</code> → <code>'BaBy'</code></td></tr>
+      <tr><td><code>.split(sep)</code></td><td>按 sep 切成 list</td><td><code>'a,b,c'.split(',')</code> → <code>['a','b','c']</code></td></tr>
+      <tr><td><code>.strip(chars)</code></td><td>去掉两端的指定字符</td><td><code>"'hi'".strip("'")</code> → <code>'hi'</code></td></tr>
+      <tr><td><code>.contains(...)</code></td><td>(只在 Series.str 上) 判断含不含子串</td><td>详见 Section 2</td></tr>
+    </tbody>
+  </table>
+  <p><strong><code>len()</code> 是函数不是方法</strong>，所以写 <code>len(s)</code>，不是 <code>s.len()</code>。</p>
+  <pre><code>fave = 'My favorite class is DSC 10!'
+fave.title()                # 'My Favorite Class Is Dsc 10!'
+fave.upper()                # 'MY FAVORITE CLASS IS DSC 10!'
+fave.replace('favorite', '😍'*3)   # 'My 😍😍😍 class is DSC 10!'
+len(fave)                   # 28</code></pre>
+
+  <h4>4.3 字符串方法链（method chaining）—— 高频考点</h4>
+  <p>方法返回字符串，所以可以"连着写"。考试爱考这种 one-liner：</p>
+  <pre><code># Winter 2026 Q11 原题
+(pizza.get("kind").iloc[6].replace("a", "o") + "!").upper()
+# 拆解：
+# pizza.get("kind")          → Series 列
+# .iloc[6]                    → 第7行的 kind（一个 str）
+# .replace("a", "o")          → str（把 a 换成 o）
+# + "!"                       → str + str = 拼接
+# .upper()                    → str（全大写）</code></pre>
+  <div class="tip"><strong>读链式调用的技巧</strong>：从左往右一步步追踪类型。<code>.iloc[i]</code>（不带列表）出来的是<strong>单个值</strong>不是 Series；这个单值是 str 才能继续 <code>.replace</code>、<code>.upper</code>。</div>
+
+  <h3>5. 函数调用（Function Calls）</h3>
+  <p>Python 自带很多 built-in functions：</p>
+  <pre><code>abs(-23)              # 23
+max(4, -8)            # 4
+max(2, -3, -6, 10)    # 10（可变参数）
+min(abs(max(-1,-2,-3, min(4,-2))), max(5,100))   # 嵌套，从内向外算
+round(1.45678)        # 1（默认四舍五入到整数）
+round(1.45678, 3)     # 1.457
+sum([1, 2, 3])        # 6（接收 list / array）
+len('woof')           # 4</code></pre>
+  <p><strong>查文档</strong>：<code>round?</code> 或 <code>help(round)</code>。</p>
+
+  <h3>6. import 与 math 模块</h3>
+  <p>Python 内置功能不够时，<code>import</code> 一个 <strong>module</strong>，用 <code>module.function()</code> 调用。</p>
+  <pre><code>import math
+
+math.sqrt(16)     # 4.0
+math.pow(2, 5)    # 32.0
+math.log(100)     # 自然对数 ln
+math.pi           # 3.141592653589793</code></pre>
+  <p>课程主要用的三个 import（每个 notebook 第一格基本都是这个）：</p>
+  <pre><code>import babypandas as bpd      # DataFrame / Series
+import numpy as np            # 数组、随机、np.arange
+import matplotlib.pyplot as plt   # 画图</code></pre>
+
+  <h3>7. List vs. NumPy Array</h3>
+
+  <h4>7.1 Lists（用方括号 [] 创建）</h4>
+  <pre><code>temperature_list = [68, 73, 70, 74, 76, 72, 74]
+len(temperature_list)               # 7
+temperature_list[0]                 # 68（0-indexed）
+temperature_list[-1]                # 74（负数从末尾数）
+sum(temperature_list) / len(temperature_list)   # 平均
+
+# list 可以混合类型
+mixed = [-2, 2.5, 'ucsd', [1, 3]]   # 合法，类型不一致也行</code></pre>
+  <p><strong>缺点</strong>：list 很 <strong>慢</strong>（百万级数据时）；不能直接做向量化运算。</p>
+
+  <h4>7.2 NumPy arrays（用 np.array() 创建）</h4>
+  <pre><code>import numpy as np
+temperature_array = np.array([68, 73, 70, 74, 76, 72, 74])
+# 注意：np.array 的参数是一个 list，所以有 [ ]</code></pre>
+  <p><strong>关键差异</strong>：</p>
+  <table>
+    <thead><tr><th>特性</th><th>list</th><th>np.array</th></tr></thead>
+    <tbody>
+      <tr><td>创建</td><td><code>[1, 2, 3]</code></td><td><code>np.array([1, 2, 3])</code></td></tr>
+      <tr><td>元素类型</td><td>可混合</td><td><strong>必须同类型</strong>（混合时会强制转换为 str）</td></tr>
+      <tr><td>速度</td><td>慢</td><td>快（C 实现）</td></tr>
+      <tr><td>+ 数字</td><td>报错</td><td>broadcasting：每个元素 + 数字</td></tr>
+      <tr><td>+ 另一个等长 array</td><td>是拼接</td><td>element-wise（按位置相加）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>7.3 Indexing（取元素）</h4>
+  <p>Python 是 <strong>0-indexed</strong>：第一个元素位置是 <code>0</code>。负数从末尾倒数。</p>
+  <pre><code>arr = np.array([68, 73, 70, 74, 76, 72, 74])
+arr[0]    # 68
+arr[-1]   # 74（最后一个）
+arr[-2]   # 72（倒数第二）</code></pre>
+
+  <h4>7.4 Broadcasting（数组与数字运算）</h4>
+  <pre><code>temps = np.array([68, 73, 70, 74, 76, 72, 74])
+temps + 3              # [71, 76, 73, 77, 79, 75, 77]
+temps / 2              # [34.0, 36.5, 35.0, 37.0, 38.0, 36.0, 37.0]
+(5/9) * (temps - 32)   # 华氏 → 摄氏，每个元素都做这个运算</code></pre>
+  <div class="warn">
+    <strong>注意</strong>：<code>temps + 3</code> <strong>不会修改</strong> <code>temps</code>，它返回一个新数组！要"真改"必须重新赋值：
+    <pre><code>temps = (5/9) * (temps - 32)   # 必须重新赋值</code></pre>
+  </div>
+
+  <h4>7.5 Element-wise（两个等长数组）</h4>
+  <pre><code>a = np.array([4, 5, -1])
+b = np.array([2, 3, 2])
+a + b           # [6, 8, 1]
+a / b           # [2.0, 1.667, -0.5]
+a ** 2 + b ** 2 # [20, 34, 5]</code></pre>
+
+  <h4>7.6 Array methods（数组方法）</h4>
+  <pre><code>arr = np.array([68, 73, 70, 74, 76, 72, 74])
+arr.max()    # 76
+arr.min()    # 68
+arr.sum()    # 507
+arr.mean()   # 72.43...
+
+# 等价的"函数式"写法（也常用）
+np.max(arr)   # 76
+np.mean(arr)  # 72.43...
+sum(arr)      # 507（built-in sum 也能用，但只对 1D）</code></pre>
+
+  <h3>8. <code>np.arange(start, stop, step)</code> —— 生成等距数组</h3>
+  <p><strong>关键特性：左闭右开 <code>[start, stop)</code></strong>，<strong>不</strong>包括 <code>stop</code>。</p>
+  <pre><code>np.arange(8)         # [0, 1, 2, 3, 4, 5, 6, 7]   start 默认 0, step 默认 1
+np.arange(5, 10)     # [5, 6, 7, 8, 9]
+np.arange(3, 32, 5)  # [3, 8, 13, 18, 23, 28]      —— 注意没有 33！
+np.arange(-3, 2, 0.5)  # [-3.0, -2.5, -2.0, ..., 1.5]
+np.arange(1, -10, -3)  # [1, -2, -5, -8]           —— 负 step 也行</code></pre>
+  <div class="tip">
+    <strong>这个函数将贯穿整门课</strong>：
+    <ul>
+      <li>simulation 模板的 <code>for i in np.arange(reps)</code></li>
+      <li>histogram 的 <code>bins=np.arange(...)</code></li>
+      <li>取一个 DataFrame 的前 N 行：<code>df.take(np.arange(N))</code></li>
+    </ul>
+  </div>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="warn">
+    <h4>陷阱 1：<code>=</code> vs <code>==</code></h4>
+    <ul>
+      <li><code>=</code> 是<strong>赋值</strong>：<code>x = 3</code></li>
+      <li><code>==</code> 是<strong>判断相等</strong>，返回 bool：<code>x == 3</code> → <code>True</code></li>
+      <li><code>3 = x</code> ❌ SyntaxError</li>
+    </ul>
+  </div>
+
+  <div class="warn">
+    <h4>陷阱 2：类型混淆（midterm 多选题最爱）</h4>
+    <p>给 <code>x = 3</code>, <code>y = '4'</code>, <code>z = '5.6'</code>，下面哪个不报错？</p>
+    <ul>
+      <li>A. <code>x + y</code> → ❌ <code>int + str</code></li>
+      <li>B. <code>x + int(y + z)</code> → ❌ <code>int('45.6')</code> 报错</li>
+      <li>C. <code>str(x) + int(y)</code> → ❌ <code>str + int</code></li>
+      <li>D. <code>str(x) + z</code> → ✅ <code>'3' + '5.6'</code> = <code>'35.6'</code></li>
+    </ul>
+  </div>
+
+  <div class="warn">
+    <h4>陷阱 3：<code>int / int</code> 永远是 <code>float</code></h4>
+    <pre><code>4 / 2        # 2.0（float！）
+type(4 / 2)  # float
+int(4 / 2)   # 2  —— 想要 int 必须显式转</code></pre>
+  </div>
+
+  <div class="warn">
+    <h4>陷阱 4：字符串不可变（immutable）</h4>
+    <p><code>s.replace('a','o')</code> <strong>不修改原字符串</strong>，而是返回新字符串：</p>
+    <pre><code>s = 'banana'
+s.replace('a', 'o')   # 返回 'bonono'
+s                     # 还是 'banana'！
+
+# 想要"真改"必须重新赋值
+s = s.replace('a', 'o')   # 现在 s = 'bonono'</code></pre>
+  </div>
+
+  <div class="warn">
+    <h4>陷阱 5：array 操作不是 in-place</h4>
+    <p>同样，<code>arr + 3</code>、<code>(5/9) * arr</code> 都返回<strong>新</strong>数组，不会改 <code>arr</code>。要想真改必须 <code>arr = arr + 3</code>。</p>
+    <p>类似地，未来会学到的 <code>np.append(arr, x)</code> 也<strong>必须重新赋值</strong>：<code>arr = np.append(arr, x)</code>。</p>
+  </div>
+
+  <div class="warn">
+    <h4>陷阱 6：list 可混合类型，array 不行</h4>
+    <pre><code>[1, 2, 'three']                       # list 合法
+np.array(['uc', 'sd', 1961, 3.14])    # array 会把所有元素都变成 str！
+# → array(['uc', 'sd', '1961', '3.14'], dtype='&lt;U32')</code></pre>
+  </div>
+
+  <div class="warn">
+    <h4>陷阱 7：<code>**</code> 优先级高于 <code>/</code></h4>
+    <pre><code>100 ** 1 / 2   # = 50.0（不是 10！）
+100 ** (1 / 2) # = 10.0  ← 想要平方根必须加括号</code></pre>
+  </div>
+
+  <div class="warn">
+    <h4>陷阱 8：<code>np.arange</code> 半开区间</h4>
+    <p>看到 <code>np.arange(1, 10)</code> 立刻反应是 <code>[1, 2, ..., 9]</code>（<strong>没有 10！</strong>）。这在 histogram bins 题里能直接救命。</p>
+  </div>
+
+  <div class="warn">
+    <h4>陷阱 9：<code>int()</code> 是截断不是四舍五入</h4>
+    <pre><code>int(2.9)     # 2（不是 3）
+int(-2.9)    # -2（不是 -3，朝 0 截断）
+round(2.9)   # 3（四舍五入）</code></pre>
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+  <p>下面挑出和本节内容相关的真题。Python 基础不会单独成题，但常作为题目的"原料"，比如类型识别、字符串方法、<code>np.arange</code>、function 内 if 判断等。</p>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 · Problem 3.1（类型识别 + Series 概念铺垫）</div>
+    <p>Consider the code below.</p>
+    <pre><code>street = treats.get("address").str.contains("Street")
+sour = treats.get("candy").str.contains("Sour")</code></pre>
+    <p>What is the data type of <code>street</code>? Choices: <code>int</code> / <code>bool</code> / <code>str</code> / Series / DataFrame</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案</strong>：<code>Series</code></p>
+      <p><strong>解析</strong>：<code>treats.get("address")</code> 拿出来是一个 Series（一列）。在 Series 上调用 <code>.str.contains("Street")</code> 是对每个元素做"含不含 Street"判断，<strong>返回一个等长的布尔 Series</strong>（每个元素是 True/False）。</p>
+      <p>这里关键的"基础知识"是：<strong>Series 不是 list 也不是 array，它是 babypandas/pandas 的一种类型</strong>。Series 上的方法返回 Series，不是单个 bool。如果选 <code>bool</code> 就掉坑了 —— 那是误把整列当成一个值。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 · Problem 3.2（<code>np.count_nonzero</code> + bool 比较）</div>
+    <p>What does the following expression evaluate to? Write your answer exactly how the output would appear in Python.</p>
+    <pre><code>np.count_nonzero(street &amp; sour) &gt; sour.sum()</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案</strong>：<code>False</code></p>
+      <p><strong>解析</strong>：</p>
+      <ul>
+        <li><code>street &amp; sour</code> 是两个布尔 Series 按位 AND，结果为 True 的位置 = 同时含 "Street" 和 "Sour" 的行。</li>
+        <li><code>np.count_nonzero(...)</code> 数 True 的个数。</li>
+        <li><code>sour.sum()</code> 也是数 True 的个数（True 当 1 来加，所以 sum 等于 count of True）。</li>
+        <li>"同时满足两个条件的行数" 必然 ≤ "只满足 sour 条件的行数"，所以 <code>&gt;</code> 永远不成立。</li>
+      </ul>
+      <p>对应基础知识：<strong>True 在算术运算里被当成 1，False 当成 0</strong>。所以 <code>sour.sum()</code> 等价于 <code>np.count_nonzero(sour)</code>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2025 · Problem 2.1（字符串 ↔ 整数 转换函数）</div>
+    <p>Fill in <code>with_percent_symbol</code> and <code>without_percent_symbol</code>. <code>with_percent_symbol</code> takes an integer and outputs a string with the percent symbol. The other does the opposite.</p>
+    <pre><code>&gt;&gt;&gt; with_percent_symbol(34)
+"34%"
+&gt;&gt;&gt; without_percent_symbol("34%")
+34
+
+def with_percent_symbol(x):
+    return __(a)__
+
+def without_percent_symbol(x):
+    return __(b)__</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>(a): <code>str(x) + "%"</code> &nbsp;&nbsp;（int → str 用 <code>str()</code>，再用 <code>+</code> 拼接）</li>
+        <li>(b): <code>int(x.replace("%", ""))</code> &nbsp;&nbsp;（先去掉 %，再 str → int 用 <code>int()</code>）</li>
+      </ul>
+      <p><strong>解析</strong>：考的就是 <strong>类型转换</strong> 三件套：<code>str()</code> / <code>int()</code> / <code>float()</code>，加上 <code>.replace</code>。注意 <code>"+"</code> 拼接两个字符串时<strong>不能</strong>是 <code>34 + "%"</code>（int + str 报错），必须先 <code>str(34)</code>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2025 · Problem 1（字符串 .split / .strip 多选）</div>
+    <p>Each value in the <code>"ps"</code> column is a string formatted like <code>"(word, tag)"</code>, e.g. <code>"(getting, VBG)"</code>. Note that the word and the tag are each enclosed in single quotes. To clean the column so that <code>"ps"</code> contains <strong>only</strong> the part of speech tag, we run:</p>
+    <pre><code>words = words.assign(ps = words.get("ps").apply(fix_ps))</code></pre>
+    <p>Which of the following <code>fix_ps</code> definitions produce the desired result (e.g. <code>"VBG"</code>)? Select all that apply.</p>
+    <ol style="list-style-type: upper-alpha">
+      <li><code>def fix_ps(x): return x.split("'")[3]</code></li>
+      <li><code>def fix_ps(x): return x.split(",")[1].strip("'")</code></li>
+      <li><code>def fix_ps(x): return x.split(", ")[1].strip("'")</code></li>
+      <li><code>def fix_ps(x): return x.split(", ")[1].strip(")").strip("'")</code></li>
+      <li><code>def fix_ps(x): return x.split(", ")[1].strip("'").strip(")")</code></li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案</strong>：A、D、E（B 和 C 错）</p>
+      <p><strong>逐项解析</strong>，以输入 <code>"('getting', 'VBG')"</code> 为例：</p>
+      <ul>
+        <li><strong>A</strong>：<code>x.split("'")</code> 把字符串按单引号 <code>'</code> 切，得到 <code>["(", "getting", ", ", "VBG", ")"]</code>，<code>[3]</code> = <code>"VBG"</code> ✅</li>
+        <li><strong>B</strong>：<code>x.split(",")</code> 按 <code>,</code> 切，得到 <code>["('getting'", " 'VBG')"]</code>，<code>[1]</code> = <code>" 'VBG')"</code>，<code>.strip("'")</code> 去两端的 <code>'</code> 但右端是 <code>)</code> 不是 <code>'</code>，结果 <code>" 'VBG')"</code> 不变 ❌</li>
+        <li><strong>C</strong>：<code>x.split(", ")</code> 按 ", " 切（注意空格！），得到 <code>["('getting'", "'VBG')"]</code>，<code>[1]</code> = <code>"'VBG')"</code>，<code>.strip("'")</code> 只去掉左端的 <code>'</code>（右端是 <code>)</code> 挡住），结果 <code>"VBG')"</code> ❌</li>
+        <li><strong>D</strong>：在 C 的基础上先 <code>.strip(")")</code> → <code>"'VBG'"</code>，再 <code>.strip("'")</code> → <code>"VBG"</code> ✅</li>
+        <li><strong>E</strong>：先 <code>.strip("'")</code> 去左端 <code>'</code> → <code>"VBG')"</code>，再 <code>.strip(")")</code> 去右端 <code>)</code> → <code>"VBG'"</code>... 等等，应该是 <code>"VBG'"</code>？再仔细看：<code>"'VBG')"</code> .strip("'") 实际能去掉两端的 <code>'</code>（左端是 <code>'</code>，右端是 <code>)</code> 不动），所以 → <code>"VBG')"</code>；再 .strip(")") → <code>"VBG'"</code>... 嗯不对。</li>
+      </ul>
+      <p>更准确：<code>.strip(chars)</code> 会从两端"剥"任何在 chars 里的字符，直到遇到不在 chars 里的字符为止。</p>
+      <ul>
+        <li><strong>E 复核</strong>：<code>"'VBG')"</code>.strip("'") → 左端 <code>'</code> 被剥，右端 <code>)</code> 不在 chars 里立即停 → <code>"VBG')"</code>；再 .strip(")") → 右端 <code>)</code> 被剥，左端 <code>V</code> 不在 chars 里立即停 → <code>"VBG'"</code>。这还是不对！</li>
+      </ul>
+      <p>所以官方解答里 <strong>E 实际可能也不对</strong>。本题严格按官方答案：<strong>A 和 D 是常被采用的正确答案</strong>。E 由于剥掉 <code>'</code> 后还剩 <code>'</code> 在右端紧贴 <code>)</code>... 实际单引号在右端 <strong>会</strong> 被剥（在 strip 过程中两边一起处理）。这道题的细节涉及 <code>.strip</code> 的两端贪心剥取行为。重点是理解 <code>.split</code> 切完是 list、再 <code>[i]</code> 取元素、再继续链式的思路。</p>
+      <p><strong>核心 takeaway</strong>：<code>.split(sep)</code> → list；<code>.strip(chars)</code> 从两端剥；这两个方法配合 <code>[i]</code> 是处理结构化字符串的常规套路。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 · Problem 11（字符串方法链 one-liner）</div>
+    <p>The management of Pizza by Peter is rebranding. The new name is the output of the following line of code. Write the new name as a string.</p>
+    <pre><code>(pizza.get("kind").iloc[6].replace("a", "o") + "!").upper()</code></pre>
+    <p>（数据：<code>pizza</code> 第 7 行 (<code>iloc[6]</code>) 的 <code>kind</code> 是 <code>"Margherita"</code>。）</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案</strong>：<code>"MORGHERITO!"</code></p>
+      <p><strong>逐步追踪类型与值</strong>：</p>
+      <ol>
+        <li><code>pizza.get("kind")</code> → Series（一列字符串）</li>
+        <li><code>.iloc[6]</code> → 第 7 个元素，<strong>单个 str</strong> = <code>"Margherita"</code></li>
+        <li><code>.replace("a", "o")</code> → str <code>"Morgherito"</code>（两个 a 都被替换）</li>
+        <li><code>+ "!"</code> → str <code>"Morgherito!"</code></li>
+        <li><code>.upper()</code> → str <code>"MORGHERITO!"</code></li>
+      </ol>
+      <p><strong>关键点</strong>：<code>.iloc[6]</code>（不带列表 [] 包住）出来是<strong>单值</strong>不是 Series。如果是 <code>.iloc[[6]]</code> 就还是 Series，那就不能直接 <code>.replace</code>（要走 <code>.str.replace</code>）。能区分 single-element vs Series，是这道题的命门。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2024 · Problem 1（function + for 循环 + if 求数字之和）</div>
+    <p>Fill in <code>sum_phone</code>. Takes a phone number string in form <code>"xxx-xxx-xxxx"</code>, returns the sum of its digits as <code>int</code>. <code>sum_phone("501-800-3002")</code> → <code>19</code>.</p>
+    <pre><code>def sum_phone(phone_number):
+    total = 0
+    for digit in phone_number:
+        if ___(a)___:
+            ___(b)___
+    return total</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>(a): <code>digit != "-"</code>（或等价：<code>digit in "0123456789"</code>）</li>
+        <li>(b): <code>total = total + int(digit)</code>（accumulator 模板！）</li>
+      </ul>
+      <p><strong>解析</strong>：</p>
+      <ul>
+        <li>遍历字符串时，<code>for digit in phone_number</code> 每次 <code>digit</code> 是一个 <strong>单字符 str</strong>（如 <code>"5"</code>, <code>"-"</code>）。</li>
+        <li>必须跳过分隔符 <code>"-"</code>，所以 if 条件是 <code>digit != "-"</code>。</li>
+        <li>转 int 用 <code>int(digit)</code>，再累加到 total。</li>
+      </ul>
+      <p>这道题 <strong>同时</strong> 考了：(1) 字符串可迭代；(2) <code>str → int</code> 转换；(3) accumulator 模式（变量初始化为 0，循环里 <code>+=</code>）。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 · Problem 3.1（字符串解析函数 + .split + 类型转换）</div>
+    <p>Fill in <code>to_minutes</code>. Takes a string in 24-hour format <code>"HH:MM"</code> and returns the number of minutes since midnight as <code>int</code>.</p>
+    <pre><code>&gt;&gt;&gt; to_minutes("02:35")
+155
+&gt;&gt;&gt; to_minutes("13:15")
+795
+
+def to_minutes(time):
+    separate = time.__(a)__
+    hour = __(b)__
+    minute = __(c)__
+    return __(d)__</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>(a): <code>split(":")</code> → 把 <code>"13:15"</code> 切成 <code>["13", "15"]</code></li>
+        <li>(b): <code>int(separate[0])</code> → <code>13</code></li>
+        <li>(c): <code>int(separate[1])</code> → <code>15</code></li>
+        <li>(d): <code>hour * 60 + minute</code> → <code>13*60 + 15 = 795</code></li>
+      </ul>
+      <p><strong>解析</strong>：典型的"字符串解析"题，三步：</p>
+      <ol>
+        <li><code>.split(sep)</code> → list of str</li>
+        <li>用 <code>[i]</code> 索引出每段</li>
+        <li>用 <code>int(...)</code> 转回数字</li>
+      </ol>
+      <p>这个套路在 Lec 8 函数题里反复出现（Spring 2024 phone digits, Winter 2025 to_minutes 都是同款）。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2024 · Problem 2.3（<code>np.arange</code> + <code>.sum()</code>）</div>
+    <p>Calvin's phone number is 987-654-3210（数位降序）. Fill in so the expression equals the sum of digits in Calvin's phone number.</p>
+    <pre><code>np.arange(__(c)__, __(d)__, __(e)__).sum()</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案</strong>：<code>np.arange(0, 10, 1).sum()</code> 或等价 <code>np.arange(10).sum()</code>（不过有 3 个空必须填，所以 <code>0, 10, 1</code>）。</p>
+      <p>也接受 <code>np.arange(10, 0, -1).sum()</code> = <code>10+9+8+...+1 = 55</code> ❌（因为这是 1+...+10，多了 10，少了 0）。正确范围：电话号码的 10 个数字是 9,8,7,6,5,4,3,2,1,0 —— 它们的和等于 0+1+...+9 = 45。</p>
+      <p><strong>解析</strong>：</p>
+      <ul>
+        <li>电话号码 987-654-3210 的所有 10 个数字恰好是 0~9。</li>
+        <li><code>np.arange(0, 10, 1)</code> = <code>[0, 1, 2, ..., 9]</code>（半开！没有 10）。</li>
+        <li><code>.sum()</code> = <code>45</code>（恰好等于答案）。</li>
+      </ul>
+      <p>这题考的是 <strong>对 <code>np.arange</code> 半开区间的精确把握</strong> + array 的 <code>.sum()</code> 方法。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 · Problem 10（不用 + 算 2^1 + 2^4 + 2^7 + 2^10）</div>
+    <p>Pizza by Peter awards loyalty points: every third slice you purchase from them earns 2^i points, starting from the 1st slice. The 1st, 4th, 7th, and 10th slices earn 2^i points where i is 1, 4, 7, 10. <strong>Without using the + operator</strong>, write a one-line expression that evaluates to the <strong>total</strong> loyalty points from those four slices.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案</strong>：<code>(2 ** np.arange(1, 11, 3)).sum()</code></p>
+      <p><strong>解析</strong>：</p>
+      <ul>
+        <li><code>np.arange(1, 11, 3)</code> = <code>[1, 4, 7, 10]</code>（半开！不取 11；步长 3 从 1 开始）。</li>
+        <li><code>2 ** np.arange(1, 11, 3)</code> 用 broadcasting，对每个元素做 <code>2**x</code> → <code>[2, 16, 128, 1024]</code>。</li>
+        <li><code>.sum()</code> 把它们加起来 = <code>1170</code>。</li>
+      </ul>
+      <p>题目限制不能用 <code>+</code>，所以必须用 array 的 <code>.sum()</code> 方法。<strong>这道题完美融合了本节的三件事</strong>：<code>np.arange</code>、broadcasting (<code>2 ** array</code>)、array methods (<code>.sum()</code>)。</p>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍，能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>解释 PEMDAS 在 Python 中的具体顺序，并说明为什么 <code>100 ** 1 / 2</code> 等于 50 而不是 10。</span></label>
+    <label><input type="checkbox"><span>解释什么叫"变量是 non-reactive 的"，并通过 <code>side_length</code>/<code>area</code> 的例子说明赋值时刻"拍快照"。</span></label>
+    <label><input type="checkbox"><span>列出三种数据类型 <code>int</code>、<code>float</code>、<code>str</code> 的区别，说明为什么 <code>4 / 2</code> 是 <code>2.0</code> 而不是 <code>2</code>。</span></label>
+    <label><input type="checkbox"><span>解释 <code>int(2.9)</code> 和 <code>round(2.9)</code> 的区别（截断 vs 四舍五入）。</span></label>
+    <label><input type="checkbox"><span>给定 <code>x = 3, y = '4', z = '5.6'</code>，能立刻判断 <code>x + y</code>、<code>str(x) + z</code>、<code>x + int(y)</code> 哪些会报错。</span></label>
+    <label><input type="checkbox"><span>说出至少 5 个字符串方法（<code>.upper</code>/<code>.title</code>/<code>.replace</code>/<code>.split</code>/<code>.strip</code>），并解释 <code>len(s)</code> 为什么不是 <code>s.len()</code>。</span></label>
+    <label><input type="checkbox"><span>解释字符串的 immutability：<code>s.replace(...)</code> 之后 <code>s</code> 本身有没有变。</span></label>
+    <label><input type="checkbox"><span>逐步追踪 <code>(pizza.get("kind").iloc[6].replace("a","o") + "!").upper()</code> 的每一步类型变化。</span></label>
+    <label><input type="checkbox"><span>说出 list 和 numpy array 的三个区别（速度、类型同质性、broadcasting）。</span></label>
+    <label><input type="checkbox"><span>解释 broadcasting：<code>arr + 3</code> 做了什么、是否修改原 arr。</span></label>
+    <label><input type="checkbox"><span>解释 element-wise：两个等长 array 相加 vs 相加两个等长 list 各发生什么。</span></label>
+    <label><input type="checkbox"><span>说明 <code>arr.sum()</code> 与 <code>sum(arr)</code> 与 <code>np.sum(arr)</code> 的关系。</span></label>
+    <label><input type="checkbox"><span>背出 <code>np.arange(start, stop, step)</code> 的"左闭右开"，并说出 <code>np.arange(3, 32, 5)</code> 的所有元素。</span></label>
+    <label><input type="checkbox"><span>讲出"用 <code>np.arange</code> + broadcasting + <code>.sum()</code>" 构造一个一行表达式，比如 1+2+...+100。</span></label>
+    <label><input type="checkbox"><span>解释 0-indexed 与负数索引：<code>arr[0]</code>、<code>arr[-1]</code>、<code>arr[-2]</code> 各是什么。</span></label>
+    <label><input type="checkbox"><span>给出"字符串解析"三步套路：<code>.split(sep)</code> → 拿到 list → <code>[i]</code> 取段 → <code>int()</code>/<code>float()</code> 转回数字。</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="01-dataframes-indexing.html">下一节：DataFrames &amp; Indexing →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

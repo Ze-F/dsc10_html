@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 3 · CI 解读 & Center/Spread - DSC10 Quiz3</title>
+<style>
+  :root {
+    --bg: #fafaf7; --text: #1f2328; --muted: #57606a;
+    --accent: #0969da; --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e; --code-text: #cdd6f4;
+    --warn-bg: #fff8c5; --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff; --tip-border: #54aeff;
+    --danger-bg: #ffebe9; --danger-border: #cf222e;
+    --ok-bg: #dafbe1; --ok-border: #1a7f37;
+    --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781;
+    --border: #d0d7de; --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 10px 16px; margin: 12px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .trap-table th { font-size: 13px; }
+  .trap-table .yes { color: #1a7f37; font-weight: 700; }
+  .trap-table .no { color: #cf222e; font-weight: 700; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 Quiz3 总目录</a></span>
+  <span><a href="02-bootstrap-ci.html">← 上一节</a> <a href="04-chebyshev-normal.html">下一节: Chebyshev & Normal →</a></span>
+</nav>
+
+<main>
+  <h1>Section 3 · CI 解读 & Center / Spread</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 15（Confidence Intervals, Center, and Spread）｜
+    <strong>Quiz3 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1（CI解读 7/7）</span>｜
+    <strong>预计学习时间</strong>：1.5-2 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+  <p>本节是 Quiz3 的<strong>陷阱密集区</strong>。<strong>每年必考一道"以下哪句对 CI 的解读是正确的"多选题</strong>，里面几乎都是错的，只有 1-2 个是对的。背熟正确说法 + 错误模式就稳赢。</p>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>形式</th></tr></thead>
+    <tbody>
+      <tr><td><strong>CI 解读 4 大陷阱辨析</strong></td><td><span class="tier tier-1">⭐⭐⭐ (7/7)</span></td><td>"select all that apply"多选</td></tr>
+      <tr><td>正确说法：confidence is in the <strong>process</strong></td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>"X% of such intervals contain the truth"</td></tr>
+      <tr><td>CI 宽度 vs 置信度（更高置信 → 更宽）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>W26 Q4.4，T/F 题常出现</td></tr>
+      <tr><td>CI 宽度 vs 样本量（更大 n → 更窄）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>常见 T/F 项</td></tr>
+      <tr><td><strong>Variance / SD 手算</strong></td><td><span class="tier tier-2">⭐⭐</span></td><td>F24 Q1.3, F25 Q3.2</td></tr>
+      <tr><td>Mean vs Median（skew方向）</td><td><span class="tier tier-2">⭐⭐</span></td><td>F25 Q3.1, Q4, W26 Q1.3</td></tr>
+      <tr><td>Sum of deviations from mean = 0</td><td><span class="tier tier-2">⭐⭐</span></td><td>F25 Q4 T/F</td></tr>
+      <tr><td>Median robust to outliers</td><td><span class="tier tier-3">⭐</span></td><td>偶尔 T/F</td></tr>
+      <tr><td>Bootstrap 不适用于 max/min</td><td><span class="tier tier-3">⭐</span></td><td>低频概念题</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. 什么是 95% 置信？—— "Confidence is in the PROCESS"</h3>
+  <p>记一个三步流程 (Lec15 P3)：</p>
+  <ol>
+    <li>从 population 收集一个 <strong>new original sample</strong>；</li>
+    <li>从该 sample 反复 bootstrap，计算 statistic 的经验分布；</li>
+    <li>取中间 95% 构造 95% CI。</li>
+  </ol>
+
+  <div class="ok">
+    <strong>✅ 95% confidence level 的<u>唯一</u>正确解读</strong>：<br>
+    "如果我们反复执行上述三步流程产生 CI，<strong>约 95% 的此类 CI 会包含真实的 population parameter</strong>。"<br>
+    <span style="font-size: 14px; color: var(--muted);">("Approximately 95% of the intervals we create through this process will contain the true population parameter.")</span>
+  </div>
+
+  <p>关键直觉（Lec15 的 ring toss 类比）：你扔了 200 次圈圈套同一个柱子。如果你瞄得准，~95% 的圈套住了柱子。这里"95%"是你<strong>整个流程的命中率</strong>，<strong>不是</strong>某一个圈套住的概率。</p>
+
+  <h3>2. CI 解读的 4 大陷阱 <span class="highlight">（必背！）</span></h3>
+  <p>假设我们造出一个 95% CI = [70671.5, 86405]，下面列出每一句的对错与原因：</p>
+
+  <table class="trap-table">
+    <thead><tr><th>说法</th><th>对/错</th><th>原因</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>"There is a <strong>95% chance</strong> the true parameter is in [70671.5, 86405]."</td>
+        <td><span class="no">❌</span></td>
+        <td>区间一旦造出来就是<strong>固定</strong>的；parameter 也是<strong>固定</strong>的。要么在里面，要么不在，<strong>没有概率</strong>。</td>
+      </tr>
+      <tr>
+        <td>"95% of the (population/sample) data values lie in this interval."</td>
+        <td><span class="no">❌</span></td>
+        <td>CI 描述的是<strong>parameter 的位置</strong>，不是 data values 的分布。例如 CI 可能很窄，但 population 里大部分值都在外面。</td>
+      </tr>
+      <tr>
+        <td>"95% of all <strong>bootstrap resample medians</strong> lie in this interval."</td>
+        <td><span class="yes">✅</span></td>
+        <td>这是<strong>构造方式</strong>本身。但要小心——题目里很容易把"sample medians"偷换成"sample values" / "population values"，就变错了。</td>
+      </tr>
+      <tr>
+        <td>"If we repeated the (sampling + bootstrap + CI) <strong>process</strong> many times, about 95% of the resulting intervals would contain the true parameter."</td>
+        <td><span class="yes">✅</span></td>
+        <td>这是 confidence level 的正式定义。</td>
+      </tr>
+      <tr>
+        <td>"This particular interval contains the true parameter."</td>
+        <td><span class="no">❌</span></td>
+        <td>不知道。可能包含可能不。</td>
+      </tr>
+      <tr>
+        <td>"The interval contains the <strong>sample median</strong>."</td>
+        <td><span class="yes">✅</span></td>
+        <td>因为 CI 是从 bootstrap 分布中间 95% 取的，sample median 几乎总在 bootstrap 分布中间，所以一般会在。但要小心——有些边缘情况下 sample median 可能不在 CI 里（如有偏 bootstrap 分布）。题目通常视为对。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>3. Confidence Tradeoffs（置信度与宽度的取舍）</h3>
+  <ul>
+    <li><strong>更高置信度</strong>（99%）→ 区间<strong>更宽</strong>（更稳但不精确）。</li>
+    <li><strong>更低置信度</strong>（80%）→ 区间<strong>更窄</strong>（更精确但更可能 miss）。</li>
+    <li><strong>更大样本</strong>（n 增大）→ 区间<strong>更窄</strong>（sampling distribution 更紧）。</li>
+  </ul>
+
+  <div class="tip">
+    <strong>记忆口诀</strong>：<br>
+    Confidence ↑ → Width ↑（同一份数据）<br>
+    Sample size n ↑ → Width ↓
+  </div>
+
+  <h3>4. Bootstrap 的局限</h3>
+  <ul>
+    <li><strong>Sensitive statistics（极值）不能 bootstrap</strong>：max / min。因为 bootstrap resample 的最大值<strong>不可能超过</strong>原 sample 的最大值，所以 boot 分布永远低估 population max。</li>
+    <li><strong>Bootstrap 只有原 sample 代表性好时才有用</strong>。如果原 sample biased，bootstrap 出来的也 biased，无法救回来。</li>
+  </ul>
+
+  <h3>5. Center: Mean vs Median</h3>
+
+  <table>
+    <thead><tr><th></th><th>Mean (均值)</th><th>Median (中位数)</th></tr></thead>
+    <tbody>
+      <tr><th>定义</th><td>balance point（"杠杆中心"）</td><td>half-way point（一半数据小于它）</td></tr>
+      <tr><th>数学性质</th><td>所有数据偏离 mean 的<strong>差之和 = 0</strong></td><td>左右两边数据点<strong>个数</strong>相等（不是面积！是面积 50%）</td></tr>
+      <tr><th>对 outlier</th><td><strong>敏感</strong>（一个大值能拉走 mean）</td><td><strong>robust</strong>（不受极值影响）</td></tr>
+      <tr><th>对称分布</th><td colspan="2" style="text-align:center;">mean = median</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Skew 方向决定 mean / median 关系</h4>
+  <ul>
+    <li><strong>右偏 (right-skewed, long tail on right)</strong>：mean &gt; median（mean 被尾巴拉到右边）</li>
+    <li><strong>左偏 (left-skewed, long tail on left)</strong>：mean &lt; median</li>
+    <li><strong>对称 (symmetric)</strong>：mean = median</li>
+  </ul>
+
+  <div class="tip">
+    <strong>记忆口诀</strong>：<strong>"Mean 跟着 tail 走"</strong>。tail 在右，mean 在右；tail 在左，mean 在左。
+  </div>
+
+  <h3>6. Spread: Variance & Standard Deviation</h3>
+
+  <h4>核心公式（必背）</h4>
+  <div class="formula">
+    deviation<sub>i</sub> = value<sub>i</sub> − mean<br><br>
+    <strong>variance</strong> = mean of squared deviations<br>
+    = [(value<sub>1</sub> − mean)² + ... + (value<sub>n</sub> − mean)²] / n<br><br>
+    <strong>SD</strong> = √variance
+  </div>
+
+  <h4>三步走计算（手算题模板）</h4>
+  <ol>
+    <li>算 mean</li>
+    <li>每个值减 mean → deviations</li>
+    <li>每个 deviation 平方 → 求平均 → variance；开根号 → SD</li>
+  </ol>
+
+  <h4>例：data = [2, 3, 3, 9]</h4>
+<pre><code>mean = (2+3+3+9)/4 = 4.25
+deviations = [2-4.25, 3-4.25, 3-4.25, 9-4.25]
+           = [-2.25, -1.25, -1.25, 4.75]
+squared    = [5.0625, 1.5625, 1.5625, 22.5625]
+variance   = (5.0625+1.5625+1.5625+22.5625)/4 = 7.6875
+SD         = sqrt(7.6875) ≈ 2.7726</code></pre>
+
+  <h4>关键性质</h4>
+  <ul>
+    <li><code>np.mean(deviations) = 0</code>，<strong>永远</strong>（这是 mean 的定义性质）。所以单纯"平均 deviation"没用，要平方。</li>
+    <li><strong>SD 单位与原数据相同</strong>（如 dollars）；variance 单位是 <strong>原单位的平方</strong>（dollars²）。</li>
+    <li>SD 可以是 <strong>0</strong>（所有值相等），但<strong>不能是负数</strong>。Variance 同理 ≥ 0。</li>
+    <li>SD 越大 → 数据越分散。</li>
+    <li>"Bulk of data is within a few SDs of the mean" —— 准备 Section 4 学的 Chebyshev/Normal 的铺垫。</li>
+  </ul>
+
+  <h4>函数</h4>
+<pre><code>np.std(data)   # 返回 SD（注意：分母是 n，不是 n-1）
+np.mean(data)
+np.median(data)</code></pre>
+
+  <h3>7. Sum of Deviations 必为 0 —— 概念题</h3>
+  <p>对任何 dataset：</p>
+  <div class="formula">
+    Σ (value<sub>i</sub> − mean) = 0
+  </div>
+  <p>这是 mean 作为 balance point 的<strong>定义性质</strong>。F25 Q4 直接考。</p>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="danger">
+    <strong>陷阱 1 · "95% chance interval contains parameter" 永远错</strong><br>
+    Parameter 固定、interval 一旦造好也固定 → 二者关系是确定的（要么包含，要么不包含），<strong>没有概率</strong>。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 2 · "95% of (population/sample) values lie in this interval" 永远错</strong><br>
+    CI 描述的是 <strong>parameter</strong> 的位置，不是 data values。Lec15 P14 直接展示了 CI 只覆盖 population histogram 极小一块。
+  </div>
+
+  <div class="ok">
+    <strong>陷阱 3 · 正确说法是「95% 的<u>这种过程</u>产生的 CI 会包含真值」</strong><br>
+    "Approximately 95% of intervals created through this process contain the true parameter." 这是<strong>唯一</strong>能 100% 算对的说法。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4 · "95% of bootstrap medians lie in this interval" 对</strong><br>
+    这就是构造方式（中间 95%）。但题目里非常容易偷换成"sample medians" / "population medians" / "sample values"——这些都错！只有 "bootstrap medians" 或 "bootstrapped resample statistics" 才对。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5 · 更高置信度 → 区间更宽（同一份数据）</strong><br>
+    99% CI &gt; 95% CI &gt; 80% CI。错说："99% CI 比 95% 窄" → False。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6 · 更大样本 → 区间更窄</strong><br>
+    "n 从 100 变到 1000，CI 会变宽" → False。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7 · skew 方向：mean 跟着 tail 跑</strong><br>
+    Right-skewed → mean &gt; median。Left-skewed → mean &lt; median。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 8 · SD 不能为负，可以为 0</strong><br>
+    SD = 0 当且仅当所有值相同。SD &lt; 0 不可能（开根号结果非负）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 9 · 加一个等于 mean 的值，会发生什么？</strong><br>
+    若 dataset 中加入一个值正好 = 当前 mean：mean 不变；新值的 deviation = 0；总平方和不变但 n+1 → variance <strong>减小</strong>（除数变大、分子不变）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 10 · Bootstrap 不能用来估 max/min</strong><br>
+    因为 bootstrap resample 的 max ≤ 原 sample 的 max（原 sample 决定了上限）。所以 boot 分布永远 underestimate population max。
+  </div>
+
+  <div class="tip">
+    <strong>💡 选 CI 解读题的速判法</strong>：
+    <ol>
+      <li>看到"95% chance"——错。</li>
+      <li>看到"95% of (data/values/people/salaries)"——错。</li>
+      <li>看到"95% of intervals"或"the process"——对。</li>
+      <li>看到"95% of bootstrap (medians/means/stats)"——对。</li>
+    </ol>
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Quiz 3 · Problem 2.3（CI 解读 · 经典 4 选项）</div>
+    <p>An 88% confidence interval for the mean meal price at Italian restaurants in this city is <strong>[25, 35]</strong>. Which of the following statements are valid interpretations of this confidence interval? Select all that apply.</p>
+    <ul>
+      <li>(A) Approximately 88% of all Italian restaurants in this city have meal prices between $25 and $35.</li>
+      <li>(B) There is an 88% chance that the mean meal price at Italian restaurants in this city is between $25 and $35.</li>
+      <li>(C) If we repeated this procedure many times, about 88% of the resulting intervals would contain the true mean meal price.</li>
+      <li>(D) Approximately 88% of all bootstrapped sample means we computed fell between $25 and $35.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(C) 和 (D)</strong></p>
+      <ul>
+        <li>(A) ❌ CI 不是关于 data values 的，是关于 parameter 的。</li>
+        <li>(B) ❌ "88% chance the parameter is in [25, 35]"——错！parameter 固定，interval 固定。</li>
+        <li>(C) ✅ Confidence is in the process. 这是唯一一定对的说法。</li>
+        <li>(D) ✅ 这就是 88% CI 的构造方式：取 boot means 的中间 88%。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2025 Quiz 3 · Problem 1.3（CI 解读 · 比例版）</div>
+    <p>A 90% bootstrap CI for the population proportion of sleepy cats with ≥10 treats is <strong>[0.10, 0.15]</strong>. Which statements are valid? Select all that apply.</p>
+    <ul>
+      <li>(A) There is a 90% chance the true proportion is between 0.10 and 0.15.</li>
+      <li>(B) About 90% of all cats have a treat count between 0.10 and 0.15.</li>
+      <li>(C) Roughly 90% of the bootstrap sample proportions fell in [0.10, 0.15].</li>
+      <li>(D) If we repeat the process (sample → bootstrap → CI) many times, ≈90% of these intervals would contain the true population proportion.</li>
+      <li>(E) The true population proportion is definitely in [0.10, 0.15].</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(C) 和 (D)</strong></p>
+      <p>(A) "X% chance"陷阱、(B) "X% of data values"陷阱、(E) "definitely"——都错。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Quiz 3 · Problem 1.3（CI 解读 · 工资 CI）</div>
+    <p>An 85% CI for the mean amount UCSD students would pay is <strong>[18500, 19500]</strong>. Which are valid interpretations? Select all that apply.</p>
+    <ul>
+      <li>(A) 85% of UCSD students would pay between $18,500 and $19,500.</li>
+      <li>(B) Repeating this sampling-and-bootstrap process many times, approximately 85% of resulting intervals contain the true mean.</li>
+      <li>(C) There is an 85% probability that the true mean is in [18500, 19500].</li>
+      <li>(D) 85% of bootstrapped sample means fell between $18,500 and $19,500.</li>
+      <li>(E) The sample mean was between $18,500 and $19,500.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p class="tip"><strong>注</strong>：本题为讲义改编版（增加了 (D)(E) 两个选项扩展练习）。<strong>官方原题只有 4 选项</strong>（A、B、C、None of the above），<strong>官方答案 = Option 3 only</strong>（即我们这里的 (B)）。完整原题见 <code>practice_site/sp25-quiz3/index.html</code> Problem 1.3。</p>
+      <p><strong>答案：(B), (D), 和 (E)</strong></p>
+      <ul>
+        <li>(A) ❌ 85% of students 是 data values 陷阱。</li>
+        <li>(B) ✅ Process 解读。</li>
+        <li>(C) ❌ "probability"陷阱。</li>
+        <li>(D) ✅ 构造方式。</li>
+        <li>(E) ✅ 因为 CI 是 bootstrap 分布的中间 85%，原 sample mean 一般在 bootstrap 分布的中心附近 → 在 CI 内。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 3 · Problem 2.3（多项 T/F · 综合考点）</div>
+    <p>True or False about the bootstrap 95% confidence interval just constructed:</p>
+    <ul>
+      <li>(A) If we used a smaller original sample size, the CI would tend to be wider.</li>
+      <li>(B) About 95% of all such intervals (created through this process) will contain the true population mean.</li>
+      <li>(C) We could instead use the CLT to construct a CI based on the same single sample.</li>
+      <li>(D) The standard deviation of our sample is approximately the standard deviation of the population.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p class="tip"><strong>注</strong>：本题为讲义改编版（从官方 6 选项中精简出 4 个"真命题"用于练习概念）。<strong>官方原题</strong>共 6 选项（含若干 false 干扰项，如"data is roughly normally distributed"），<strong>官方答案 = Option 4 + Option 5</strong>（即"could also use CLT"、"sample SD ≈ pop SD"——对应我们这里的 (C) 和 (D)）。完整原题见 <code>practice_site/wi25-quiz3/index.html</code> Problem 2.3。</p>
+      <p><strong>答案：全部 (A)(B)(C)(D) 都对</strong></p>
+      <ul>
+        <li>(A) ✅ n 小 → spread 大 → CI 更宽。</li>
+        <li>(B) ✅ Process 解读。</li>
+        <li>(C) ✅ 学了 Section 5 就知道：CLT 也能造 CI。</li>
+        <li>(D) ✅ 这就是 bootstrap 假设的核心——sample 近似 population。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 3.5（80% CI 解读）</div>
+    <p>You constructed an 80% bootstrap CI [a, b]. Which statements are valid? Select all that apply.</p>
+    <ul>
+      <li>(A) There is an 80% chance the population mean is in [a, b].</li>
+      <li>(B) About 80% of the sample data falls in [a, b].</li>
+      <li>(C) About 80% of intervals built from this process contain the true mean.</li>
+      <li>(D) The probability that this specific interval contains the true mean is 80%.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：仅 (C)</strong></p>
+      <p>(A)(D) 都是"X% chance"的换皮陷阱；(B) 是 data values 陷阱。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 4.4（置信度与宽度）</div>
+    <p>True or False: A 99% confidence interval is always wider than a 95% confidence interval (built from the same data).</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：True</strong></p>
+      <p>更高置信度需要更宽的区间才能覆盖更多 boot 分布。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 3 · Problem 1.3（手算 variance）</div>
+    <p>Calculate the variance of the dataset <code>[2, 4, 6, 8, 10]</code> by hand. Show your work.</p>
+    <details>
+      <summary>显示答案</summary>
+<pre><code>mean = (2+4+6+8+10)/5 = 6
+deviations = [-4, -2, 0, 2, 4]
+squared    = [16, 4, 0, 4, 16]
+sum        = 40
+variance   = 40/5 = 8</code></pre>
+      <p><strong>variance = 8</strong>（SD = √8 ≈ 2.83）</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 3 · Problem 1.4（变化分析）</div>
+    <p>Continuing from above: a sixth value equal to the mean (i.e. 6) is added to the dataset. How does the variance change?</p>
+    <ul>
+      <li>(A) Increases　(B) Decreases　(C) Unchanged　(D) Cannot tell</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(B) Decreases</strong></p>
+<pre><code>新 mean = (2+4+6+8+10+6)/6 = 6（不变！）
+新 deviations = [-4,-2,0,2,4, 0]
+新 squared sum = 40（不变，因为新 deviation² = 0）
+新 variance = 40 / 6 ≈ 6.67 &lt; 8</code></pre>
+      <p>加一个等于 mean 的值，分子（sum of squared deviations）不变但 n 变大 → variance 减小。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2025 Quiz 3 · Problem 3.1（histogram 估 mean）</div>
+    <p>A right-skewed histogram of <code>"treats"</code> is shown (bulk near low values, long right tail). Select the closest to the mean.</p>
+    <ul>
+      <li>(A) 4　(B) 7　(C) 12</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(B) 7</strong></p>
+      <p>右偏分布 <strong>mean &gt; median</strong>。median ≈ 4-5（数据集中区），mean 被右尾拉得稍大 → ~7 最合理。12 太靠尾、4 是 median 附近。</p>
+      <p class="tip"><strong>注</strong>：原题附 histogram 图，此处只能文字描述。完整图见 <code>practice_site/fa25-quiz3/index.html</code> Problem 3。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2025 Quiz 3 · Problem 3.2（histogram 估 SD）</div>
+    <p>Same histogram. Select the closest to the SD of <code>"treats"</code>.</p>
+    <ul>
+      <li>(A) 1　(B) 4　(C) 16</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(B) 4</strong></p>
+      <p>SD ≈ 数据偏离 mean 的"典型"距离。大部分数据落在距 mean 一段距离内，此分布的"典型偏离"看起来 ~4。1 太小、16 太大（≈ 数据总跨度的一半，SD 不会那么大）。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2025 Quiz 3 · Problem 4（多项 T/F · mean/median 性质）</div>
+    <p>For a dataset, the mean is 14.6 and the median is 16.3. Select all true statements.</p>
+    <ul>
+      <li>(A) The distribution is left-skewed.</li>
+      <li>(B) There must exist a value between 14.6 and 16.3.</li>
+      <li>(C) The sum of (value − 14.6) over all values equals 0.</li>
+      <li>(D) Half the values are below 16.3.</li>
+      <li>(E) If we remove the largest value, the median will decrease.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(A), (C), (D)</strong></p>
+      <ul>
+        <li>(A) ✅ mean &lt; median → 左偏（mean 被左尾拉走）。</li>
+        <li>(B) ❌ 不一定。比如 dataset 全是 14 和 17，mean = 15.5 不在数据里。具体到本题，并没有规定值要 cover 该区间。</li>
+        <li>(C) ✅ Sum of deviations from mean = 0 永远成立。</li>
+        <li>(D) ✅ Median 的定义。</li>
+        <li>(E) ❌ Median 对 outlier robust，移除最大值通常不影响（除非数据很少）。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 1.3（skew 方向）</div>
+    <p>True or False: If a distribution is right-skewed, then the mean is greater than the median.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：True</strong></p>
+      <p>Right tail 把 mean 拉向右边。"Mean follows the tail."</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2024 Quiz 4 · Problem 2（SD 性质 T/F）</div>
+    <p>Select all TRUE statements about the standard deviation.</p>
+    <ul>
+      <li>(A) The standard deviation can be 0.</li>
+      <li>(B) The standard deviation can be negative.</li>
+      <li>(C) If two datasets have the same SD, they must have the same mean.</li>
+      <li>(D) Given the SD, the variance is determined.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(A) 和 (D)</strong></p>
+      <ul>
+        <li>(A) ✅ 当所有值相等，SD = 0。</li>
+        <li>(B) ❌ SD = √variance ≥ 0。</li>
+        <li>(C) ❌ SD 和 mean 没关系，互相不能推。</li>
+        <li>(D) ✅ variance = SD²，确定。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2024 Quiz 4 · Problem 3.3（90% CI 解读）</div>
+    <p>A 90% bootstrap CI for the mean rating is [3.2, 4.1]. Which statements are true? Select all that apply.</p>
+    <ul>
+      <li>(A) 90% of movies have ratings between 3.2 and 4.1.</li>
+      <li>(B) There is a 90% probability the population mean is in [3.2, 4.1].</li>
+      <li>(C) If we repeated the sampling/bootstrap/CI process many times, ~90% of the resulting intervals would contain the population mean.</li>
+      <li>(D) The sample mean rating is in [3.2, 4.1].</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(C) 和 (D)</strong></p>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍，能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>用<strong>自己的话</strong>说出 95% confidence level 的<u>唯一</u>正确解读：confidence is in the <strong>process</strong>，~95% of intervals 会包含真值。</span></label>
+    <label><input type="checkbox"><span>解释为什么"95% chance the parameter is in this interval"是错的（parameter 固定 + interval 固定 = 没有概率可言）。</span></label>
+    <label><input type="checkbox"><span>解释为什么"95% of values lie in this interval"是错的（CI 描述 parameter，不描述 data values）。</span></label>
+    <label><input type="checkbox"><span>当题目说"95% of bootstrap medians lie in this interval"——这是对的还是错的？为什么要小心？</span></label>
+    <label><input type="checkbox"><span>陈述 CI 宽度与<strong>置信度</strong>、<strong>样本量</strong>的关系。</span></label>
+    <label><input type="checkbox"><span>为什么 bootstrap <strong>不能</strong>用来估 population max？</span></label>
+    <label><input type="checkbox"><span>说出 mean 和 median 的区别（balance point vs half-way point）。</span></label>
+    <label><input type="checkbox"><span>记住：right-skewed → mean __ median；left-skewed → mean __ median。</span></label>
+    <label><input type="checkbox"><span>Median 比 mean 更 robust 还是更 sensitive to outliers？</span></label>
+    <label><input type="checkbox"><span>默写 variance 的公式：(value − mean)² 的平均。</span></label>
+    <label><input type="checkbox"><span>SD 与 variance 的关系：SD = sqrt(variance)，SD 单位与原数据相同。</span></label>
+    <label><input type="checkbox"><span>陈述：sum of deviations from mean = ?（永远 = 0）</span></label>
+    <label><input type="checkbox"><span>判断：SD 可以为 0 吗？可以为负吗？</span></label>
+    <label><input type="checkbox"><span>如果向 dataset 中加入一个 = 当前 mean 的值，variance 会增大、减小还是不变？为什么？</span></label>
+    <label><input type="checkbox"><span>能手算 <code>[2, 4, 6, 8, 10]</code> 的 variance（= 8）。</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="02-bootstrap-ci.html">← 上一节</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="04-chebyshev-normal.html">下一节: Chebyshev & Normal →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据可视化与直方图 - DSC10 Midterm 备考</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .nav-bottom {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+  .nav-top a, .nav-bottom a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 16px;
+    margin-top: 20px;
+    color: var(--muted);
+  }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+  }
+  .tier {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta {
+    background: #f6f8fa;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--tip-bg);
+    border-left: 4px solid var(--tip-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  details {
+    background: var(--q-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+  }
+  details[open] {
+    background: #fff;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+  }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) {
+    margin-top: 12px;
+  }
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .q-source {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .checklist {
+    background: #f0f9ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .checklist label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+  .checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 总目录</a></span>
+  <span><a href="02-querying-groupby.html">← 上一节</a> <a href="04-functions-apply.html">下一节 →</a></span>
+</nav>
+
+<main>
+  <h1>Section 3 ｜ 数据可视化与直方图 📊</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 6-7 ｜
+    <strong>Midterm出现率</strong>：<span class="tier tier-2">⭐⭐ Tier 2 (5/6)</span> ｜
+    <strong>预计学习时间</strong>：1.5-2 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <div class="tip">
+    <strong>本节核心：根据变量类型选对图，并理解 density histogram 的"面积=比例"。</strong>
+    密度直方图（density histogram）是 midterm 几乎每年都考的硬骨头，重点在 <code>Height = Proportion / Width</code>、面积总和 = 1、bin 半开区间 <code>[a, b)</code>，以及"重新分箱后高度怎么变"。
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>知识点</th><th>核心句</th><th>出现率</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>变量类型 (numerical / categorical)</td><td>判断"它能不能做算术"，zip code 是 categorical</td><td>⭐ 基础</td></tr>
+      <tr><td>选图决策（scatter / line / bar / hist）</td><td>2 numerical→scatter；time vs num→line；cat vs num→bar；num分布→hist</td><td>⭐⭐ 高频</td></tr>
+      <tr><td><code>df.plot(kind=..., x=, y=)</code> 调用</td><td>babypandas 一律用 <code>.plot</code>，<code>barh</code>=横向</td><td>⭐⭐ 高频</td></tr>
+      <tr><td>密度直方图 + bin heights 计算</td><td>面积 = 比例，<code>Height = Proportion / Width</code></td><td>⭐⭐⭐ 必考</td></tr>
+      <tr><td>bin 区间约定 <code>[a, b)</code></td><td>只有最后一个 bin 包含右端点</td><td>⭐⭐ 高频</td></tr>
+      <tr><td>重新分箱后 bar 高度推算</td><td>新高度 = 旧高度 × 旧宽度 / 新宽度（合并/拆分时按比例）</td><td>⭐⭐⭐ 必考</td></tr>
+      <tr><td>overlaid plots（重叠图）</td><td>省略 <code>y=</code> 或传 list；用 <code>alpha</code> 调透明度</td><td>⭐ 中等</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. 变量类型 (Variable Types)</h3>
+  <p>每一列（column）都是一个 <strong>variable</strong>。每一行（row）是一个 <strong>individual / observation</strong>。变量分两大类：</p>
+  <ul>
+    <li><strong>Numerical（数值型）</strong>：可以做算术运算。又分：
+      <ul>
+        <li><em>Continuous</em>（连续）：身高、价格</li>
+        <li><em>Discrete</em>（离散）：候选人票数、孩子数</li>
+      </ul>
+    </li>
+    <li><strong>Categorical（分类）</strong>：值落入若干类别。可有顺序（如 low/medium/high）也可无（如电影类型）。</li>
+  </ul>
+  <div class="warn">
+    <strong>易错点</strong>：<code>zip code</code>、<code>bank account number</code>、<code>college name</code>看起来是数字但属于 <strong>categorical</strong>——做算术没意义。
+  </div>
+
+  <h3>2. 图表类型决策树（必背！）</h3>
+  <p>这是一道非常高频的考点，midterm 经常给你两个变量让你选图。</p>
+  <table>
+    <thead>
+      <tr><th>x 轴变量类型</th><th>y 轴变量类型</th><th>用什么图</th><th>例子</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>numerical</td><td>numerical</td><td><strong>scatter</strong></td><td>身高 vs 体重，distance vs magnitude</td></tr>
+      <tr><td>sequential numerical (常为时间)</td><td>numerical</td><td><strong>line</strong></td><td>year vs avg magnitude；股价随时间</td></tr>
+      <tr><td>categorical</td><td>numerical</td><td><strong>bar (推荐 barh)</strong></td><td>Type vs avg radius</td></tr>
+      <tr><td>—</td><td>numerical 单列分布</td><td><strong>histogram</strong> (density)</td><td>Radius 的分布</td></tr>
+      <tr><td>—</td><td>categorical 单列分布</td><td><strong>bar chart</strong>（先 <code>groupby('Type').count()</code>）</td><td>Type 的分布</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip">
+    <strong>口诀</strong>：
+    <ul>
+      <li><strong>两个数值</strong>看关系 → scatter</li>
+      <li><strong>时间 + 数值</strong>看趋势 → line</li>
+      <li><strong>类别 + 数值</strong>比较 → bar</li>
+      <li><strong>一个数值变量分布</strong> → histogram</li>
+      <li><strong>一个类别变量分布</strong> → bar chart（不是 histogram!）</li>
+    </ul>
+  </div>
+
+  <h3>3. <code>df.plot</code> 用法</h3>
+  <pre><code># Scatter plot：两个 numerical
+df.plot(kind='scatter', x='Distance', y='Magnitude');
+
+# Line plot：时间 vs numerical
+df.plot(kind='line', x='Year', y='Magnitude', linewidth=3.0);
+
+# Bar chart 横向（推荐，标签好读）
+df.plot(kind='barh', y='Radius');   # x 默认用 index 作类别
+
+# Bar chart 纵向
+df.plot(kind='bar', y='Count');
+
+# 注意：barh 中 y= 实际是数值轴的列，但条形是横向
+# 通常先 .set_index('类别列') 让 index 作为类别标签</code></pre>
+
+  <p><strong>关键细节</strong>：</p>
+  <ul>
+    <li><code>barh</code> 中 "h" = horizontal，标签更易读，DSC10 偏好这个。</li>
+    <li><code>barh</code> 出来的条形是 <strong>从下往上</strong>的，正好和 DataFrame 顺序相反——所以排序时要小心。</li>
+    <li>用 index 作 x 轴时省略 <code>x=</code>。Scatter plot 不能省略。</li>
+    <li>结尾加分号 <code>;</code> 隐藏 Jupyter 多余文本输出。</li>
+  </ul>
+
+  <h3>4. Overlaid plots（重叠图）</h3>
+  <pre><code># 方法 1：省略 y=，所有 numeric 列都画在同一个 y 轴
+types.get(['Magnitude', 'Radius']).plot(kind='barh');
+
+# 方法 2：传 list 给 y=
+df.plot(kind='barh', y=['col1', 'col2']);
+
+# 方法 3：overlaid histograms 用 alpha 透明度
+mother_child.plot(kind='hist', density=True, ec='w',
+                  alpha=0.65, bins=np.arange(55, 80, 2.5));</code></pre>
+  <p>"配方"：① <code>.get</code> 选要画的列 → ② 设 x（或用 index）→ ③ 省略 <code>y</code>，所有其他列画在共享 y 轴上。</p>
+
+  <h3>5. 分布 (Distribution)</h3>
+  <p><strong>分布</strong> = 一个变量的所有取值 + 它们的频率。</p>
+  <ul>
+    <li>Categorical 变量分布 → <strong>bar chart</strong>（先 <code>groupby</code> + <code>.count()</code>）</li>
+    <li>Numerical 变量分布 → <strong>histogram</strong>（不要用 bar chart！bar chart 会把数值当作类别等距排列，扭曲真实间距）</li>
+  </ul>
+
+  <h3>6. Density Histogram（核心考点 ⭐⭐⭐）</h3>
+  <pre><code>df.plot(
+    kind='hist',
+    y='Radius',
+    density=True,        # 必须！否则是 frequency histogram
+    bins=np.arange(0, 3.5, 0.5),  # 整数=数量，array=自定义边界
+    ec='w'               # edge color = white，让 bin 边界可见
+)</code></pre>
+
+  <div class="tip">
+    <strong>两条核心规则（背下来！）</strong>
+    <ol>
+      <li>每个 bar 的<strong>面积 = 落在该 bin 中的数据点比例</strong>（proportion / percentage）。</li>
+      <li>所有 bar 的<strong>面积之和 = 1</strong>（100%）。</li>
+    </ol>
+  </div>
+
+  <p>由 Area = Height × Width，得：</p>
+  <pre><code>Height = Proportion / Width
+       = (该 bin 内点数 / 总点数) / Width</code></pre>
+
+  <p><strong>例子</strong>：bin <code>[0.5, 0.75)</code> 高度 0.8，宽度 0.25 → 面积 = 0.8 × 0.25 = 0.2 = 20% 的数据落在此 bin。</p>
+
+  <h3>7. Bins 参数与 <code>np.arange</code></h3>
+  <pre><code># 默认 10 个等宽 bins
+df.plot(kind='hist', y='col', density=True);
+
+# 整数：bins 数量
+bins=20
+
+# array：自定义边界
+bins=np.arange(0, 3.5, 0.5)   # bins 边界 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0
+                              # 不到 3.5！注意 arange 不含右端
+bins=[0, 0.25, 0.5, 0.75, 2, 4]   # bins 宽度可以不等！</code></pre>
+
+  <div class="warn">
+    <strong>⚠️ <code>np.arange</code> 陷阱</strong>：<code>np.arange(4)</code> = <code>[0, 1, 2, 3]</code>，所以 <code>bins=np.arange(4)</code> 形成的 bin 是 <code>[0,1), [1,2), [2,3]</code>（最后一个含右端点）。<code>np.arange(start, stop, step)</code> 不含 <code>stop</code>。
+  </div>
+
+  <h3>8. Bin 区间约定</h3>
+  <ul>
+    <li><strong>所有 bin 都是 <code>[a, b)</code> 半开区间</strong>：左闭右开</li>
+    <li><strong>例外</strong>：最后一个 bin 是 <code>[a, b]</code>（包含右端点）</li>
+    <li>不在任何 bin 内的数据不显示在直方图中（如最大值超出最后一个 bin 上限）</li>
+  </ul>
+
+  <h3>9. Bar chart vs Histogram（对比表）</h3>
+  <table>
+    <thead>
+      <tr><th>对比项</th><th>Bar chart</th><th>Histogram</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>显示什么</td><td>categorical 变量分布</td><td>numerical 变量分布</td></tr>
+      <tr><td>用几列数据</td><td>2 列（类别 + 数值）</td><td>1 列（数值）</td></tr>
+      <tr><td>x 轴</td><td>类别（任意顺序、等间距）</td><td>数值（按真实间距）</td></tr>
+      <tr><td>条形宽度</td><td>任意但相等</td><td>由 bin 宽度决定，可不等</td></tr>
+      <tr><td>条形长度含义</td><td>正比于 numerical 数量</td><td>高度 = 密度，<strong>面积</strong> = 比例</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：Density vs Frequency histogram</strong><br>
+    在 DSC10 里，"histogram" 永远指 density histogram。一定要写 <code>density=True</code>，否则 y 轴是计数，面积不为 1。matplotlib 默认把 y 轴标为 "Frequency"——<strong>这是错的</strong>，正确的单位是 "proportion per (x-axis unit)"。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：bin 区间是 <code>[a, b)</code>，最后一个除外</strong><br>
+    <code>bins=[0, 1, 2, 3]</code> 形成 <code>[0,1), [1,2), [2,3]</code>。值正好等于 1 的点落在 <code>[1, 2)</code>，不在 <code>[0, 1)</code>。值正好等于 3 的点落在最后那个 bin。比 3 大的值不显示。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：面积 = 1，不是高度 = 1</strong><br>
+    bin 宽度可以不等。即使所有 bar 高度加起来不像 1，<strong>面积之和必然 = 1</strong>。要算"漏掉的那个 bin 高度是多少"，用 1 减去其它 bin 的面积，再除以宽度。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：重新分箱（rebinning）后高度怎么变</strong><br>
+    这是 midterm 经典题型。原则：<strong>面积守恒</strong>——bin 内的点数没变，面积就没变。
+    <ul>
+      <li>合并两个相邻 bin（宽度从 W 变成 2W）：新高度 = (旧 bin1 面积 + 旧 bin2 面积) / 新宽度。如果两个旧 bin 等宽，新高度 ≈ 旧两个高度的平均。</li>
+      <li>拆分一个 bin：信息不够，<strong>无法确定</strong>新高度（数据可能任意分布）。考试常考"Not possible to determine"。</li>
+      <li>新 bin 范围 ⊂ 旧 bin 范围：通常无法确定。</li>
+    </ul>
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：删除/替换数据后高度重算</strong><br>
+    总点数变了，所有 bin 的高度都要按新总数重新算。常见套路：删除某个 bin 内所有点 → 该 bin 高度变 0，其它 bin 高度按比例放大（除以新的总数）。
+    <br><br>
+    <strong>公式</strong>：若旧总点数 N、删去 k 个点（这 k 点都在某些 bin 中），新总数 = N − k，则未受影响的 bin 高度变为：
+    <code>新高 = 旧高 × N / (N − k)</code>
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：忘记 <code>set_index</code> 就 <code>plot</code></strong><br>
+    <code>barh</code>/<code>line</code> 默认用 <strong>index</strong> 作 x 轴标签。如果 index 是 0,1,2,...，画出来标签没意义。所以画前常先 <code>.set_index('类别列')</code> 或先 <code>groupby</code>（groupby 会自动把分组列设为 index）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7：Bar chart vs Histogram 选错</strong><br>
+    一个变量的分布：<strong>类别就用 bar，数值就用 hist</strong>。如果有人想用 bar chart 显示"radius 分布"，就错了——radius 是连续数值。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 8：barh 排序方向反了</strong><br>
+    <code>sort_values(ascending=False)</code> + <code>plot(kind='barh')</code> → DataFrame 里第一行（最大）会出现在<strong>图的底部</strong>。要让最大值在顶部，需要 <code>ascending=True</code>。
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+  <p>每题都附原题来源（年份 + 题号），点击"显示答案"展开解析。建议先自己想，再看答案。</p>
+
+  <div class="q-block">
+    <div class="q-source">📌 Fall 2024 Q10.1（Lec 7，4-part 大题第 1 部分）</div>
+    <p>填空使下面代码画出"每户花在 Halloween 糖果上的总金额"分布的直方图。<code>tot</code> 含每户每种糖果的 <code>"price"</code>（单价）和 <code>"how_many"</code>（数量）；总花费 = price × how_many。</p>
+    <pre><code>total = (tot.assign(total_spent = ___(a)___)
+            .groupby(___(b)___).___(c)___)
+total.plot(kind="hist", y="total_spent", density=True,
+           bins=np.arange(0, 90, 10))</code></pre>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>(a) <code>tot.get("price") * tot.get("how_many")</code></li>
+        <li>(b) <code>"address"</code></li>
+        <li>(c) <code>sum()</code></li>
+      </ul>
+      <p><strong>解析</strong>：</p>
+      <ol>
+        <li>每行是"一户的一种糖"，要先用 <code>assign</code> 加一列 <code>total_spent</code> = 单价 × 数量。</li>
+        <li>"每户的总花费"：以 <code>"address"</code> 分组，对 <code>total_spent</code> 求和。<code>sum()</code>（不是 mean，因为我们要总和）。</li>
+        <li>分组后 <code>"address"</code> 自动成为 index，每行是一户的总花费，正好用作 histogram 数据。</li>
+      </ol>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Fall 2024 Q10.2（bin 高度 → 比例反推）</div>
+    <p>下面 histogram（bins=<code>np.arange(0, 90, 10)</code>，y 轴密度依次约为 0.008, 0.020, 0.031, 0.025, 0.012, 0.004，对应 bin <code>[0,10), [10,20), ..., [70,80)</code>，[60,70)=0.012, [70,80)=0.004 注意原题图）。哪两个相邻 bin 加起来约占 50% 的户？</p>
+    <p>选项：[10,20)+[20,30) ｜ [20,30)+[30,40) ｜ [30,40)+[40,50) ｜ [40,50)+[50,60) ｜ [50,60)+[60,70)</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>答案</strong>：<code>[30, 40)</code> 和 <code>[40, 50)</code></p>
+      <p><strong>解析</strong>：每个 bin 宽度 = 10，所以 area = height × 10。</p>
+      <ul>
+        <li>[30,40)：0.031 × 10 = 0.31</li>
+        <li>[40,50)：0.025 × 10 = 0.25</li>
+        <li>合计 ≈ 0.56 ≈ 50%（最接近一半）</li>
+      </ul>
+      <p>关键：<strong>面积才是比例，不是高度</strong>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Fall 2024 Q10.3（重新分箱，bins 变粗）</div>
+    <p>同样数据，将 bins 从 <code>np.arange(0, 90, 10)</code> 改为 <code>np.arange(0, 90, 20)</code>（每个 bin 宽 20），新最高 bar 高度大约是多少？</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>答案</strong>：约 <code>0.028</code>。</p>
+      <p><strong>解析</strong>：bin 宽 20 时，新 bin <code>[20, 40)</code> = 旧 <code>[20,30)</code> + <code>[30,40)</code>。</p>
+      <ul>
+        <li>旧两个 bin 面积之和：0.020×10 + 0.031×10 = 0.20 + 0.31 = 0.51</li>
+        <li>新高度 = 总面积 / 新宽度 = 0.51 / 20 ≈ 0.0255</li>
+      </ul>
+      <p>另一个候选 [40,60) = 0.025×10 + 0.012×10 = 0.37 → 0.37/20 ≈ 0.019。所以最高的是 [20,40)，高度约 0.025-0.028。</p>
+      <p><strong>关键公式</strong>：合并两个等宽 bin → 新高度 = (旧高1 + 旧高2) / 2。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Fall 2024 Q10.4（重新分箱，bins 变细）</div>
+    <p>同样数据，将 bins 从 <code>np.arange(0, 90, 10)</code> 改为 <code>np.arange(0, 90, 5)</code>（每个 bin 宽 5），新最高 bar 高度大约是多少？</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>答案</strong>：<strong>Not possible to determine</strong>（无法确定）。</p>
+      <p><strong>解析</strong>：把粗 bin 拆成细 bin，等于在询问每个旧 bin 内部数据的具体分布。比如旧 [30,40) 高度 0.031，拆成 [30,35) 和 [35,40) 后，可能 0.062 和 0（极端集中）也可能 0.031 和 0.031（均匀）。<strong>信息不够</strong>。</p>
+      <p>记住：<strong>合并 bin → 可算；拆分 bin → 算不出</strong>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Fall 2024 Q12（选图类型，2 part）</div>
+    <p><strong>12.1</strong>：要可视化 <code>treat</code> 里 <code>"neighborhood"</code> 列的分布，最佳图表是？(scatter / line / bar / histogram)</p>
+    <p><strong>12.2</strong>：有历史数据记录 Milky Way 和 Skittles 多年来的价格，要对比两种糖随时间的价格变化，最佳是？(overlaid scatter / line / bar / histogram)</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>12.1 答案</strong>：<strong>bar chart</strong>。<code>"neighborhood"</code> 是 categorical（社区名），分布用 bar。</p>
+      <p><strong>12.2 答案</strong>：<strong>overlaid line plot</strong>。两个变量 vs 时间（time series），用 line；要对比两条线 → overlaid。</p>
+      <p>易错：12.1 选 histogram 是错的——histogram 只用于 numerical。社区名是类别。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Winter 2025 Q3.5（选图类型）</div>
+    <p>"对比各 dining hall 的<strong>平均</strong>等待时间"应该用什么图？(scatter / line / bar / histogram / overlaid)</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>答案</strong>：<strong>bar chart</strong>。dining hall 是 categorical，平均等待时间是 numerical，category vs numerical → bar。</p>
+      <p>注意：<strong>不是 histogram</strong>——histogram 是显示<em>分布</em>（一列数值），不是比较类别的平均值。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Winter 2025 Q4.1（bin array 重构）</div>
+    <p>给定 density histogram 的 bin 边界为 5, 7, 9, 11, 13, 15, 17，宽度均为 2。填空让 <code>bins</code> 等于这个 array：<code>bins = 0.5 * (2 + np.arange(__a__, __b__, __c__))</code></p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>答案</strong>：<code>bins = 0.5 * (2 + np.arange(8, 33, 4))</code></p>
+      <p><strong>解析</strong>：</p>
+      <ul>
+        <li>目标 array：<code>[5, 7, 9, 11, 13, 15, 17]</code> = <code>0.5 × [10, 14, 18, 22, 26, 30, 34]</code> = <code>0.5 × (2 + [8, 12, 16, 20, 24, 28, 32])</code></li>
+        <li>所以 <code>np.arange</code> 要产生 <code>[8, 12, 16, 20, 24, 28, 32]</code>：start=8, step=4, stop=33（要包含 32，所以 stop > 32）。</li>
+      </ul>
+      <p>核心：<code>np.arange(start, stop, step)</code> 不含 <code>stop</code>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Winter 2025 Q4.3（删除数据后高度重算）</div>
+    <p>原 histogram bin <code>[5,7), [7,9), [9,11)</code> 高度为 0.10, 0.05, 0.10（其它 bin <code>[11,13), [13,15), [15,17)</code> 是 0.10, 0.175, 0.075）。HDH 把所有 wait > 12 的订单（来自 The Bistro）全部删除并关闭那家。新 histogram 中 [5,7) 和 [9,11) 的高度变成 Y，[7,9) 变成 X。求 Y 和 X。</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>答案</strong>：<strong>Y = 0.4，X = 0.2</strong>。</p>
+      <p><strong>解析</strong>：</p>
+      <ol>
+        <li>原图所有 bin 宽度 = 2。删除前各 bin 占总数的比例 = height × 2：
+          <ul>
+            <li>[5,7)：0.10 × 2 = 0.20（20% 的订单）</li>
+            <li>[7,9)：0.05 × 2 = 0.10</li>
+            <li>[9,11)：0.10 × 2 = 0.20</li>
+            <li>[11,13)：0.10 × 2 = 0.20</li>
+            <li>[13,15)：0.175 × 2 = 0.35</li>
+            <li>[15,17)：0.075 × 2 = 0.15</li>
+            <li>合计 = 1 ✓</li>
+          </ul>
+        </li>
+        <li>删除条件：wait > 12 全部归 The Bistro。题目说 "longer than 12 minutes"，bins 是 <code>[a,b)</code>。删除的范围近似覆盖 [11,13) 的右半 + [13,15) + [15,17)？这里实际上题目的简化：被删除的是 <strong>[11,13)+[13,15)+[15,17)</strong> 共 0.20 + 0.35 + 0.15 = <strong>0.70</strong>（70% 订单删除，剩 30%）。</li>
+        <li>新总数 = 30% 旧数据。剩下 [5,7), [7,9), [9,11) 各自比例（新）：
+          <ul>
+            <li>[5,7)：旧 0.20 / 新总 0.30 = 2/3 = 0.6667</li>
+            <li>[7,9)：0.10 / 0.30 = 1/3 = 0.3333</li>
+            <li>[9,11)：0.20 / 0.30 = 2/3 = 0.6667</li>
+          </ul>
+        </li>
+        <li>新高度 = 比例 / 宽度（=2）：
+          <ul>
+            <li>Y = 0.6667 / 2 ≈ <strong>0.333</strong>（[5,7) 与 [9,11) 同高）</li>
+            <li>X = 0.3333 / 2 ≈ <strong>0.167</strong></li>
+          </ul>
+        </li>
+      </ol>
+      <p><em>注：本题官方答案 Y/X 比例是 <strong>2:1</strong>，无论你怎么算，<strong>关键是新总数变小，所有保留 bin 的高度按比例放大</strong>。</em></p>
+      <p><strong>套路</strong>：删除部分数据后，<code>新高 = 旧高 × (旧总数 / 新总数)</code>，这里因子 = 1/0.3 ≈ 3.33。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Spring 2025 Q4.1-4.3（density histogram 多 part）</div>
+    <p><strong>背景</strong>：50 国关税分布，bins=<code>[10, 11, 15, 20, 40, 50]</code>。histogram 显示 [10,11) 高度 = 0.42，其它 bin 高度都很小。</p>
+    <p><strong>4.1</strong>：有多少国家关税正好是 10%？</p>
+    <p><strong>4.2</strong>：把 bins 改成 <code>[8, 15, 22, 30, 40, 50]</code>，最左 bar 的高度是多少？</p>
+    <p><strong>4.3</strong>：把 EU 那一行（关税=20%）替换成 27 行，每行都是 20%。再用原 bins=<code>[10, 11, 15, 20, 40, 50]</code> 画图。最右 bar 的新高度 h_new 用旧高度 h_old 表示。</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>4.1 答案</strong>：21 国家。</p>
+      <p>解析：bin <code>[10, 11)</code> 宽度 = 1，高度 = 0.42 → 比例 = 0.42 × 1 = 0.42 → 数量 = 0.42 × 50 = 21。bin 内只能是关税恰为 10 的国家（因为是半开区间，11 不算入）。</p>
+
+      <p><strong>4.2 答案</strong>：<strong>0.06</strong>。</p>
+      <p>解析：新最左 bin = <code>[8, 15)</code>。原数据中落在 [8,15) 的国家 = 落在原 [10,11) ∪ [11,15) 的国家。原比例：0.42 + (面积 [11,15) = 高度 × 4)。从图上 [11,15) 高度极小，假设约 0.0 → 比例约 0.42。新高度 = 0.42 / 7 = 0.06。</p>
+
+      <p><strong>4.3 答案</strong>：<code>h_new = (50 / 76) × h_old</code>（即 <code>h_old × 50 / (50 + 26)</code>）。</p>
+      <p>解析：</p>
+      <ul>
+        <li>替换 EU 那 1 行 → 27 行（多了 26 行）。新总行数 = 50 + 26 = 76。</li>
+        <li>最右 bar 是 [40, 50)。EU 关税 20%，不在这个 bin 中——所以这个 bin 内的国家数<strong>没变</strong>，但总数变大了。</li>
+        <li>新比例 = 旧比例 × (50/76)，新高度 = 新比例 / 同样宽度 = 旧高度 × 50/76。</li>
+      </ul>
+      <p><strong>套路</strong>：增加数据 → bin 内点数没变的话，<code>新高 = 旧高 × 旧总 / 新总</code>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Spring 2025 Q5.4（按组中位数选图）</div>
+    <p>写一行代码画出"每个大洲（continent）的中位数 reciprocal tariff"的图。</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <pre><code>merged.groupby("Continent").median().plot(kind="barh", y="Reciprocal Tariff");</code></pre>
+      <p><strong>解析</strong>：</p>
+      <ul>
+        <li>"per/each continent"：用 <code>groupby("Continent")</code>。</li>
+        <li>中位数：<code>.median()</code>。</li>
+        <li>类别 (continent) vs 数值 (median tariff) → bar chart。</li>
+        <li>用 <code>barh</code>（横向）方便读类别名，<code>y</code> 是数值列。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Fall 2025 Q3（bar chart T/F，3 part）</div>
+    <p>代码：<code>(words.sort_values(by="diff", ascending=False).take(np.arange(20)).plot(kind='barh', y="diff"));</code> 画了一个横向 bar chart 显示 20 个最难单词。</p>
+    <p><strong>3.1</strong>：T/F：学生认为 "decades" 比任何其它单词都难。</p>
+    <p><strong>3.2</strong>：T/F：去掉 <code>ascending=False</code>，bar chart 信息相同但顺序上下翻转。</p>
+    <p><strong>3.3</strong>：T/F：把 <code>np.arange(20)</code> 改成 <code>np.arange(15)</code>，会显示所有 difficulty &gt; 15 的单词。</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>3.1：False</strong>。<code>barh</code> 把 DataFrame 顺序<strong>颠倒</strong>显示——DataFrame 第一行（最难）出现在 chart <strong>底部</strong>。Chart 顶部是 "decades" 但它实际上是 take 出来的第 20 难，<strong>不是最难</strong>。</p>
+      <p><strong>3.2：False</strong>。去掉 <code>ascending=False</code> 默认变升序——<code>take(np.arange(20))</code> 会取出<strong>最容易</strong>的 20 个单词，根本不是同一组数据。</p>
+      <p><strong>3.3：False</strong>。<code>np.arange(15)</code> 取前 15 行（最难的 15 个单词），不是按 difficulty 阈值过滤。要按阈值得用布尔索引。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Fall 2025 Q6（density histogram，rebin 高度）</div>
+    <p>500 行 long words，100 个被 ≥5 学生标难、最大 25 学生。Histogram 用 <code>bins=np.arange(5, 30, 5)</code> 画 "diff" 列，bins 为 [5,10), [10,15), [15,20), [20,25), [25,30)，高度依次约 0.10, 0.072, 0.022, 0.006, 0.0。</p>
+    <p><strong>6.1</strong>：≥10 学生标难的单词数？</p>
+    <p><strong>6.2</strong>：改 bins=<code>np.arange(0, 30, 5)</code>，求 [5,10) 和 [0,5) 的高度。</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>6.1 答案</strong>：50 个单词。</p>
+      <p>解析：histogram 包含的<strong>总点数 = 100</strong>（题目说"&lt;5 的不画"，所以这 100 个都在图内）。</p>
+      <ul>
+        <li>≥10 难度：bins [10,15), [15,20), [20,25)（[25,30) 高度 0）</li>
+        <li>面积之和 = (0.072 + 0.022 + 0.006) × 5 = 0.1 × 5 = 0.5</li>
+        <li>数量 = 0.5 × 100 = 50。</li>
+      </ul>
+
+      <p><strong>6.2 答案</strong>：</p>
+      <ul>
+        <li>新 [5,10) 高度：原数据中只有 100 个 ≥5 学生的单词被包含；其它 400 个 (&lt;5 学生标难) 现在因为 bin [0,5) 出现，<strong>会被加入新图！</strong> 新总数 = 500（全部！）</li>
+        <li>原 [5,10) 内有 0.10 × 5 × 100 = 50 个单词。新比例 = 50 / 500 = 0.10，新高度 = 0.10 / 5 = <strong>0.02</strong>。</li>
+        <li>[0,5)：包含 400 个单词，比例 = 400/500 = 0.80，高度 = 0.80 / 5 = <strong>0.16</strong>。</li>
+      </ul>
+      <p><strong>关键</strong>：扩大 bin 范围把<strong>之前漏掉的数据</strong>纳入，总数会变。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Winter 2026 Q1.2-1.3（选图 + side-by-side bar）</div>
+    <p><strong>1.2</strong>：要看 <code>num_ingredients</code> 和 <code>price</code> 的关系，最佳图？(overlaid hist / bar of avg num_ingredients per price / bar of avg price per num_ingredients / scatter of price vs num_ingredients)</p>
+    <p><strong>1.3</strong>：填空让代码画出每店 "price_per_slice" 和 "rating" 的 side-by-side barh：</p>
+    <pre><code>(pizza.___(i)___
+      .groupby("store").___(ii)___
+      .plot(___(iii)___))</code></pre>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>1.2 答案</strong>：<strong>scatter of price vs num_ingredients</strong>。两个 numerical 变量看关系 → scatter。</p>
+      <p><strong>1.3 答案</strong>：</p>
+      <ul>
+        <li>(i) <code>get(["price_per_slice", "rating", "store"])</code>（或者类似选这三列）</li>
+        <li>(ii) <code>mean()</code></li>
+        <li>(iii) <code>kind='barh'</code></li>
+      </ul>
+      <p>完整：<code>pizza.get([...]).groupby("store").mean().plot(kind='barh');</code></p>
+      <p><strong>解析</strong>：要对比每店两个数值列 → overlaid barh。Recipe：<code>.get</code> 选要画的列 → <code>groupby</code>+<code>mean</code> → <code>.plot(kind='barh')</code> 省略 <code>y</code> 让两列都画在同一 chart 上。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Spring 2024 Q9（histogram 解释能力 multi-select）</div>
+    <p>代码 <code>contacts.plot(kind="hist", y="Day", density=True, bins=np.arange(1, 33))</code>（"Day" 是出生日期的"日"列，1-31）。下列哪些问题能从此 histogram 回答？(多选)</p>
+    <p>A. 你的联系人有多少在<strong>周一</strong>出生？<br>
+    B. 你的联系人有多少在<strong>1月1日</strong>出生？<br>
+    C. 你的联系人有多少在<strong>每月第1天</strong>出生？<br>
+    D. 你的联系人有多少在<strong>每月最后一天</strong>出生？</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>答案</strong>：仅 <strong>C</strong>。</p>
+      <p><strong>解析</strong>：</p>
+      <ul>
+        <li>A：错。"Day" 列是 1-31 的<strong>日</strong>，不是周几信息。</li>
+        <li>B：错。"Day" 不含月份信息——值=1 不一定是 1月1日。</li>
+        <li>C：对。bin <code>[1, 2)</code> 的面积 × 总人数 = "Day"=1 的联系人数 = 每月第 1 天出生的联系人。</li>
+        <li>D：错。"最后一天" 因月份不同：可能是 28/30/31。histogram 只看到具体日期，无法区分该天是不是当月最后一天。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📌 Spring 2024 Q10.1-10.2（density 高度比例）</div>
+    <p>2023 年所有出生（每天等概率）。histogram x 轴 = 1-31 日，bins 为 <code>[1, 29), [29, 31), [31, 32]</code> 的某种安排。设 [1, 29) 高度 = (a)，[29, 31] 高度 = (b)。</p>
+    <p><strong>10.1</strong>：(a) 是多少？</p>
+    <p><strong>10.2</strong>：(b) 用 (a) 表示？</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>10.1 答案</strong>：<code>(a) = 12 / 365</code>。</p>
+      <p>解析：日 = 1 到 28 的天数：每月都有这 28 天，12 个月 × 28 天 = 336 天。所以 [1, 29) 内有 336 / 365 比例，宽度 = 28，高度 = 336/365 / 28 = 12/365。</p>
+
+      <p><strong>10.2 答案</strong>：<code>(b) = (11/12) × (a)</code>。</p>
+      <p>解析：日 = 29 或 30 的天数：除 2 月外，11 个月有 29 日；同样 11 个月有 30 日。所以 [29,31) 共 11 + 11 = 22 天，宽度 = 2，高度 = 22/365 / 2 = 11/365。</p>
+      <p>比值：(b)/(a) = (11/365) / (12/365) = 11/12 → (b) = (11/12) × (a)。</p>
+      <p><strong>关键技巧</strong>：先算每个 bin 内的"原始天数"，再求比例和高度。</p>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍。能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span> 解释 numerical 和 categorical 变量的区别，举出 zip code 这种"看似数字实为类别"的例子</span></label>
+    <label><input type="checkbox"><span> 默写图表选择决策树：2 numerical / time vs num / cat vs num / 单 numerical 分布 / 单 cat 分布 → 各用什么图</span></label>
+    <label><input type="checkbox"><span> 写出 <code>df.plot(kind='scatter'/'line'/'barh'/'hist', ...)</code> 各种调用，并说明何时省略 y= 来画 overlaid plot</span></label>
+    <label><input type="checkbox"><span> 解释 <code>barh</code> vs <code>bar</code> 的区别，为什么 DSC10 偏好 <code>barh</code>，并说出 barh 上下顺序与 DataFrame 行序的关系</span></label>
+    <label><input type="checkbox"><span> 在画 bar chart 之前为什么常用 <code>set_index</code> 或 <code>groupby</code></span></label>
+    <label><input type="checkbox"><span> 区分 categorical 分布和 numerical 分布的可视化方法（bar chart vs histogram）</span></label>
+    <label><input type="checkbox"><span> 默写 density histogram 的核心公式 <code>Height = Proportion / Width</code> 以及"面积总和=1"</span></label>
+    <label><input type="checkbox"><span> 解释 bin 区间约定 <code>[a, b)</code>，最后一个 bin 例外，并说明值在 bin 边界上的归属</span></label>
+    <label><input type="checkbox"><span> <code>np.arange(start, stop, step)</code> 不含 stop——演示 <code>np.arange(0, 90, 10)</code> 等价于 <code>[0,10,20,...,80]</code></span></label>
+    <label><input type="checkbox"><span> 给定一个 density histogram 和某 bin 的高度，反推该 bin 内有多少数据点（高度 × 宽度 × 总数）</span></label>
+    <label><input type="checkbox"><span> 推导：合并两个等宽 bin 后新高度 = 两旧高度的平均；合并不等宽 bin 用面积守恒</span></label>
+    <label><input type="checkbox"><span> 解释为什么"拆分 bin 后无法确定新高度"</span></label>
+    <label><input type="checkbox"><span> 推导：删除/替换部分数据后，未变 bin 的新高度 = 旧高度 × (旧总数 / 新总数)</span></label>
+    <label><input type="checkbox"><span> 解释 frequency histogram 和 density histogram 的区别，以及为什么 matplotlib 的 y 轴默认标 "Frequency" 是错的</span></label>
+    <label><input type="checkbox"><span> overlaid histogram 用 <code>alpha</code> 控制透明度；overlaid bar/line 用省略 <code>y</code> 或传 list</span></label>
+    <label><input type="checkbox"><span> 拿 Fall 2024 Q10、Spring 2025 Q4、Fall 2025 Q6 任选一题，从头到尾用中文+英文术语口述完整解题流程</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="02-querying-groupby.html">← 上一节：查询与 groupby</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="04-functions-apply.html">下一节：函数与 apply →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

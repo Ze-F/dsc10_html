@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>条件与循环 - DSC10 Midterm 备考</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .nav-bottom {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+  .nav-top a, .nav-bottom a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 16px;
+    margin-top: 20px;
+    color: var(--muted);
+  }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+  }
+  .tier {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta {
+    background: #f6f8fa;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--tip-bg);
+    border-left: 4px solid var(--tip-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  details {
+    background: var(--q-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+  }
+  details[open] {
+    background: #fff;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+  }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) {
+    margin-top: 12px;
+  }
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .q-source {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .checklist {
+    background: #f0f9ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .checklist label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+  .checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 总目录</a></span>
+  <span><a href="05-multi-groupby-merge.html">← 上一节：多列groupby与merge</a> <a href="07-probability-simulation.html">下一节：概率与模拟 →</a></span>
+</nav>
+
+<main>
+  <h1>Section 6 · 条件与循环 (Conditionals &amp; Loops)</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 10 ｜
+    <strong>Midterm出现率</strong>：<span class="tier tier-2">⭐⭐ Tier 2 (5/6)</span> ｜
+    <strong>预计学习时间</strong>：1.5 - 2 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+  <p>这一节是第二阶段（统计/概率/模拟）的基础工具。Midterm 几乎每年都会考一道<strong>条件函数填空</strong>或<strong>for-loop accumulator</strong>的题。Lec 10 本身代码不难，但和 <code>.apply</code>、模拟、字符串方法结合后变化很多。</p>
+  <ul>
+    <li><strong>布尔与运算符</strong>：<code>and</code>/<code>or</code>/<code>not</code> 用于<em>标量</em> bool；<code>&amp;</code>/<code>|</code>/<code>~</code> 用于 <em>Series</em>（一定要加括号！）</li>
+    <li><strong><code>in</code> 运算符</strong>：判断元素在 list/array/string 中是否出现，结果是 bool</li>
+    <li><strong><code>if</code>/<code>elif</code>/<code>else</code></strong>：缩进敏感，函数里搭配 <code>return</code>；考点是<strong>等价改写</strong>（去 <code>else</code>、扁平化嵌套）</li>
+    <li><strong><code>for</code> 循环</strong>：遍历 list / array / string / <code>np.arange(n)</code></li>
+    <li><strong>Accumulator pattern</strong>（累加器模式）：
+      <ul>
+        <li>整数计数：<code>counter = 0</code> → 循环里 <code>counter += 1</code></li>
+        <li>数组累加：<code>arr = np.array([])</code> → 循环里 <code>arr = np.append(arr, x)</code>（必须重新赋值！）</li>
+      </ul>
+    </li>
+    <li><strong>真题主考形式</strong>：① 条件函数填空 ② if/else 等价改写 ③ for-loop 求和（电话号码digits）④ for-loop 模拟概率（与 Sec 7 重叠）</li>
+  </ul>
+
+  <div class="tip">
+    <strong>💡 一句话记忆</strong>：<code>and</code>/<code>or</code> 看到 Series 就报错（"truth value ambiguous"）；<code>&amp;</code>/<code>|</code> 看到标量也能用，但<strong>必须每个比较都加括号</strong>。
+  </div>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. Booleans 与比较运算符</h3>
+  <p><code>bool</code> 是 Python 的一种数据类型，只有两个值：<code>True</code> 和 <code>False</code>。所有比较运算（<code>==</code>、<code>!=</code>、<code>&lt;</code>、<code>&gt;</code>、<code>&lt;=</code>、<code>&gt;=</code>）都返回 bool。</p>
+<pre><code>course = 10
+course &lt; 20            # True
+type(course &lt; 20)      # bool
+course == 10           # True
+1 == 1.0               # True   ← 数值上相等就 True，类型不同也行
+1 == '1'               # False  ← 数字 vs 字符串永远不等
+</code></pre>
+
+  <h3>2. <code>in</code> 运算符（成员/子串）</h3>
+<pre><code>10 in [10, 20, 30]      # True   ← 元素是否在 list/array
+'DS' in 'Data Science'  # False  ← 子串是否在字符串
+'DS' in 'DSC'           # True
+</code></pre>
+  <p><strong>考点</strong>：在条件函数里经常用来判断"某个值是否属于一组合法选项"。</p>
+
+  <h3>3. 标量 boolean 运算符：<code>and</code> / <code>or</code> / <code>not</code></h3>
+  <p>用于把单个 bool 值组合起来。注意优先级：<code>not</code> &gt; <code>and</code> &gt; <code>or</code>。考试时<strong>建议用括号</strong>，不要靠优先级心算。</p>
+<pre><code>dept = 'DSC'; course = 10
+
+dept == 'DSC' and course == 10   # True
+not dept == 'DSC'                # False
+course == 80 or type(course) == str  # False
+
+# 优先级陷阱：and 先于 or
+course == 10 or dept == 'DSC' and dept == 'CSE'
+# 等价于：course == 10 or (dept == 'DSC' and dept == 'CSE')  → True
+</code></pre>
+
+  <h3>4. Series 位运算：<code>&amp;</code> / <code>|</code> / <code>~</code></h3>
+  <p>对<strong>布尔 Series</strong>做<strong>逐元素</strong>运算（element-wise），用于 DataFrame 查询过滤。<strong>每个比较都要加括号</strong>，因为 <code>&amp;</code>/<code>|</code> 优先级<em>高于</em> <code>==</code>/<code>&lt;</code>/<code>&gt;</code>。</p>
+<pre><code># ✅ 正确：每个比较都加括号
+df[(df.get('dept') == 'DSC') &amp; (df.get('course') == 10)]
+
+# ❌ 错误：会被解析成 'DSC' &amp; df.get('course') 然后 == 10
+df[df.get('dept') == 'DSC' &amp; df.get('course') == 10]
+
+# ❌ 错误：对 Series 用 and/or → "truth value of Series is ambiguous"
+df[(df.get('dept') == 'DSC') and (df.get('course') == 10)]
+</code></pre>
+
+  <h4>什么时候用哪个？（高频混淆点）</h4>
+  <table>
+    <tr><th>场景</th><th>用什么</th><th>例子</th></tr>
+    <tr><td>函数里 <code>if</code> 判断单个值</td><td><code>and</code> / <code>or</code> / <code>not</code></td><td><code>if x &gt; 5 and x &lt; 10:</code></td></tr>
+    <tr><td>DataFrame 布尔过滤</td><td><code>&amp;</code> / <code>|</code> / <code>~</code></td><td><code>df[(s &gt; 5) &amp; (s &lt; 10)]</code></td></tr>
+    <tr><td>Series 上做 <code>.apply</code> 里的判断</td><td><code>and</code> / <code>or</code>（因为函数处理的是单个标量）</td><td>函数体里 <code>if x &gt; 5 and x &lt; 10:</code></td></tr>
+  </table>
+
+  <h3>5. <code>if</code> / <code>elif</code> / <code>else</code></h3>
+<pre><code>if &lt;condition_1&gt;:
+    &lt;body_1&gt;
+elif &lt;condition_2&gt;:
+    &lt;body_2&gt;
+else:
+    &lt;body_3&gt;
+</code></pre>
+  <ul>
+    <li><strong>缩进敏感</strong>：每一层 4 个空格。</li>
+    <li><strong>冒号别忘</strong>：<code>if</code>/<code>elif</code>/<code>else</code> 后面都要 <code>:</code>。</li>
+    <li><strong><code>elif</code> 链一旦有一个为 True，后面的全部跳过</strong>；如果用多个独立 <code>if</code>（不是 <code>elif</code>），每个条件都会被检查。</li>
+    <li>函数里用 <code>return</code> 时，触发 <code>return</code> 就立即退出，<code>elif</code> 和 <code>if</code> 在这种情况下行为相同——这是 Sp25 Q3.2 / Fa25 Q4 的等价改写考点。</li>
+  </ul>
+
+  <h4>例：百分制转字母分</h4>
+<pre><code>def grade_converter(grade):
+    if grade &gt;= 90:
+        return 'A'
+    elif grade &gt;= 80:
+        return 'B'
+    elif grade &gt;= 70:
+        return 'C'
+    elif grade &gt;= 60:
+        return 'D'
+    else:
+        return 'F'
+</code></pre>
+
+  <h4>等价改写技巧（考点）</h4>
+  <p>下面四种写法在<strong>所有正整数输入</strong>下行为相同（只要每个分支都 <code>return</code>）：</p>
+<pre><code># 写法 A：标准 if/elif/else
+def f(x):
+    if x &lt;= 6: return "short"
+    elif x &lt;= 10: return "medium"
+    else: return "long"
+
+# 写法 B：扁平化（多个 if + return，无 elif/else）
+def f(x):
+    if x &lt;= 6: return "short"
+    if x &lt;= 10: return "medium"     # x &lt;= 6 已 return，到这里说明 x &gt; 6
+    return "long"                    # 到这里说明 x &gt; 10
+
+# 写法 C：先把"中间情况"挑出来（Fa25 Q4 思路）
+def f(x):
+    if 7 &lt;= x &lt;= 10: return "medium"
+    if x &gt;= 7: return "long"          # 已排除 medium，所以 &gt;=7 就是 long
+    return "short"
+
+# 写法 D：无分支（Sp25 Q3.2 思路）—— 用算术表达
+# 例：half = max(int((charged+1)/2), 10)
+</code></pre>
+
+  <h3>6. <code>for</code> 循环</h3>
+<pre><code>for &lt;element&gt; in &lt;sequence&gt;:
+    &lt;body&gt;
+</code></pre>
+  <p>"sequence" 可以是 list、numpy array、字符串、<code>np.arange(...)</code> 等。</p>
+
+<pre><code># 遍历元素本身
+for college in colleges:
+    print(college, 'College')
+
+# 遍历下标（用 np.arange）
+for i in np.arange(len(actions)):
+    print('I', actions[i], 'and I felt', feelings[i])
+
+# 遍历字符串：每次拿一个字符
+for ch in 'hello':
+    print(ch)
+
+# 仅用循环重复 n 次（不关心循环变量）
+for i in np.arange(3):
+    print('🐻')
+</code></pre>
+
+  <h3>7. Accumulator Pattern（累加器模式）</h3>
+  <p><strong>DSC10 里几乎每个 for-loop 都属于这种模式</strong>：循环外初始化一个变量，循环里反复"加东西"进去。</p>
+
+  <h4>(a) 整数计数器</h4>
+<pre><code># 数 array 里有多少个 &gt; 5 的元素
+counter = 0
+for x in arr:
+    if x &gt; 5:
+        counter = counter + 1     # 也可写 counter += 1
+counter
+</code></pre>
+
+  <h4>(b) 数组累加器</h4>
+<pre><code>results = np.array([])               # 循环外：空数组
+for i in np.arange(10000):
+    num_heads = flip(10)
+    results = np.append(results, num_heads)   # 必须重新赋值！
+</code></pre>
+
+  <div class="warn">
+    <strong>⚠️ <code>np.append</code> 不修改原数组！它<strong>返回</strong>一个新数组。</strong>
+    <pre><code>some_array = np.array([])
+np.append(some_array, 'hello')   # 这行返回了新数组，但没存
+some_array                       # 仍然是空！
+
+# 正确做法：
+some_array = np.append(some_array, 'hello')</code></pre>
+  </div>
+
+  <h4>(c) 数字累加（求和）</h4>
+<pre><code># Spring 2024 Q1 模板：算电话号码各位数字之和
+def sum_phone(phone_number):
+    total = 0
+    for digit in phone_number:        # digit 是字符 '5','0','1','-','8',...
+        if digit != '-':              # 跳过短横线
+            total = total + int(digit)
+    return total
+</code></pre>
+
+  <h3>8. 不要用 for-loop 做 Series 元素级运算！</h3>
+  <p>这是 DSC10 反复强调的一条准则：能用 Series/numpy 内置方法的就别写 for-loop。</p>
+<pre><code># ❌ 慢且丑
+total = 0
+for x in df.get('price'):
+    total = total + x * 1.05
+
+# ✅ 简洁
+total = (df.get('price') * 1.05).sum()
+</code></pre>
+  <p>那 for-loop 什么时候<strong>必须</strong>用？—— <strong>模拟（simulation）</strong>：每次循环要调用一次 <code>np.random.choice</code>，结果不能直接向量化。</p>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：<code>and</code> 用在 Series 上</strong><br>
+    <code>df[(s1 == 'a') and (s2 &gt; 5)]</code> → 报错 <code>ValueError: The truth value of a Series is ambiguous</code>。<br>
+    Series 之间用 <code>&amp;</code>，并且<strong>每个比较都加括号</strong>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：<code>&amp;</code> / <code>|</code> 不加括号</strong><br>
+    <code>s == 'a' &amp; s2 &gt; 5</code> 会被解析为 <code>s == ('a' &amp; s2) &gt; 5</code>，类型错误或结果离谱。永远写 <code>(s == 'a') &amp; (s2 &gt; 5)</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：忘记给 <code>np.append</code> 赋值</strong><br>
+    <code>np.append(arr, x)</code> 是<strong>返回</strong>新数组，不改原数组。永远写 <code>arr = np.append(arr, x)</code>。<br>
+    类似地，babypandas 所有方法都不 in-place（如 <code>df.assign(...)</code> 也要赋值）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：修改循环变量不影响原序列</strong>
+    <pre><code>arr = np.array([1, 2, 3])
+for x in arr:
+    x = x * 10
+arr   # 还是 [1, 2, 3]！</code></pre>
+    要修改原数组就用累加器或直接向量化运算 <code>arr = arr * 10</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：缩进不一致</strong><br>
+    Python 严格区分缩进。同一个 block 必须用相同空格数（一般 4 空格）。混用 tab 和 space 会报 <code>IndentationError</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：函数里漏写 <code>else</code> → 隐式返回 <code>None</code></strong>
+    <pre><code>def f(x):
+    if x &gt; 0:
+        return 'positive'
+    # 没写 else，x &lt;= 0 时函数返回 None（不是 'negative'，也不报错！）</code></pre>
+    考试时要确认每条路径都有 <code>return</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7：类型比较的坑</strong>
+    <ul>
+      <li><code>1 == 1.0</code> → <strong>True</strong>（int 和 float 数值上相等）</li>
+      <li><code>1 == '1'</code> → <strong>False</strong>（数字 vs 字符串永远不等）</li>
+      <li><code>True == 1</code> → <strong>True</strong>（bool 是 int 的子类）</li>
+      <li>从 <code>'1-2-3'</code> 这种字符串里 for 出来的每个字符都是 <code>str</code>，要 <code>int(digit)</code> 才能加。</li>
+    </ul>
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 8：用多个独立 <code>if</code> vs <code>elif</code></strong><br>
+    多个独立 <code>if</code>（无 elif）会<strong>每个都判断一遍</strong>。如果有多个分支同时为 True，会 <code>print</code> / 执行多次。<br>
+    但如果每个分支都 <code>return</code>，则等价于 <code>elif</code>（一旦 return 就退出函数）。<strong>这是 Fa25 Q4 等价改写题的核心</strong>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 9：<code>and</code>/<code>or</code> 优先级</strong><br>
+    <code>a or b and c</code> = <code>a or (b and c)</code>。考试时<strong>一律加括号</strong>，不要靠记忆。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 10：在 <code>.apply(func)</code> 的 <code>func</code> 内部用 <code>and</code> 还是 <code>&amp;</code>?</strong><br>
+    <code>.apply</code> 是把 Series 的<strong>每个元素</strong>分别送进 <code>func</code>，所以 <code>func</code> 内部是<strong>标量</strong>，用 <code>and</code>/<code>or</code>！这和直接对 Series 过滤完全相反。
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <p>以下题目侧重<strong>条件函数</strong>和 <strong>for-loop 累加器</strong>。模拟类（np.random.choice + 循环）会和 Section 7 有重叠，这里只挑<strong>循环结构本身</strong>是考点的题。</p>
+
+  <div class="q-block">
+    <p class="q-source">题 1 · Spring 2024 Q1（Lec 8 + Lec 10：for-loop + if）</p>
+    <p>函数 <code>sum_phone</code> 接收一个形如 <code>"xxx-xxx-xxxx"</code> 的字符串，返回所有数字之和（int）。例：<code>sum_phone("501-800-3002") == 19</code>。</p>
+<pre><code>def sum_phone(phone_number):
+    total = 0
+    for digit in phone_number:
+        if ___(a)___:
+            ___(b)___
+    return total
+</code></pre>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>(a)：<code>digit != '-'</code>（或 <code>digit in '0123456789'</code>）</li>
+        <li>(b)：<code>total = total + int(digit)</code>（或 <code>total += int(digit)</code>）</li>
+      </ul>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>对字符串 <code>for</code> 时，每次拿出来的 <code>digit</code> 是<strong>单个字符（str）</strong>，比如 <code>'5'</code> 或 <code>'-'</code>。</li>
+        <li>所以要先<strong>跳过短横线</strong>（条件 a），再把字符转成 int 才能加（条件 b）。</li>
+        <li><span class="highlight">易错</span>：忘了 <code>int(...)</code> 直接 <code>total + digit</code> 会报错，因为 int + str 不能相加。</li>
+        <li>这是<strong>整数累加器</strong>的标准模板：循环外 <code>total=0</code>，循环里 <code>total = total + ...</code>，循环结束 <code>return total</code>。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <p class="q-source">题 2 · Spring 2025 Q3.1（Lec 10：条件函数填空）</p>
+    <p>每个国家的"对等关税" = <code>"Tariffs Charged to USA"</code> 的一半向上取整，但<strong>如果原本 &lt; 20%</strong>，则对等关税<strong>固定为 10%</strong>。</p>
+<pre><code>def reciprocate(charged):
+    half = int((charged + 1) / 2)   # 这是向上取整的一半
+    if ___(a)___:
+        return ___(b)___
+    else:
+        return ___(c)___
+</code></pre>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>(a)：<code>charged &lt; 20</code></li>
+        <li>(b)：<code>10</code></li>
+        <li>(c)：<code>half</code></li>
+      </ul>
+      <p><strong>中文解析</strong>：题目两条规则对应一个 if/else：满足"&lt; 20%"返回 10，否则返回算好的 <code>half</code>。注意：题目说"如果<code>charged &lt; 20</code>"——这是<strong>条件标量</strong>（一个 int），所以用 <code>&lt;</code> 即可，不需要 <code>&amp;</code>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <p class="q-source">题 3 · Spring 2025 Q3.2（Lec 10：等价改写，<strong>无分支</strong>版本）</p>
+    <p>填写 <code>reciprocate_2</code> 的 return 语句，使其与 <code>reciprocate</code> 在所有输入下行为一致。<strong>不能调用 <code>reciprocate</code>，且只用一行表达式</strong>。</p>
+<pre><code>def reciprocate_2(charged):
+    return ___(d)___
+</code></pre>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案</strong>：<code>max(int((charged + 1) / 2), 10)</code></p>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>原函数等价于："计算 <code>half</code>，但保证不低于 10"。这正是 <code>max(half, 10)</code> 的含义。</li>
+        <li>当 <code>charged &lt; 20</code> 时，<code>half = int((charged+1)/2)</code> 一定 ≤ 10，所以 <code>max(half, 10) = 10</code>。</li>
+        <li>当 <code>charged &gt;= 20</code> 时，<code>half &gt;= 10</code>，所以 <code>max(half, 10) = half</code>。</li>
+        <li><strong>核心思想</strong>：很多 if/else 可以用 <code>min</code>/<code>max</code>/算术运算替代，让代码更简洁。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <p class="q-source">题 4 · Spring 2025 Q3.3（Lec 10：等价性测试）</p>
+    <p>已知 <code>ch = tariffs.get("Tariffs Charged to USA")</code>。写一个表达式，当且仅当 <code>reciprocate</code> 和 <code>reciprocate_2</code> 在 <code>ch</code> 的所有元素上输出一致时为 <code>True</code>。</p>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案</strong>：<code>(ch.apply(reciprocate) == ch.apply(reciprocate_2)).all()</code></p>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li><code>ch.apply(reciprocate)</code> 返回一个 Series（每个元素调用一次函数）。</li>
+        <li>两个 Series 用 <code>==</code> 做<strong>逐元素</strong>比较，得到一个 bool Series。</li>
+        <li><code>.all()</code> 当所有元素都为 True 时返回 True，否则 False。</li>
+        <li><span class="highlight">易错</span>：直接写 <code>ch.apply(reciprocate) == ch.apply(reciprocate_2)</code> 是 Series 不是 bool，不能当最终答案。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <p class="q-source">题 5 · Fall 2025 Q4（Lec 10：if/elif/else 等价改写）</p>
+    <p>原函数：</p>
+<pre><code>def classify_length(x):
+    if x &lt;= 6:
+        return "short"
+    elif x &lt;= 10:
+        return "medium"
+    else:
+        return "long"
+</code></pre>
+    <p>填空使 <code>classify_length_2</code> 在所有正整数输入下输出相同。每个空必须是<strong>一行代码</strong>。</p>
+<pre><code>def classify_length_2(x):
+    if ___(a)___:
+        return "medium"
+    if x &gt;= 7:
+        ___(b)___
+    ___(c)___
+</code></pre>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>(a)：<code>7 &lt;= x &lt;= 10</code> （或 <code>x &gt;= 7 and x &lt;= 10</code>）</li>
+        <li>(b)：<code>return "long"</code></li>
+        <li>(c)：<code>return "short"</code></li>
+      </ul>
+      <p><strong>中文解析</strong>（按代码执行流程逆推）：</p>
+      <ol>
+        <li>新函数<strong>第一个 if 处理 medium</strong>，所以 (a) 必须刚好是 medium 的范围：<code>7 ≤ x ≤ 10</code>。</li>
+        <li>到第二个 <code>if x &gt;= 7</code> 时，medium 已被 return 排除（x 不是 7-10）。剩下 <code>x &gt;= 7</code> 的只能是 <code>x &gt; 10</code>，即 long → (b) 返回 "long"。</li>
+        <li>(c) 是函数最后一行，到这里说明 x &lt; 7，对应 short → (c) 返回 "short"。</li>
+        <li><strong>关键洞察</strong>：因为每个分支都 <code>return</code>，所以多个独立 <code>if</code> 等价于 <code>elif</code> —— 一旦 return 就退出函数，后面的 if 不会再判断。</li>
+      </ol>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <p class="q-source">题 6 · Fall 2024 Q4.1（Lec 8 + 10：条件函数 + .loc 取值）</p>
+    <p>填写 <code>address_part</code>。已知 <code>treat</code> 是 DataFrame，<code>"address"</code> 列形如 <code>"820 Opal Street, San Diego, CA, 92109"</code>。函数接收一个 <code>index_value</code> 和一个字符串 <code>part</code>（"street" 或 "zip"），返回对应部分。例：<code>address_part(4, "street") == "8575 Jade Coast Drive"</code>，<code>address_part(1, "zip") == "92109"</code>。</p>
+<pre><code>def address_part(index_value, part):
+    if part == "street":
+        var = 0
+    else:
+        ___(a)___
+    return treat.get("address").loc[___(b)___].___(c)___
+</code></pre>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>(a)：<code>var = 3</code></li>
+        <li>(b)：<code>index_value</code></li>
+        <li>(c)：<code>split(", ")[var]</code></li>
+      </ul>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>地址按 <code>", "</code> 分割得到 <code>["820 Opal Street", "San Diego", "CA", "92109"]</code>，<strong>street 在 index 0</strong>，<strong>zip 在 index 3</strong>。</li>
+        <li>所以 <code>part=="street"</code> 时 <code>var=0</code>；<code>else</code>（即 part 是 "zip"）时 <code>var=3</code>。</li>
+        <li><code>treat.get("address").loc[index_value]</code> 取出那一行对应的字符串（注意是 <code>.loc</code>，按 index label）。</li>
+        <li>对字符串调用 <code>.split(", ")[var]</code> 得到对应部分。</li>
+        <li><span class="highlight">考点</span>：if/else 设置变量 → 在后面统一使用，避免重复代码。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <p class="q-source">题 7 · Winter 2025 Q5.1（Lec 10：for-loop 累加器 vs merge）</p>
+    <p>菜单：Sourdough $2 / Whole Wheat $3 / Multigrain $4。<code>eaten</code> 是吃过的面包名字数组。计算总花费。</p>
+<pre><code>breads = ["Sourdough", "Whole Wheat", "Multigrain"]
+prices = [2, 3, 4]
+total_cost = 0
+for i in __(a)__:
+    total_cost = (total_cost +
+                  np.count_nonzero(eaten == __(b)__) * __(c)__)
+</code></pre>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>(a)：<code>np.arange(3)</code> （或 <code>np.arange(len(breads))</code>）</li>
+        <li>(b)：<code>breads[i]</code></li>
+        <li>(c)：<code>prices[i]</code></li>
+      </ul>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>循环 3 次（每种面包一次），每次：</li>
+        <li>① <code>eaten == breads[i]</code> 得到一个 bool 数组；② <code>np.count_nonzero(...)</code> 数 True 的个数 = 吃了几片这种面包；③ 乘以单价 <code>prices[i]</code> = 这种面包的花费；④ 累加进 <code>total_cost</code>。</li>
+        <li><strong>这是整数累加器的典型用法</strong>：循环对象是<strong>面包种类的下标</strong>，不是 eaten 本身。</li>
+        <li>Q5.2 用 merge 实现同样功能（见 Section 5），同一题对比两种思路：循环 vs merge。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <p class="q-source">题 8 · Winter 2025 Q6.2（Lec 10 + Lec 12：模拟 + for-loop + counter）</p>
+    <p>6 种 topping，每种以概率 0.5 独立加入披萨。估计"恰好 3 种 topping"的概率。</p>
+<pre><code>tiptop = 0
+num_trials = 10000
+for i in np.arange(num_trials):
+    pizza = np.random.choice([0, 1], __(a)__)
+    if np.__(b)__ == 3:
+        tiptop = __(c)__
+
+toppa = __(d)__
+</code></pre>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>(a)：<code>6</code> （第二个参数：每次抽 6 个 0/1）</li>
+        <li>(b)：<code>sum(pizza)</code> （或 <code>count_nonzero(pizza)</code>）</li>
+        <li>(c)：<code>tiptop + 1</code></li>
+        <li>(d)：<code>tiptop / num_trials</code></li>
+      </ul>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>每次试验抽 6 个 0/1（<code>np.random.choice([0,1], 6)</code>，<strong>默认 with replacement</strong>），相当于 6 种 topping 各独立掷一次硬币。</li>
+        <li><code>np.sum(pizza)</code> 是 1 的个数 = 选中的 topping 数。</li>
+        <li>如果恰好 3，则计数器 +1（<strong>整数累加器</strong>）。</li>
+        <li>循环结束后，频率 = 命中次数 / 总试验数 = 概率估计。</li>
+        <li><strong>这是 DSC10 模拟的标准模板</strong>：<code>counter = 0</code> → <code>for i in np.arange(reps): if 满足条件: counter += 1</code> → <code>counter / reps</code>。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <p class="q-source">题 9 · Spring 2024 Q5（Lec 10 + Lec 12：模拟 + len/np.unique）</p>
+    <p>Arya 电话区号后 7 位只用 2 个不同的数字。估计"猫/猴随机拨号后区号后 7 位恰好 2 种不同数字"的概率：</p>
+<pre><code>digits = np.arange(10)
+property_count = 0
+num_trials = 10000
+for i in np.arange(num_trials):
+    after_area_code = __(x)__   # 猴：with replacement；猫：without replacement
+    num_distinct = len(np.unique(after_area_code))
+    if __(y)__:
+        property_count = property_count + 1
+
+probability_estimate = property_count / num_trials
+</code></pre>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案</strong>：</p>
+      <ul>
+        <li>猴（5.1）：<code>np.random.choice(digits, 7)</code>（默认 replace=True）</li>
+        <li>猫（5.2）：<code>np.random.choice(digits, 7, replace=False)</code></li>
+        <li>(y)：<code>num_distinct == 2</code></li>
+        <li>5.4：<strong>0</strong>（猫一定 7 个全不同，<code>num_distinct</code> 永远 = 7，永远不会进 if）</li>
+      </ul>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>模板还是<strong>整数累加器</strong>：每次试验生成数据 → 检查条件 → 满足就 +1。</li>
+        <li>关键区别在 <code>replace</code> 参数：猴可重复（猴随机按键），猫不可（猫不会重按）。</li>
+        <li>5.4 的"陷阱"：猫场景下 <code>num_distinct</code> 永远是 7，所以 if 永远不触发，最终概率 = 0/10000 = 0。这考的是<strong>对模拟逻辑的理解</strong>，不是代码。</li>
+      </ul>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍，能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>解释 Python 中 <code>bool</code> 类型，列举至少 3 种返回 bool 的运算或方法</span></label>
+    <label><input type="checkbox"><span>说出 <code>and</code>/<code>or</code>/<code>not</code> 与 <code>&amp;</code>/<code>|</code>/<code>~</code> 的<strong>使用场景区别</strong>，并解释为什么对 Series 用 <code>and</code> 会报错</span></label>
+    <label><input type="checkbox"><span>写一个 DataFrame 双条件过滤，强调括号位置和优先级</span></label>
+    <label><input type="checkbox"><span>解释 <code>in</code> 运算符的两种用法（list 成员、字符串子串），并说明 <code>'DS' in 'DSC'</code> 为什么是 True</span></label>
+    <label><input type="checkbox"><span>写出 <code>if</code>/<code>elif</code>/<code>else</code> 的语法骨架，强调冒号和缩进</span></label>
+    <label><input type="checkbox"><span>解释为什么"多个独立 <code>if</code> + return"等价于 <code>if</code>/<code>elif</code>/<code>else</code>（Fa25 Q4 的核心）</span></label>
+    <label><input type="checkbox"><span>把一个 if/elif/else 重写成<strong>无分支</strong>形式（如用 <code>max</code>/<code>min</code>/算术），举一例</span></label>
+    <label><input type="checkbox"><span>说明函数漏写 <code>else</code> 会发生什么（隐式返回 <code>None</code>）</span></label>
+    <label><input type="checkbox"><span>写出 for-loop 的语法，说明可以遍历哪些类型（list/array/string/<code>np.arange</code>）</span></label>
+    <label><input type="checkbox"><span>讲清楚什么是 accumulator pattern，区分整数累加器和数组累加器</span></label>
+    <label><input type="checkbox"><span>解释 <code>np.append</code> 为什么要赋值，演示忘了赋值的后果</span></label>
+    <label><input type="checkbox"><span>说出"修改循环变量不会影响原 array/list"，演示 <code>for x in arr: x = x*10</code> 之后 arr 不变</span></label>
+    <label><input type="checkbox"><span>写出 Sp24 Q1 的 <code>sum_phone</code> 完整代码（不看答案），并解释为什么 <code>int(digit)</code> 不可省</span></label>
+    <label><input type="checkbox"><span>写出标准模拟模板：<code>counter = 0</code> → 循环 <code>num_trials</code> 次 → 满足条件 +1 → 最后除以 <code>num_trials</code></span></label>
+    <label><input type="checkbox"><span>解释为什么 DSC10 不鼓励用 for-loop 做 Series 元素级计算，应该用什么替代</span></label>
+    <label><input type="checkbox"><span>说明 <code>1 == 1.0</code> 是 True 但 <code>1 == '1'</code> 是 False，并把它和"字符串遍历得到的字符是 str"联系起来</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="05-multi-groupby-merge.html">← 上一节：多列groupby与merge</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="07-probability-simulation.html">下一节：概率与模拟 →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

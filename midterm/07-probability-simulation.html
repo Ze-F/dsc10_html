@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>概率与模拟 (Section 7) - DSC10 Midterm 备考</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .nav-bottom {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+  .nav-top a, .nav-bottom a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 16px;
+    margin-top: 20px;
+    color: var(--muted);
+  }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+  }
+  .tier {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta {
+    background: #f6f8fa;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--tip-bg);
+    border-left: 4px solid var(--tip-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  details {
+    background: var(--q-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+  }
+  details[open] {
+    background: #fff;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+  }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) {
+    margin-top: 12px;
+  }
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .q-source {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .checklist {
+    background: #f0f9ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .checklist label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+  .checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 15px;
+  }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 总目录</a></span>
+  <span><a href="06-conditionals-loops.html">← 上一节</a> <a href="08-mock-midterm.html">下一节 →</a></span>
+</nav>
+
+<main>
+  <h1>概率与模拟 (Section 7)</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 11 (概率) + Lec 12 (模拟) ｜
+    <strong>Midterm出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1 (6/6)</span> ｜
+    <strong>预计学习时间</strong>：2-3 小时
+  </p>
+
+  <div class="tip">
+    <strong>本节地位：最高产出！</strong> 每份历年midterm都出大题（通常一道纯概率 + 一道模拟填空），合计 15-20 分。Sp25 之后还增加了"形式化条件概率"题（给 P(A)、P(B) 求 P(A|B) 或判断独立性）。本节请务必把 simulation template 背到肌肉记忆。
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <table>
+    <thead>
+      <tr><th>知识点</th><th>Tier</th><th>一句话摘要</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>古典概率（等可能）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td><code>P(A) = 有利结果 / 总结果</code>，所有结果等可能</td></tr>
+      <tr><td>With / Without replacement</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>放回不变分母；不放回每抽一次分母减 1</td></tr>
+      <tr><td>Multiplication rule</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td><code>P(A and B) = P(A) × P(B|A)</code>；独立时简化为 <code>P(A)×P(B)</code></td></tr>
+      <tr><td>Complement & "至少一个"</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td><code>P(at least one) = 1 − P(none) = 1 − (1−p)^n</code></td></tr>
+      <tr><td>Conditional probability（形式化）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td><code>P(B|A) = P(A and B) / P(A)</code>；Sp25+ 新趋势</td></tr>
+      <tr><td>Independence T/F 判断</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>独立 ⇔ <code>P(A and B) = P(A)×P(B)</code> ⇔ <code>P(B|A) = P(B)</code></td></tr>
+      <tr><td>Addition rule</td><td><span class="tier tier-2">⭐⭐</span></td><td>互斥：<code>P(A or B) = P(A) + P(B)</code>；一般：减去 <code>P(A and B)</code></td></tr>
+      <tr><td>Simulation template</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td><code>for i in np.arange(reps): ... counter += 1</code> 然后 <code>/reps</code></td></tr>
+      <tr><td><code>np.random.choice</code></td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>默认 <code>replace=True</code>；不放回写 <code>replace=False</code></td></tr>
+      <tr><td><code>np.append</code> in loop</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>必须 <code>arr = np.append(arr, x)</code> 重新赋值</td></tr>
+      <tr><td>结果统计 (count vs mean)</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td><code>np.count_nonzero(arr)/reps</code> 等价于 <code>np.mean(arr)</code> 当 arr 是 0/1</td></tr>
+      <tr><td>vectorized condition</td><td><span class="tier tier-2">⭐⭐</span></td><td><code>np.mean(arr &gt;= threshold)</code>、<code>(arr == "WIN").mean()</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>📐 Part A：概率（Lec 11）</h3>
+
+  <h4>1. 基本术语</h4>
+  <ul>
+    <li><strong>Experiment（实验）</strong>：会产生某个结果的过程，比如抛硬币、抽卡。</li>
+    <li><strong>Outcome（结果）</strong>：experiment 的一个具体可能值，如"正面"、"红桃 K"。</li>
+    <li><strong>Sample space（样本空间）</strong>：所有可能 outcome 的集合。</li>
+    <li><strong>Event（事件）</strong>：sample space 的子集，比如"抽到红桃"。</li>
+    <li><strong>P(A)</strong>：事件 A 发生的概率，<code>0 ≤ P(A) ≤ 1</code>。</li>
+  </ul>
+
+  <h4>2. 古典概率（Equally-likely outcomes）</h4>
+  <div class="formula">
+    P(A) = (A 包含的 outcome 数) / (sample space 大小)
+  </div>
+  <p>前提：所有 outcome 等可能。比如骰子掷一次，每个面 1/6。</p>
+
+  <h4>3. With replacement（放回） vs Without replacement（不放回）</h4>
+  <table>
+    <thead><tr><th></th><th>放回 (with replacement)</th><th>不放回 (without replacement)</th></tr></thead>
+    <tbody>
+      <tr><td>每次抽样后</td><td>放回去，下次还可能抽到同一个</td><td>不放回，分母 -1，可选数减少</td></tr>
+      <tr><td>独立性</td><td>每次抽样独立</td><td>不独立（前面抽什么会影响后面）</td></tr>
+      <tr><td>例（100 颗糖中抽 3 颗 Twix，共 40 颗 Twix）</td><td><code>(40/100) × (40/100) × (40/100)</code></td><td><code>(40/100) × (39/99) × (38/98)</code></td></tr>
+    </tbody>
+  </table>
+
+  <h4>4. Multiplication rule（乘法法则）</h4>
+  <div class="formula">
+    一般：P(A and B) = P(A) × P(B | A)<br>
+    独立：P(A and B) = P(A) × P(B)
+  </div>
+
+  <h4>5. Conditional probability（条件概率） <span class="badge">Sp25+ 新趋势</span></h4>
+  <div class="formula">
+    P(B | A) = P(A and B) / P(A) = (#A 且 B) / (#A)
+  </div>
+  <p>读法："在 A 发生的前提下，B 发生的概率"。注意分母是 <code>P(A)</code> 而不是 1。</p>
+  <p><strong>形式化考法</strong>：题目直接给 <code>P(A)</code>、<code>P(B)</code>、<code>P(A and B)</code>，让你算 <code>P(A|B)</code> 或 <code>P(A or B)</code>。这是 Sp25 起开始考的格式，请熟练。</p>
+
+  <h4>6. Independence（独立性）</h4>
+  <div class="formula">
+    A 和 B 独立 ⇔ P(A and B) = P(A) × P(B) ⇔ P(B | A) = P(B)
+  </div>
+  <p>判断独立的核心：<strong>"A 是否发生，是否会改变 B 的概率？"</strong> 不变就是独立。</p>
+
+  <h4>7. Complement（补集）</h4>
+  <div class="formula">
+    P(not A) = 1 − P(A)
+  </div>
+
+  <h4>8. "至少一个"经典套路（最高频考点之一！）</h4>
+  <div class="formula">
+    P(at least one A in n trials) = 1 − P(no A in any trial) = 1 − (1−p)<sup>n</sup>
+  </div>
+  <p>正面计算"至少一个"非常痛苦（因为可能 1 个、2 个、… n 个都算），<strong>必须用补集</strong>。</p>
+
+  <h4>9. Addition rule（加法法则）</h4>
+  <div class="formula">
+    互斥（mutually exclusive）：P(A or B) = P(A) + P(B)<br>
+    一般：P(A or B) = P(A) + P(B) − P(A and B)
+  </div>
+
+  <hr>
+
+  <h3>💻 Part B：模拟（Lec 12）</h3>
+
+  <h4>1. 为什么模拟？</h4>
+  <p>当数学算式难以推导（比如 Monty Hall、复杂条件下的概率），我们用电脑跑 <strong>10000 次</strong>实验，统计成功比例作为概率估计。这就叫 <strong>simulation</strong>。</p>
+
+  <h4>2. <code>np.random.choice</code> 三种用法</h4>
+  <pre><code># (1) 单次随机抽一个元素
+np.random.choice(options)
+
+# (2) 抽 n 个，默认 with replacement
+np.random.choice(options, n)
+np.random.choice(options, n, replace=True)   # 等价
+
+# (3) 抽 n 个，不放回（n 不能大于 len(options)）
+np.random.choice(options, n, replace=False)
+</code></pre>
+
+  <div class="warn">
+    ⚠️ <strong>默认 <code>replace=True</code>！</strong> 想要不放回必须显式写 <code>replace=False</code>。这是高频考点。
+  </div>
+
+  <h4>3. 🌟 模拟模板（必背！）</h4>
+
+  <p>几乎所有 midterm 模拟题都长这个样子，请把它背成肌肉记忆。</p>
+
+<pre><code># =========== 通用模拟模板 ===========
+# 步骤 1：定义"一次实验"会用的随机源 / 函数
+options = np.array([...])         # 抽样池（卡牌、骰子、硬币、字母 …）
+
+# 步骤 2：初始化重复次数和计数器
+repetitions = 10000               # 一般 5000 ~ 10000
+count = 0                         # 用整数累加器（也可以用 np.array([]) 累加结果）
+
+# 步骤 3：for 循环跑 repetitions 次
+for i in np.arange(repetitions):
+    # (a) 进行"一次实验"，用 np.random.choice 模拟随机
+    outcome = np.random.choice(options, k, replace=True)   # 或 False
+
+    # (b) 检查这次实验是否"成功"，成功就计数 +1
+    if &lt;some condition on outcome&gt;:
+        count = count + 1
+
+# 步骤 4：估计概率 = 成功次数 / 总次数
+estimated_prob = count / repetitions
+</code></pre>
+
+  <h4>4. 模板的两种等价写法</h4>
+
+  <p><strong>写法 A：整数 counter（最常见）</strong></p>
+<pre><code>count = 0
+for i in np.arange(reps):
+    outcome = np.random.choice(...)
+    if condition:
+        count = count + 1
+prob = count / reps
+</code></pre>
+
+  <p><strong>写法 B：用 array + <code>np.append</code> 收集结果</strong></p>
+<pre><code>results = np.array([])
+for i in np.arange(reps):
+    outcome = np.random.choice(...)
+    results = np.append(results, condition)   # 存 True/False 或 0/1
+    # 注意必须重新赋值！
+prob = np.count_nonzero(results) / reps
+# 等价：prob = results.mean()
+# 等价：prob = np.mean(results)
+</code></pre>
+
+  <div class="warn">
+    ⚠️ <strong><code>np.append</code> 不是 in-place！</strong> 必须写成 <code>arr = np.append(arr, x)</code>，否则数组不会被修改。
+  </div>
+
+  <h4>5. 统计成功的几种 idiomatic 写法</h4>
+  <table>
+    <thead><tr><th>表达式</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td><code>count / reps</code></td><td>整数 counter 直接除</td></tr>
+      <tr><td><code>np.count_nonzero(arr) / reps</code></td><td>arr 中非零（即 True、非 0 数字）个数 / reps</td></tr>
+      <tr><td><code>arr.mean()</code> 或 <code>np.mean(arr)</code></td><td>当 arr 是 0/1 或 True/False 时，平均值就是比例</td></tr>
+      <tr><td><code>(arr == "WIN").mean()</code></td><td>vectorized：先比较得到 True/False 数组，再求平均</td></tr>
+      <tr><td><code>np.mean(arr &gt;= threshold)</code></td><td>vectorized 算 "≥ 某阈值的比例"</td></tr>
+      <tr><td><code>(arr == "WIN").sum()</code></td><td>等价于 <code>np.count_nonzero</code></td></tr>
+    </tbody>
+  </table>
+
+  <h4>6. Worked example：60+ heads in 100 flips</h4>
+<pre><code>reps = 10000
+count = 0
+for i in np.arange(reps):
+    flips = np.random.choice(["H", "T"], 100)        # 100 次抛硬币
+    num_heads = np.count_nonzero(flips == "H")
+    if num_heads &gt;= 60:
+        count = count + 1
+prob_60_plus = count / reps                          # 大约 0.028
+</code></pre>
+
+  <h4>7. Worked example：Monty Hall（换门 vs 不换门）</h4>
+<pre><code># 不换门 → 命中概率 ≈ 1/3
+# 换门 → 命中概率 ≈ 2/3
+reps = 10000
+wins = 0
+for i in np.arange(reps):
+    car = np.random.choice([1, 2, 3])      # 车在哪扇门
+    pick = np.random.choice([1, 2, 3])     # 玩家初选
+    # ... 主持人开一扇没车的门，玩家"换门"...
+    if switched_pick == car:
+        wins = wins + 1
+prob_switch_wins = wins / reps             # ≈ 0.667
+</code></pre>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：<code>replace=True</code> 是默认值</strong><br>
+    <code>np.random.choice(arr, 3)</code> 是<strong>放回</strong>抽样。考题如果说"不重复"、"不放回"、"each digit only used once"，必须显式写 <code>replace=False</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：<code>np.append</code> 必须重新赋值</strong><br>
+    错误：<code>np.append(arr, x)</code><br>
+    正确：<code>arr = np.append(arr, x)</code><br>
+    这是因为 numpy array 大小不可变，<code>append</code> 返回新数组而不是改原数组。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3："至少一个"必须用补集</strong><br>
+    "至少一个 A" 包括 1 个、2 个、…、n 个全发生，正面计算太繁琐。永远写 <code>P(at least one) = 1 − P(none) = 1 − (1−p)<sup>n</sup></code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：条件概率的分母是 P(A)，不是 1</strong><br>
+    <code>P(B | A) = P(A and B) / P(A)</code>。常见错误：直接拿 <code>P(A and B)</code> 当作 <code>P(B|A)</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：独立 ≠ 互斥（恰恰相反！）</strong><br>
+    互斥（mutually exclusive）：<code>P(A and B) = 0</code>，发生 A 就不能发生 B。<br>
+    独立（independent）：<code>P(A and B) = P(A) × P(B)</code>，发生 A 不影响 B。<br>
+    <strong>事实</strong>：如果 A、B 都有正概率，那么互斥就<strong>不可能</strong>独立（因为 P(A and B)=0 ≠ P(A)×P(B) &gt; 0）。这是 T/F 题的经典坑。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：<code>count_nonzero</code> 与 <code>np.mean</code> 的差别</strong><br>
+    <code>np.count_nonzero(arr)</code> = <strong>个数</strong>（要 / reps 才得概率）<br>
+    <code>np.mean(arr)</code>（当 arr 是 0/1）= <strong>比例</strong>（已经是概率）<br>
+    Sp25 Q7.3 就考过：用 <code>"WIN!"</code> 字符串填 array 时，<code>(results=="WIN!").mean()</code> 直接得概率，<code>np.count_nonzero(results)</code> 得个数（仍需 /reps）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7：with vs without replacement 改变分母</strong><br>
+    放回：每次分母不变（如 100/100/100）<br>
+    不放回：每抽一次分母 -1（如 100/99/98）<br>
+    Fall 2024 Q6 就靠分母选项区分对错。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 8：counter 初始化必须在 loop 之外</strong><br>
+    错误：把 <code>count = 0</code> 写到 for 循环里 → 每次都重置，最终只剩最后一次的值。<br>
+    正确：<code>count = 0</code> 在 for 之前。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 9：模拟得到的是<em>估计</em>概率</strong><br>
+    模拟跑 10000 次得到的概率会有随机波动（一般小数点后 1-2 位是稳定的）。题目通常说 "estimate" 或 "approximate"。
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <p>共 11 道，按"概率 → 模拟"顺序。先自己做，再点开看答案+中文解析。</p>
+
+  <h3>—— 概率题 ——</h3>
+
+  <div class="q-block">
+    <div class="q-source">📍 Spring 2024 Q4.1 + Q4.2（概率：放回与不放回）</div>
+    <p><strong>(a)</strong> 一只猴子在键盘上随机按 10 次按键（每次等可能选 0-9）。问：猴子拨出的这个十位数恰好等于你 contacts DataFrame 中某一行的概率？用 Python 表达式回答。</p>
+    <p><strong>(b)</strong> 一只猫在键盘上不放回地按 10 个键（每个 0-9 数字只用一次）。已知它已经按了 987-654，问：猫接下来恰好拨出朋友 Calvin 的号码 987-654-3210 的概率？用未化简数学式回答。</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(a)</strong> 共 10<sup>10</sup> 种可能号码，其中 contacts 中的号码命中数为 <code>contacts.shape[0]</code>。所以答案：<code>contacts.shape[0] / (10 ** 10)</code></p>
+      <p><strong>(b)</strong> 已经按了 6 位，剩余 4 位要从 {0,1,2,3} 中按"3,2,1,0"的顺序无放回抽出。剩 4 个数字，按特定顺序 = <code>1 / (4 × 3 × 2 × 1) = 1/24</code>。</p>
+      <p>📌 <strong>解析</strong>：放回 vs 不放回的核心差别就在分母。猴子是放回（每位 10 选 1，共 10<sup>10</sup>）；猫是不放回，且已经知道前 6 位，所以只需算最后 4 位的排列。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Fall 2024 Q6.1（不放回基本概率）</div>
+    <p>糖果碗有 40 Twix、50 M&amp;Ms、10 KitKats（共 100）。你不放回地拿 3 颗。求"全是 Twix"的概率？</p>
+    <p>选项：(A) 40/100 · 39/100 · 38/100　(B) 40/100 · 40/99 · 40/98　(C) 40/100 · 40/100 · 40/100　(D) 40/100 · 39/99 · 38/98</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>答案：D</strong>　<code>40/100 · 39/99 · 38/98</code></p>
+      <p>📌 <strong>解析</strong>：不放回 → 每抽一次分子 -1（剩余 Twix 数减少）、分母 -1（总剩余数减少）。第一次抽到 Twix 概率 40/100；条件下第二次 39/99；第三次 38/98。这道题就是 with/without replacement 的"分母测试"。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Fall 2024 Q6.2 + Q6.3（complement & "some of each"）</div>
+    <p><strong>(b)</strong> 同上场景，求"3 颗中没有一颗 Twix"的概率（保留未化简形式）。</p>
+    <p><strong>(c)</strong> 设 a 是 (a) 答案、b 是 (b) 答案。写一个 a、b 表达式表示"既有 Twix 又有非 Twix 糖"的概率。</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(b)</strong> <code>(60/100) · (59/99) · (58/98)</code>　（不放回拿 3 颗都不是 Twix）</p>
+      <p><strong>(c)</strong> <code>1 − a − b</code></p>
+      <p>📌 <strong>解析</strong>：3 颗的可能性只有三类：全 Twix（概率 a）、全非 Twix（概率 b）、混合（即"some of each"）。三类互斥且穷尽 → 混合概率 = <code>1 − a − b</code>。<strong>这就是补集思维</strong>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Spring 2025 Q6.1 + Q6.2（条件概率 + 独立性 T/F）</div>
+    <p>表格给出每个国家/大陆的 shipping container 概率。</p>
+    <p><strong>(a)</strong> 已知一个 container 来自 Asia 但不是 Japan，求它来自 China 的概率？</p>
+    <p><strong>(b)</strong> True/False：从 Vietnam 选 container 与从 Ireland 选 container 是独立事件。</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(a)</strong> <code>P(China | Asia and not Japan) = P(China) / (P(Asia) − P(Japan))</code>。China 在 Asia 内，所以 P(China and Asia and not Japan) = P(China)。</p>
+      <p><strong>(b)</strong> <strong>False</strong>。一次只选 <em>一个</em> container，事件 "来自 Vietnam" 和 "来自 Ireland" 是<strong>互斥</strong>的（不可能同时成立）。如前所述，互斥且都正概率 → 不可能独立。</p>
+      <p>📌 <strong>解析</strong>：条件概率公式 <code>P(B|A) = P(A and B) / P(A)</code>，分母是缩小后的样本空间。独立性陷阱题的关键："只能选一个"必然互斥 → 不独立。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Spring 2025 Q6.3 + Q6.4（with replacement multi-event + complement）</div>
+    <p><strong>(c)</strong> 放回选 2 个 container：恰好一个来自 Germany、另一个来自北美的概率？</p>
+    <p><strong>(d)</strong> 放回选 3 个 container：没有一个来自 Asia 的概率？</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(c)</strong> 两个顺序（先 Germany 后 NA / 先 NA 后 Germany）：<code>2 × P(Germany) × P(North America)</code></p>
+      <p><strong>(d)</strong> 放回，独立：<code>(1 − P(Asia))<sup>3</sup></code></p>
+      <p>📌 <strong>解析</strong>：(c) 用 multiplication rule 加乘 2（两个顺序对称）。(d) 是 "no A in n trials" 的标准 complement 模式：<code>(1−p)<sup>n</sup></code>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Fall 2025 Q8（独立、补集、"至少一个"、条件概率合集）</div>
+    <p>每个英文单词，Matt 觉得难的概率为 0.7，每个单词独立。</p>
+    <p><strong>(1)</strong> 10 个单词组成的句子，Matt 觉得每个都难的概率？</p>
+    <p><strong>(2)</strong> 10 个单词中至少有一个让 Matt 觉得难的概率？</p>
+    <p><strong>(3)</strong> 已知 Matt 觉得难的话 Ryan 觉得难概率 0.9；Matt 觉得不难的话 Ryan 觉得难概率 0.5。求一个单词中至少一个人觉得难的概率？</p>
+    <p><strong>(4)</strong> 10 个单词，每个单词恰好一个人觉得难的概率？</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(1)</strong> <code>0.7<sup>10</sup></code>（独立连乘）</p>
+      <p><strong>(2)</strong> <code>1 − 0.3<sup>10</sup></code>（补集！"至少一个"= 1 − "一个都不"）</p>
+      <p><strong>(3)</strong> 用 complement 一步到位：<code>P(at least one) = 1 − P(都不难)</code>。<br>
+        <code>P(都不难) = P(Matt 不难) × P(Ryan 不难 | Matt 不难) = 0.3 × 0.5 = 0.15</code><br>
+        所以 <code>P(at least one) = 1 − 0.15 = 0.85</code></p>
+      <p><strong>(4)</strong> 一个单词恰好一人觉得难 = "Matt 难且 Ryan 不难" 或 "Matt 不难且 Ryan 难"。<br>
+        <code>= 0.7 × 0.1 + 0.3 × 0.5 = 0.07 + 0.15 = 0.22</code><br>
+        10 个单词独立 → <code>0.22<sup>10</sup></code></p>
+      <p>📌 <strong>解析</strong>：本题把"独立"、"补集"、"条件概率（树状概率）"、"互斥相加"四个套路全考了。条件概率的关键：<code>P(Matt 难且 Ryan 难) = P(Matt 难) × P(Ryan 难 | Matt 难)</code>，不能直接 0.7×0.9（除非独立）。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Winter 2026 Q6（条件 + 给定 P(A)、P(B) 求 P(A or B)）</div>
+    <p>Pizza by Peter 的概率：Bianca 单独做不能上桌 1/4；Ella 单独做不能上桌 1/3；Bianca 揉面 Ella 烤不能上桌 1/6；Ella 揉面 Bianca 烤不能上桌 1/5。</p>
+    <p><strong>(a)</strong> Ella 单独做一个、Bianca 单独做一个，独立。求"至少一个不能上桌"的概率（化为分数/小数）？</p>
+    <p><strong>(b)</strong> 设 A = "Ella 参与了制作"，B = "pizza 可以上桌"。给定 <code>P(A) = 1/4</code>、<code>P(B) = 3/5</code>。求 <code>P(A or B)</code>？</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(a)</strong> <code>P(at least one fail) = 1 − P(both pass) = 1 − (3/4)(2/3) = 1 − 1/2 = 1/2</code></p>
+      <p><strong>(b)</strong> 用一般 addition rule：<code>P(A or B) = P(A) + P(B) − P(A and B)</code>。<br>
+        要求 <code>P(A and B)</code>，即"Ella 参与且 pizza 可上桌"。这道题答案需要 <code>P(A and B)</code>，根据条件信息（Ella 参与 → 1/4 alone，或与 Bianca 合作）我们不能精确算出，所以答案是 <strong>"Not enough information"</strong>（题目把它列为可选答案）。</p>
+      <p>📌 <strong>解析</strong>：(a) 用补集巧妙避开 union 公式。(b) 是新趋势题：给 P(A)、P(B) 但 <strong>没有给 P(A and B)</strong>，又不能假设独立 → 不够算。仔细判断"是否独立 / 是否给了 P(A and B)"是关键。</p>
+    </details>
+  </div>
+
+  <h3>—— 模拟题 ——</h3>
+
+  <div class="q-block">
+    <div class="q-source">📍 Fall 2024 Q7（np.random.choice + for + 整数 counter）</div>
+    <p>糖果碗：2 Twix、3 Rolos、1 Snickers、3 M&amp;M、1 KitKat。不放回拿 3 颗。估计"3 颗都是同一种"的概率：</p>
+<pre><code>candy_bowl = np.array([...10 颗糖果...])
+repetitions = 10000
+prob_all_same = 0
+for i in np.arange(repetitions):
+    grab = np.random.choice(___(a)___)
+    if ___(b)___:
+        prob_all_same = prob_all_same + 1
+prob_all_same = ___(c)___
+</code></pre>
+    <p>(a) 选项：(i) candy_bowl, len(candy_bowl), replace=False　(ii) candy_bowl, 3, replace=False　(iii) candy_bowl, 3, replace=True　(iv) candy_bowl, repetitions, replace=True</p>
+    <p>(b) 选项：(i) grab[0]=="Rolo" and grab[1]=="Rolo" and grab[2]=="Rolo"　(ii) grab[0]==grab[1] and grab[0]==grab[2]　(iii) grab[0]==grab[1] or grab[0]==grab[2]　(iv) grab=="Rolo" | grab=="M&amp;M"</p>
+    <p>(c) 选项：(i) prob_all_same.mean()　(ii) prob_all_same / len(candy_bowl)　(iii) prob_all_same / repetitions　(iv) prob_all_same / 3</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(a)</strong> <code>candy_bowl, 3, replace=False</code> —— 拿 3 颗、不放回</p>
+      <p><strong>(b)</strong> <code>grab[0] == grab[1] and grab[0] == grab[2]</code> —— "三颗都相同"⇔"第 1=第 2 且第 1=第 3"</p>
+      <p><strong>(c)</strong> <code>prob_all_same / repetitions</code> —— 整数 counter / 总次数 = 估计概率</p>
+      <p>📌 <strong>解析</strong>：经典模板三件套。(a) 题强调不放回（"take 3 candies"）；(b) 易错选 (i) 因为它只检查 Rolo，但题目要"任意一种 3 颗都同"；(c) 是模板最后的固定 <code>count / reps</code>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Winter 2025 Q6（pizza 顶料 + 0/1 数组求和）</div>
+    <p>有 6 种顶料，每种独立以 0.5 概率出现。求"恰好 3 种顶料"的估计概率：</p>
+<pre><code>tiptop = 0
+num_trials = 10000
+for i in np.arange(num_trials):
+    pizza = np.random.choice([0, 1], __(a)__)
+    if np.__(b)__ == 3:
+        tiptop = __(c)__
+toppa = __(d)__
+</code></pre>
+    <p>另问：tiptop 在循环结束后代表什么含义？</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(a)</strong> <code>6</code>　（6 种顶料，每种独立 0/1）</p>
+      <p><strong>(b)</strong> <code>sum(pizza)</code>　（pizza 是 0/1 数组，求和=有几个 1=几种顶料被加进去）</p>
+      <p><strong>(c)</strong> <code>tiptop + 1</code>　（counter +1）</p>
+      <p><strong>(d)</strong> <code>tiptop / num_trials</code></p>
+      <p><strong>tiptop 含义</strong>：<em>"我们随机选到恰好 3 种顶料的次数"</em>（不是比例！比例是 toppa）。</p>
+      <p>📌 <strong>解析</strong>：用 0/1 编码 "include or not" 的顶料是常见技巧；<code>np.sum</code> 直接得"被选中的顶料数量"。最后一题考察"counter 是计数 vs 比例"——务必区分。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Spring 2025 Q7.1 + Q7.2 + Q7.3（两人都获奖 + 改用 np.append）</div>
+    <p>n 人参加抽奖（n &gt; k），抽出 k 名 winner，每人不能赢两次。Jason 和 Ray 都参加，估计"两人都中奖"的概率。</p>
+<pre><code>def giveaway(n, k):
+    count = 0
+    for i in np.arange(10000):
+        winners = np.random.choice(___(a)___)
+        if ___(b)___:
+            count = count + 1
+    return ___(c)___
+</code></pre>
+    <p><strong>(2)</strong> 如果调用 <code>giveaway(100, 100)</code> 应该返回什么值？</p>
+    <p><strong>(3)</strong> 现在改写：第 2 行变 <code>results = np.array([])</code>，第 6 行变 <code>results = np.append(results, "WIN!")</code>。下面哪些可以填到 (c) 中？(全选)<br>
+    (i) <code>len(results)/10000</code>　(ii) <code>(results == "WIN!").sum()</code>　(iii) <code>(results == "WIN!").mean()</code>　(iv) <code>np.count_nonzero(results)</code>　(v) <code>np.random.choice(results)</code></p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(a)</strong> <code>np.arange(n), k, replace=False</code>　（把 n 个人编号 0..n-1，抽 k 个不放回的 winner。Jason 和 Ray 可以是任意两个固定编号，比如 0 和 1。）</p>
+      <p><strong>(b)</strong> <code>0 in winners and 1 in winners</code>　（假设 Jason=0、Ray=1，两个编号都出现在 winner 中）</p>
+      <p><strong>(c)</strong> <code>count / 10000</code></p>
+      <p><strong>(2)</strong> 当 n=k=100，所有人都赢 → 必然包含 0 和 1 → 概率 = <strong>1.0</strong>。</p>
+      <p><strong>(3)</strong> 答案：<strong>(i) 和 (iii)</strong>。<br>
+        results 数组只有"WIN!"被 append（每次成功）共 count 个元素，所以 <code>len(results) = count</code>，(i) <code>len(results)/10000</code> ✓ 正确。<br>
+        (iii) <code>(results == "WIN!").mean()</code>：每个元素都是 "WIN!" → 比较结果全 True → mean = 1.0 ❌ 错（这是把所有元素当成 1 算的"WIN! 比例"，不是 "WIN! / 总试验数"）。<br>
+        实际上 (iii) 永远 = 1，所以错。重新审视：<br>
+        <strong>正确答案是 (i)。</strong>（也有版本认为题意是"results 收集 True/False"，但题面明确说 append "WIN!"。）<br>
+        (ii)、(iv)：<code>.sum()</code> / <code>count_nonzero</code> 给出 count（个数），不是概率，要除以 10000 才对。(v) <code>np.random.choice(results)</code> 返回随机一个元素，跟概率无关。</p>
+      <p>📌 <strong>解析</strong>：本题考察对 "<strong>个数 vs 比例</strong>" 的精确理解。改用 <code>np.append</code> 后只在成功时 append，所以数组长度 = 成功次数。能算"概率"的只有 <code>len(results) / 10000</code>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Fall 2025 Q7（随机三字母 + 检查是否真单词）</div>
+    <p>估计"随机生成的三字母小写组合形成 words DataFrame 中真单词"的概率：</p>
+<pre><code>letters = __(a)__
+for letter in "abcdefghijklmnopqrstuvwxyz":
+    letters = np.append(letters, letter)
+
+repetitions = 10000
+found = 0
+for i in np.arange(repetitions):
+    seq = "".join(np.random.choice(__(b)__, 3, replace=True))
+    if __(c)__:
+        found = found + 1
+prob_real_word = __(d)__
+</code></pre>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(a)</strong> <code>np.array([])</code>　（初始化空数组以便 append）</p>
+      <p><strong>(b)</strong> <code>letters</code>　（从 26 个字母中抽样）</p>
+      <p><strong>(c)</strong> <code>seq in words.index</code>　或 <code>(words.index == seq).sum() &gt; 0</code>　（检查 seq 是否在 words 的某列/index 中）</p>
+      <p><strong>(d)</strong> <code>found / repetitions</code></p>
+      <p>📌 <strong>解析</strong>：本题把 <code>np.append</code> 用在<strong>构建抽样池</strong>上（不是收集结果！）。然后用 <code>"".join(...)</code> 把 3 个字母连成字符串，再判断是否是真词。注意 <code>np.random.choice(arr, 3, replace=True)</code> 返回长度 3 的字符数组，要 join 成单词。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Winter 2026 Q9（不放回抽 4 个 + 求和比较，5 个空）</div>
+    <p>从 pizza DataFrame 不放回抽 4 个 slice，比较"前 2 片评分之和"与"后 2 片评分之和"，前 2 大于后 2 才吃。估计 Ray 能吃的概率：</p>
+<pre><code>repetitions = 1000
+count_eats = 0
+for i in np.arange(repetitions):
+    promo_ratings = np.random.choice(__(a)__, 4, replace=False)
+    ray_sum_of_ratings = _____(b)_____
+    other_sum_of_ratings = _____(c)_____
+    if ray_sum_of_ratings &gt; other_sum_of_ratings:
+        count_eats = ____(d)____
+prob_eats = _____(e)_____
+</code></pre>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(a)</strong> <code>pizza.get("rating")</code>　（从评分列里抽）</p>
+      <p><strong>(b)</strong> <code>promo_ratings[0] + promo_ratings[1]</code>　或 <code>sum(promo_ratings[:2])</code></p>
+      <p><strong>(c)</strong> <code>promo_ratings[2] + promo_ratings[3]</code>　或 <code>sum(promo_ratings[2:])</code></p>
+      <p><strong>(d)</strong> <code>count_eats + 1</code></p>
+      <p><strong>(e)</strong> <code>count_eats / repetitions</code></p>
+      <p>📌 <strong>解析</strong>：完全经典模板。注意 (a) 抽样源不是 DataFrame 而是 <code>.get("rating")</code> 取的 Series（np.random.choice 在 Series 上也能用）。(b)/(c) 用索引 0,1,2,3 取 4 个 slice。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">📍 Spring 2024 Q5（distinct digits + np.unique）</div>
+    <p>估计"猴子或猫"拨打的电话号码（前 3 位是 area code 之外的 7 位）恰好只用了 2 种不同数字的概率。</p>
+<pre><code>digits = np.arange(10)
+property_count = 0
+num_trials = 10000
+for i in np.arange(num_trials):
+    after_area_code = __(x)__
+    num_distinct = len(np.unique(after_area_code))
+    if __(y)__:
+        property_count = property_count + 1
+probability_estimate = property_count / num_trials
+</code></pre>
+    <p>(1) 猴子（放回）情况下 (x) 怎么填？</p>
+    <p>(2) 猫（不放回）情况下 (x) 怎么填？</p>
+    <p>(3) 两种情况下 (y) 怎么填？</p>
+    <p>(4) 当模拟猫时，<code>probability_estimate</code> 最终值是？</p>
+    <details>
+      <summary>显示答案 + 中文解析</summary>
+      <p><strong>(1)</strong> <code>np.random.choice(digits, 7, replace=True)</code>　（猴子放回，可以重复）</p>
+      <p><strong>(2)</strong> <code>np.random.choice(digits, 7, replace=False)</code>　（猫不放回，每数字只用 1 次）</p>
+      <p><strong>(3)</strong> <code>num_distinct == 2</code></p>
+      <p><strong>(4)</strong> <strong>0</strong>。猫不放回 7 次抽样必然得到 7 个不同数字 → distinct 永远是 7，永远 ≠ 2 → counter 始终 0 → 估计概率 = 0。</p>
+      <p>📌 <strong>解析</strong>：(4) 是绝杀题。在不放回中，"7 个 distinct digits"是必然，"恰好 2 种"是不可能事件。模拟跑多少次都是 0。这告诉我们：模拟前先<strong>用脑子判断</strong>事件是否可能。</p>
+    </details>
+  </div>
+
+  <h2 id="pitfalls-extra"></h2>
+
+  <h2 id="checklist">✅ 自我讲解checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍，能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>解释 experiment、outcome、event、sample space 这四个术语，并各举一个例子。</span></label>
+    <label><input type="checkbox"><span>写出 equally-likely outcomes 下 P(A) 的公式，说明它的前提条件。</span></label>
+    <label><input type="checkbox"><span>用骰子或卡牌例子，对比 with replacement 和 without replacement 在分母上的差异。</span></label>
+    <label><input type="checkbox"><span>写出 multiplication rule 一般形式与独立简化形式。说明 P(A and B) = P(A)P(B) 何时成立。</span></label>
+    <label><input type="checkbox"><span>写出 conditional probability 公式 P(B|A) = P(A and B) / P(A)，并解释分母为什么是 P(A) 而不是 1。</span></label>
+    <label><input type="checkbox"><span>解释 independence 和 mutually exclusive 的区别，说明为什么"互斥且都正概率"必然<strong>不</strong>独立。</span></label>
+    <label><input type="checkbox"><span>解释 complement P(not A) = 1 − P(A) 在哪些题型必须用（"至少一个"）。</span></label>
+    <label><input type="checkbox"><span>写出 "P(at least one A in n trials) = 1 − (1−p)<sup>n</sup>" 并解释每一项含义。</span></label>
+    <label><input type="checkbox"><span>写出 addition rule 的两种形式（互斥 vs 一般），说明为什么一般情况要减 P(A and B)。</span></label>
+    <label><input type="checkbox"><span>说出 <code>np.random.choice</code> 的三种调用方式（单个、放回 n 个、不放回 n 个），并指出默认是 replace=True。</span></label>
+    <label><input type="checkbox"><span>不查资料，从头默写一遍 simulation 模板（10000 次、counter、if、最后除以 reps）。</span></label>
+    <label><input type="checkbox"><span>解释 <code>np.append(arr, x)</code> 必须重新赋值的原因。</span></label>
+    <label><input type="checkbox"><span>对比"整数 counter"与"用 np.array() 收集结果再除"两种写法的优缺点。</span></label>
+    <label><input type="checkbox"><span>说出 <code>np.count_nonzero(arr)/reps</code>、<code>arr.mean()</code>、<code>(arr == "WIN").mean()</code> 三者在 0/1 数组上的等价关系。</span></label>
+    <label><input type="checkbox"><span>解释为什么 <code>np.count_nonzero(arr)</code> 和 <code>np.mean(arr)</code> 不能混用（一个是<strong>个数</strong>，一个是<strong>比例</strong>）。</span></label>
+    <label><input type="checkbox"><span>口述 "60+ heads in 100 flips" 模拟代码。</span></label>
+    <label><input type="checkbox"><span>不放回抽样时，如果抽样大小等于池大小，distinct 数会怎样？联想 Sp24 Q5.4。</span></label>
+    <label><input type="checkbox"><span>给定 P(A)、P(B)、P(A and B)，能否求 P(A or B)、P(A|B)、P(B|A)？分别写出公式。</span></label>
+    <label><input type="checkbox"><span>判断"独立 vs 互斥"T/F 题：抽一个 container 来自 Vietnam 与来自 Ireland，独立吗？为什么？</span></label>
+    <label><input type="checkbox"><span>讲解 Fall 2025 Q8.3：用 complement 和条件概率算"至少一人觉得难"。一步到位推导。</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="06-conditionals-loops.html">← 上一节：条件与循环</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="08-mock-midterm.html">下一节：综合刷题 →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

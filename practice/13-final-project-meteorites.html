@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 13 · Final Project — Meteorites · DSC10</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --ok-bg: #dafbe1;
+    --ok-border: #1a7f37;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; flex-wrap: wrap; gap: 8px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color: var(--muted); cursor: not-allowed; text-decoration: none; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: pre;
+    word-wrap: normal;
+    word-break: normal;
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 16px 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+    white-space: pre;
+  }
+  pre::-webkit-scrollbar { height: 8px; }
+  pre::-webkit-scrollbar-track { background: #2a2a3e; border-radius: 4px; }
+  pre::-webkit-scrollbar-thumb { background: #585b70; border-radius: 4px; }
+  pre::-webkit-scrollbar-thumb:hover { background: #6c7086; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 10px 14px; margin: 12px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .err { background: #ffebe9; border-left: 4px solid #cf222e; padding: 10px 14px; margin: 12px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; margin: 22px 0; }
+  .q-id { display: inline-block; background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; padding: 2px 10px; border-radius: 4px; margin-right: 10px; letter-spacing: 0.5px; }
+  .q-title { display: inline; font-size: 16px; font-weight: 600; }
+  .q-stmt { color: var(--muted); font-size: 14px; margin: 10px 0; border-left: 3px solid #d0d7de; padding-left: 10px; font-style: italic; }
+  .think, .why, .pitfall-inline { margin: 12px 0; font-size: 14.5px; }
+  .think strong { color: #6f42c1; }
+  .why strong { color: #1f883d; }
+  .pitfall-inline strong { color: #cf222e; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .crosslink { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin: 20px 0; font-size: 14px; }
+  .crosslink h4 { margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 600; }
+  .crosslink ul { margin: 4px 0; padding-left: 20px; }
+  .crosslink a { color: var(--accent); text-decoration: none; }
+  .crosslink a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+  th { background: #f6f8fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  details { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; margin: 10px 0; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); font-size: 14px; }
+  details[open] summary { margin-bottom: 8px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="12-lab2-fortune500-functions.html">⬅ 上一份：Lab 2</a> | <a class="disabled">下一份 ➡：—</a></span>
+</nav>
+
+<main>
+  <h1>Practice 13 · Final Project — Meteorites 🌠</h1>
+  <p class="meta">
+    <strong>原始截止</strong>：项目最终大作业（Final 前 4 天）｜
+    <strong>涵盖讲义</strong>：<u>整个学期所有讲义</u>（Lec 1–25） ｜
+    <strong>对应模块</strong>：Final 综合 ｜
+    <strong>主题</strong>：NASA 陨石数据集 38,094 行 → merge/概率/TVD/permutation/bootstrap CI/CLT CI/无放回检验 ｜
+    <strong>预计时长</strong>：4–6 小时 ｜
+    <strong>auto grader</strong>：otter 测试通过 = 格式对，<strong>不</strong>保证答案对（hidden tests 在 due date 后跑）
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#overview">📋 项目概览 + 数据集 + 知识点回链</a></li>
+      <li><a href="#sec1">📚 Section 1 — Seen vs. Recorded（q1.1–1.5）merge + groupby + density</a></li>
+      <li><a href="#sec2">📚 Section 2 — The View From Space（q2.1–2.9）独立事件概率全家桶</a></li>
+      <li><a href="#sec3">📚 Section 3 — Long-Distance Relationship（q3.1–3.9）TVD/MD 拟合度检验</a></li>
+      <li><a href="#sec4">📚 Section 4 — Around the World（q4.1–4.5）permutation 慢/快两种写法</a></li>
+      <li><a href="#sec5">📚 Section 5 — Confidence is Key（q5.1–5.7）bootstrap CI vs CLT CI</a></li>
+      <li><a href="#sec6">📚 Section 6 — Decade-nt（q6.1–6.5）<u>无放回</u>抽样的假设检验</a></li>
+      <li><a href="#pitfalls">⚠️ Final Project 高频陷阱（25 条）</a></li>
+      <li><a href="#templates">🧰 项目用到的 7 类代码模板速查</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist（25 项）</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="overview">📋 项目概览</h2>
+
+  <p><strong>数据集</strong>：NASA Meteoritical Society 收录的 38,094 颗已知陨石。</p>
+<pre><code>raw_df: 38094 行 × 9 列
+  id, name, recclass, seen_falling (bool), mass (g), year, decade,
+  latitude, longitude</code></pre>
+
+  <p>另有两份小 CSV：</p>
+  <ul>
+    <li><code>data/continents.csv</code>：每个 <code>id</code> → 所在 <code>continent</code>（38094 行）</li>
+    <li><code>data/areas.csv</code>：7 大洲面积（km²），索引 <code>Continent</code></li>
+    <li><code>data/populated_cells.csv</code>：每个洲"夜灯亮度足够"的 1°×1° 网格数量（6 个洲，<strong>没有 Antarctica</strong>）</li>
+  </ul>
+
+  <p><strong>Tier 速览</strong>（在 Final 中考到对应概念的密度）：</p>
+  <ul>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Section 3 + 4：两种假设检验（TVD 拟合度、permutation 两样本）— Final 必出</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Section 5：bootstrap CI 与 CLT CI 的 <u>区别</u> + <code>find_z</code> 反查 — Final 多套真题考</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Section 2：独立事件概率（all / none / exactly one / 排列）— Midterm + Final 范围</li>
+    <li><span class="tier tier-2">⭐⭐</span> Section 6：<u>无放回</u>抽样模拟 — 与 bootstrap（有放回）形成对照</li>
+    <li><span class="tier tier-2">⭐⭐</span> Section 1：merge + groupby + density 计算 — 基本功</li>
+  </ul>
+
+  <div class="warn">
+    <strong>⚠️ Otter autograder 是怎么回事？</strong> 项目里你会看到大量 <code>grader.check("qX_Y")</code>，输出 <code>Test case failed</code>。看 <code>Trying:</code> 那一行——那是<strong>格式</strong>测试（"是不是 Series？长度对不对？某个值大概是多少？"）。<u>所有格式测试通过</u>不等于"答对"，hidden correctness tests 在交卷后跑。报错里写 <code>ellipsis</code> 是因为题目里写的是 <code>... = ...</code> 占位符，你没填代码所以那个变量是 <code>Ellipsis</code> 对象（Python 里的 <code>...</code> 字面量），所以 <code>.shape</code>、<code>.get</code>、<code>.sum()</code> 都会 AttributeError。
+  </div>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链 — 想复习某个块：</h4>
+    <ul>
+      <li>merge 行数预测 + groupby → <a href="../midterm/05-multi-groupby-merge.html#concepts">midterm/05-multi-groupby-merge</a></li>
+      <li>独立事件 / multiplication rule / "at least one" 补集 → <a href="../midterm/07-probability-simulation.html#concepts">midterm/07-probability-simulation</a></li>
+      <li>Bootstrap CI 模板 + <code>np.percentile</code> → <a href="../quiz3/02-bootstrap-ci.html#concepts">quiz3/02-bootstrap-ci</a></li>
+      <li>CLT-based CI + <code>find_z</code> + <code>norm.ppf</code> → <a href="../quiz3/05-clt-clt-ci.html#concepts">quiz3/05-clt-clt-ci</a></li>
+      <li>TVD（÷ 2、只对 categorical） → <a href="../quiz4/04-tvd-categorical.html#concepts">quiz4/04-tvd-categorical</a></li>
+      <li>Permutation test（shuffle 机制 + faster perm） → <a href="../quiz4/06-permutation-testing.html#concepts">quiz4/06-permutation-testing</a></li>
+      <li>三种结论："reject / fail to reject / never accept" → <a href="../quiz4/03-pvalues-decisions.html#concepts">quiz4/03-pvalues-decisions</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec1">📚 Section 1 — Seen vs. Recorded（q1.1–1.5）</h2>
+
+  <p><strong>背景</strong>：陨石分两类——<strong>seen falling</strong>（有人当场看见掉下来）和<strong>recorded</strong>（之后被发现）。我们想搞清两组的地理分布差异。</p>
+
+  <!-- Q1.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.1</span><span class="q-title">合并 continents → <code>df</code></span>
+    <p class="q-stmt">"Assign df to a DataFrame that contains all columns in raw_df plus continent. Set index to 'id'. Continents has same rows? <strong>不知道</strong>——题目暗示要 merge。"</p>
+    <p class="think"><strong>💭 思路</strong>：raw_df 38094 行 × 9 列；加一列 → 期望 38094 行 × 9 列（id 变成 index 不算列了，原本 9 列减 1 加 1 = 9）。</p>
+<pre><code>continents = bpd.read_csv('data/continents.csv')
+df = raw_df.merge(continents, on='id').set_index('id')</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>isinstance(df, bpd.DataFrame) and df.shape == (38094, 9)</code> ｜<code>'continent' in df.columns</code> ｜<code>df.index.name == 'id'</code></div>
+    <p class="why"><strong>💡 行数为什么不变</strong>：inner merge 后行数 = 两表共有 id 的交集。题目暗示 continents <u>没有</u> 38094 行（hint："不是同样行数所以你需要 merge"），<u>但</u> raw_df 的<u>每个</u> id 在 continents 都有匹配 —— 反之不一定。所以 inner merge 结果保留 raw_df 的所有 38094 行。</p>
+    <p class="pitfall-inline"><strong>⚠️ 坑</strong>：很多人写 <code>raw_df.merge(continents, left_on='id', right_on='id')</code>，会出现 <code>id_x</code> 和 <code>id_y</code>；用 <code>on='id'</code> 直接消歧义。<u>set_index 一定放在 merge <strong>之后</strong></u>（先 set_index 再 merge 会找不到 id 列）。</p>
+  </div>
+
+  <!-- Q1.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.2</span><span class="q-title">只保留 seen falling → <code>saw_fall</code></span>
+<pre><code>saw_fall = df[df.get('seen_falling') == True]</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>saw_fall.shape == (1065, 9)</code>。autograder 提示 "应该是 38094"——那是错误版本（漏了过滤）。</div>
+    <p class="why"><strong>💡 为什么从 <code>df</code> 而不是 <code>raw_df</code></strong>：题目明确"start with <code>df</code>, not <code>raw_df</code>"——因为后面要用到 <code>continent</code> 列。</p>
+    <p class="pitfall-inline"><strong>⚠️ 坑</strong>：<code>df.get('seen_falling') == True</code> 可以简写成 <code>df.get('seen_falling')</code>（因为本身就是 bool Series），但<u>显式 == True 更清楚</u>。<strong>不能</strong>写 <code>df['seen_falling'] == True</code>——babypandas 不支持方括号取列。</p>
+  </div>
+
+  <!-- Q1.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.3</span><span class="q-title">按洲计数，<u>降序</u>排</span>
+<pre><code>recorded_per_continent = (
+    df.groupby('continent').count().get('name')
+      .sort_values(ascending=False)
+)
+seen_per_continent = (
+    saw_fall.groupby('continent').count().get('name')
+      .sort_values(ascending=False)
+)</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>len(recorded_per_continent) == 7 and len(seen_per_continent) == 6</code>。<u>seen 少一个 Antarctica</u> —— 没人看见南极的陨石落下。</div>
+    <p class="why"><strong>💡 <code>.get('name')</code> 任意一列都行</strong>：<code>groupby('continent').count()</code> 后所有非分组列的"非 NaN 计数"都是同一个值。<code>.get('name')</code> 是惯例选择，因为 name 没缺失值。</p>
+    <p class="pitfall-inline"><strong>⚠️ 坑</strong>：<code>sort_values</code> 后<strong>不要</strong>再 <code>.iloc[0]</code>——题目要的是<u>整个 Series</u>，不是最大值。</p>
+  </div>
+
+  <!-- Q1.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.4</span><span class="q-title">每洲陨石密度 → <code>density</code></span>
+    <p class="q-stmt">"density = number of recorded meteorites / area in km²"</p>
+<pre><code>density = recorded_per_continent / areas.get('Area (km^2)')</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>len(density) == 7 and np.all(density &gt; 0)</code>。Antarctica 因为 recorded 极多 + 面积适中 → 密度<u>最高</u>（远超其他洲）。</div>
+    <p class="why"><strong>💡 为什么 Series ÷ Series 安全</strong>：两边都是按 continent 索引的 Series，babypandas 会<u>按 index 对齐</u>再做除法。即使 <code>recorded_per_continent</code> 是按"数量降序排"、<code>areas</code> 是按"面积降序排"，对齐之后没问题。</p>
+    <p class="pitfall-inline"><strong>⚠️ 坑</strong>：autograder 提示 "Make sure to use recorded_per_continent, not seen_per_continent" —— 别用错。</p>
+  </div>
+
+  <!-- Q1.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.5</span><span class="q-title">为什么 Antarctica 陨石这么多？</span>
+    <p class="q-stmt">从 1/2/3/4 选一个。</p>
+    <p class="think"><strong>💭 思路</strong>：物理学告诉我们陨石落地点应该是<strong>随机均匀</strong>分布。Antarctica 数量多 ≠ 那里掉得多。地图显示集中在 McMurdo Sound——南极<strong>研究站</strong>所在地。所以"研究员多 + 冰面易发现"是<u>记录多</u>的原因，<u>不能</u>支持"那里掉得多"。</p>
+<pre><code>q1_5 = 4   # 研究员多 + 不支持"更多陨石落南极"</code></pre>
+    <p class="why"><strong>💡 选 4 而不是 2</strong>：选项 2 说"冰面易发现"——这只是<u>一部分</u>原因。选项 4 说"研究员多"——更接近 McMurdo Sound 集中的解释（地图证据）。<u>关键是后半句"不支持"</u>—— 1 和 3 后半句都说"支持"，逻辑错误。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec2">📚 Section 2 — The View From Space（q2.1–2.9）</h2>
+
+  <p><strong>背景</strong>：假设你是国际空间站的宇航员能看见所有陨石。陨石落在某洲的概率 ∝ 该洲"夜灯亮度足够"的网格数 (= populated_cells)。<u>只有 6 个洲</u>（没有 Antarctica）。</p>
+
+  <div class="tip">
+    <strong>📐 关键约定（贯穿整个 Section 2）</strong><br>
+    • <code>probabilities</code> = Series, 索引为 6 个 continent, 数值 ∈ [0,1], 和 = 1<br>
+    • 每颗陨石独立同分布 → 用乘法规则<br>
+    • <u>不</u>会看到 Antarctica，因为它不在 probabilities 里
+  </div>
+
+  <!-- Q2.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.1</span><span class="q-title"><code>probabilities</code> Series</span>
+<pre><code>probabilities = populated_cells.get('Cells') / populated_cells.get('Cells').sum()</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>isinstance(probabilities, bpd.Series) and len(probabilities) == 6</code> ｜ <code>np.isclose(probabilities.sum(), 1)</code> ｜ <code>np.isclose(probabilities.loc['Asia'], 0.384311)</code></div>
+    <p class="why"><strong>💡 数值速记</strong>：Asia ≈ 0.384、Africa ≈ 0.212、Europe ≈ 0.175、N.America ≈ 0.121、S.America ≈ 0.101、Australia ≈ 0.0067。<u>Asia 最大、Australia 最小</u>——这决定了后面 Q2.8 的"最高概率组合"。</p>
+  </div>
+
+  <!-- Q2.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.2</span><span class="q-title">3 颗都落 Europe</span>
+<pre><code>prob_all_europe = probabilities.loc['Europe'] ** 3</code></pre>
+    <p class="why"><strong>💡 乘法规则</strong>：3 颗独立 → P(A∩B∩C) = P(A)·P(B)·P(C) = p³。值 ≈ 0.175³ ≈ 0.00536。</p>
+  </div>
+
+  <!-- Q2.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.3</span><span class="q-title">3 颗都<u>不</u>落 Europe 或 Asia</span>
+<pre><code>prob_none_europe_asia = (1 - probabilities.loc['Europe'] - probabilities.loc['Asia']) ** 3</code></pre>
+    <p class="why"><strong>💡 拆解</strong>：单颗"不落 E 或 A" = 1 − P(E) − P(A)（互斥洲可以直接减）。3 颗都不落 → 立方。值 ≈ (1 − 0.175 − 0.384)³ ≈ 0.441³ ≈ 0.0856。</p>
+    <p class="pitfall-inline"><strong>⚠️ 坑</strong>：互斥（mutually exclusive）洲的"或"才能直接相加。这里因为一颗陨石只落一个洲，所以 P(E ∪ A) = P(E) + P(A)。</p>
+  </div>
+
+  <!-- Q2.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.4</span><span class="q-title"><code>prob_none(n, continents)</code> 函数</span>
+    <p class="q-stmt">"n 颗陨石都不落入给定 continents 中的<u>任何</u>一个的概率"</p>
+<pre><code>def prob_none(n, continents):
+    p_in = sum(probabilities.loc[c] for c in continents)
+    return (1 - p_in) ** n</code></pre>
+    <p class="think"><strong>💭 思路</strong>：<code>continents</code> 是 list / array。一颗"落入给定洲" 的概率 = 给定洲概率之和（互斥）。"都不落入" = (1 − 这个和)<sup>n</sup>。</p>
+    <p class="why"><strong>💡 测试用例</strong>：<code>prob_none(6, ['Europe', 'North America', 'Asia', 'Australia']) ≈ ?</code>。Africa + S.America = 0.212 + 0.101 ≈ 0.313, 6 次方 ≈ 0.000932。</p>
+  </div>
+
+  <!-- Q2.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.5</span><span class="q-title"><code>prob_all(n, continents)</code> 函数</span>
+    <p class="q-stmt">"n 颗陨石都落入给定 continents 中的<u>某一个</u>（可以是同一个）的概率"</p>
+<pre><code>def prob_all(n, continents):
+    p_in = sum(probabilities.loc[c] for c in continents)
+    return p_in ** n</code></pre>
+    <p class="why"><strong>💡 对照 Q2.4</strong>：prob_none = (1 − S)<sup>n</sup>，prob_all = S<sup>n</sup>。S = 给定洲概率之和。<u>"都落到给定洲群"≠"都落到同一个洲"</u>——一颗 Asia、一颗 Africa 也算"都落到 [Asia, Africa]"。</p>
+  </div>
+
+  <!-- Q2.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.6</span><span class="q-title">用 <code>prob_none</code> 实现 <code>prob_all_again</code></span>
+    <p class="q-stmt">"prob_all_again should equal prob_all on any input."</p>
+<pre><code>def prob_all_again(n, continents):
+    all_six = ['Asia', 'Africa', 'Europe', 'North America', 'South America', 'Australia']
+    some_continents = [c for c in all_six if c not in continents]
+    return prob_none(n, some_continents)</code></pre>
+    <p class="think"><strong>💭 关键洞察</strong>："n 颗都落入 X" ≡ "n 颗都<u>不</u>落入 X 的补集"（补集 = 6 大洲减去 X）。所以 <code>prob_all(n, X) = prob_none(n, 6洲 − X)</code>。</p>
+    <p class="why"><strong>💡 边界情况</strong>：如果 X 就是 6 个全部，补集 = [] → <code>(1 − sum([])) ** n = 1 ** n = 1</code>，对（必落入 6 洲）。如果 X = [] → 补集 = 6 洲 → <code>(1 − 1) ** n = 0</code>，对。</p>
+    <p class="pitfall-inline"><strong>⚠️ 坑</strong>：用 <code>probabilities.index</code> 替代硬编码也行：<code>some_continents = [c for c in probabilities.index if c not in continents]</code>。<u>千万别</u>把 Antarctica 加进列表——它不在 probabilities 里，会 KeyError。</p>
+  </div>
+
+  <!-- Q2.7 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.7</span><span class="q-title"><code>order_probability(continents)</code></span>
+    <p class="q-stmt">"看到 1 颗落 c₁、再 1 颗落 c₂、…的概率，<u>按指定顺序</u>"</p>
+<pre><code>def order_probability(continents):
+    return np.prod([probabilities.loc[c] for c in continents])</code></pre>
+    <p class="why"><strong>💡 思路</strong>：每颗独立 → 顺序事件的联合概率 = 单个概率的<u>连乘</u>。<code>np.prod([])</code> 默认返回 1.0（数学约定空积 = 1）。</p>
+  </div>
+
+  <!-- Q2.8 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.8</span><span class="q-title">11 颗的最高概率组合 → <code>highest_prob_combination</code></span>
+    <p class="q-stmt">"6¹¹ 个 length-11 list 中，哪个 order_probability 最大？"</p>
+<pre><code>highest_prob_combination = ['Asia'] * 11</code></pre>
+    <p class="think"><strong>💭 思路（不写 for-loop）</strong>：连乘的每个因子都 ≤ Asia 的概率（0.384，最大）。要最大化连乘，每个因子都取最大 → 全 Asia。值 ≈ 0.384¹¹ ≈ 4.6 × 10⁻⁵。</p>
+    <p class="why"><strong>💡 为什么不写 for-loop</strong>：6¹¹ ≈ 3.6 亿种组合，遍历会非常慢。题目 hint 已经说了"conceptual question"。</p>
+  </div>
+
+  <!-- Q2.9 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.9</span><span class="q-title"><code>prob_one(n, continent)</code> "恰好一颗"</span>
+    <p class="q-stmt">"n 颗中<u>恰好一颗</u>落 continent 的概率。提示：n 种互斥情况（第 i 颗落入，其余 n-1 颗不落入）"</p>
+<pre><code>def prob_one(n, continent):
+    p = probabilities.loc[continent]
+    return n * p * (1 - p) ** (n - 1)</code></pre>
+    <p class="think"><strong>💭 公式拆解</strong>：单个 case "第 i 颗落入、其余 n−1 颗不落入" 的概率 = p · (1−p)<sup>n−1</sup>。共 n 个互斥 case → 总概率 = n · p · (1−p)<sup>n−1</sup>。</p>
+    <p class="why"><strong>💡 测试用例</strong>：<code>prob_one(3, 'Europe')</code> ≈ 3 · 0.175 · 0.825² ≈ 0.358。autograder 期望 ≈ 0.358。<u>选项 0.119 是 case 总<u>差</u>了——那是 1·p·(1-p)² 没乘 n。</u></p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec3">📚 Section 3 — Long-Distance Relationship（q3.1–3.9）</h2>
+
+  <p><strong>背景</strong>：probabilities 是<strong>理论</strong>分布；自 1980 年以来真实看到的陨石分布 = <strong>observed</strong>。两者一致吗？假设检验！</p>
+
+  <div class="tip">
+    <strong>📐 假设</strong><br>
+    H<sub>0</sub>: observed 是从 probabilities 抽样产生的，差异 = 随机抽样误差<br>
+    H<sub>A</sub>: observed <u>不是</u>从 probabilities 抽样的<br>
+    <strong>统计量</strong>：TVD（categorical 分布距离，<u>不带方向</u>）<br>
+    <strong>p 值方向</strong>：右尾（TVD 永远非负，距离越大越奇怪）
+  </div>
+
+  <!-- Q3.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.1</span><span class="q-title">1980 后看见的总数 + 观察分布</span>
+<pre><code>since_1980 = saw_fall[saw_fall.get('year') &gt;= 1980]
+total_since_1980 = since_1980.shape[0]                            # = 179
+observed_proportions = (
+    since_1980.groupby('continent').count().get('name') / total_since_1980
+)</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>len(observed_proportions) == 6 and np.isclose(observed_proportions.sum(), 1)</code>。<strong>179 颗</strong>是后续模拟次数的依据。</div>
+    <p class="why"><strong>💡 为什么 1980</strong>：题目里说陨石记录方法在 1980 年后较稳定（无技术变迁偏差）——这是后面 Section 5 Q5.7 选 "2" 的伏笔。</p>
+  </div>
+
+  <!-- Q3.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.2</span><span class="q-title"><code>generate_proportions()</code> — H<sub>0</sub> 下的模拟</span>
+<pre><code>def generate_proportions():
+    return np.random.multinomial(179, probabilities) / 179</code></pre>
+    <p class="think"><strong>💭 思路</strong>：<code>multinomial(n, p)</code> 一次抽 179 颗、按 probabilities 分到 6 洲、返回长 6 的<u>计数 array</u>。除 179 → 比例。</p>
+    <p class="why"><strong>💡 比 for-loop 快几十倍</strong>：等价于 179 次 <code>np.random.choice(6, p=probabilities)</code> 然后数频次，但 multinomial 一次搞定。</p>
+    <p class="pitfall-inline"><strong>⚠️ 坑</strong>：返回是 <strong>array</strong>（不是 Series）。后面 tvd 要兼容两种类型。</p>
+  </div>
+
+  <!-- Q3.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.3</span><span class="q-title"><code>tvd(a, b)</code> + 10,000 次模拟 <code>tvd_stats</code></span>
+<pre><code>def tvd(a, b):
+    return np.sum(np.abs(np.array(a) - np.array(b))) / 2
+
+tvd_stats = np.array([])
+for i in np.arange(10000):
+    tvd_stats = np.append(tvd_stats, tvd(generate_proportions(), probabilities))</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>len(tvd_stats) == 10000</code> ｜ <code>np.isclose(tvd(np.array([0.5, 0.5]), np.array([0.4, 0.6])), 0.1)</code></div>
+    <p class="why"><strong>💡 为什么 <code>÷ 2</code></strong>：直觉——每"多在 A 的"必然对应"少在 B 的"，所以绝对差被算了<u>两次</u>，÷ 2 修正。例：[0.5, 0.5] vs [0.4, 0.6] → |0.1| + |0.1| = 0.2，÷ 2 = 0.1（"10% 的 mass 错位"）。</p>
+    <p class="why"><strong>💡 为什么 <code>np.array(...)</code> 转换</strong>：兼容 Series 输入。如果直接 <code>a - b</code> 在 Series-Series 上会按 index 对齐，但传 array 时不对齐——统一转 array 后<u>按位置</u>对齐，要求两边顺序一致。</p>
+    <p class="pitfall-inline"><strong>⚠️ 顺序对齐</strong>：<code>generate_proportions()</code> 按 probabilities 的<u>原始顺序</u>返回。<code>observed_proportions</code> 是 groupby 出来按<u>字母</u>排的。两者顺序<strong>不</strong>同！但因为 <code>probabilities</code> 来自 <code>populated_cells</code>（设置 index='Continent' 后<u>未排序</u>），其实可能也是字母序——具体看 CSV。<u>安全做法</u>：把 observed_proportions <code>.loc[probabilities.index]</code> 重排一次。autograder 没明确测，但稳妥起见可以加这一行。</p>
+  </div>
+
+  <!-- Q3.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.4</span><span class="q-title"><code>tvd_p_value</code></span>
+<pre><code>observed_tvd = tvd(observed_proportions, probabilities)
+tvd_p_value = np.count_nonzero(tvd_stats &gt;= observed_tvd) / 10000</code></pre>
+    <p class="why"><strong>💡 永远右尾</strong>：TVD ≥ 0，"距离越大越像 H<sub>A</sub>"。所以用 <code>&gt;=</code> 而<u>不是</u> <code>&lt;=</code> 或绝对差。</p>
+    <p class="why"><strong>💡 典型值</strong>：观察 TVD 通常 ≈ 0.15–0.25；模拟 TVD 分布峰值 ≈ 0.04–0.07。所以 p-value 一般很小（接近 0），强烈 reject。</p>
+  </div>
+
+  <!-- Q3.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.5</span><span class="q-title">结论 <code>q3_5</code></span>
+<pre><code>q3_5 = 3   # We reject the null hypothesis</code></pre>
+    <p class="pitfall-inline"><strong>⚠️ <u>永远不要</u>选 1</strong>："accept the null" 在统计学里<u>不合法</u>。我们最多说"fail to reject"。<u>4 也错</u>："null hypothesis is consistent with our observation" 意思也是接受 H<sub>0</sub>，错。<u>2 错</u>：p-value < 0.05 已经足够拒绝，不需要更多数据。</p>
+  </div>
+
+  <!-- Q3.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.6</span><span class="q-title">最大绝对差 <code>maximum_distance</code></span>
+<pre><code>def maximum_distance(a, b):
+    return np.max(np.abs(np.array(a) - np.array(b)))</code></pre>
+    <p class="why"><strong>💡 跟 TVD 区别</strong>：TVD 是<u>和</u>除 2；MD 是<u>取最大</u>。例：[0.3, 0.4, 0.2, 0.1] vs [0.25, 0.25, 0.25, 0.25] → 绝对差 = [0.05, 0.15, 0.05, 0.15] → max = 0.15，TVD = sum/2 = 0.40/2 = 0.20。</p>
+    <p class="pitfall-inline"><strong>⚠️ MD <u>不</u>除 2</strong>。</p>
+  </div>
+
+  <!-- Q3.7 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.7</span><span class="q-title">通用 <code>categorical_test(distance_fn, show_hist)</code></span>
+<pre><code>def categorical_test(distance_fn, show_hist):
+    observed_dist = distance_fn(observed_proportions, probabilities)
+    sim_dists = np.array([])
+    for i in np.arange(10000):
+        sim_dists = np.append(sim_dists, distance_fn(generate_proportions(), probabilities))
+    if show_hist:
+        bpd.DataFrame().assign(simulated_dists=sim_dists).plot(
+            kind='hist', density=True, bins=30, ec='w'
+        )
+        plt.axvline(x=observed_dist, color='black', label='observed')
+        plt.legend()
+    return np.count_nonzero(sim_dists &gt;= observed_dist) / 10000</code></pre>
+    <p class="why"><strong>💡 "函数作为参数"</strong>：<code>distance_fn</code> 是个<u>函数对象</u>。调用 <code>distance_fn(x, y)</code> 时传入 tvd 或 maximum_distance 都行。这跟 Lec 8 讲的 "functions as first-class objects" 一脉相承。</p>
+    <p class="pitfall-inline"><strong>⚠️ 坑</strong>：<code>show_hist</code> 是 True 才画图，否则只返回 p-value。不要把 plot 写在 if 外面。</p>
+  </div>
+
+  <!-- Q3.8 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.8</span><span class="q-title">MD 是否给出同 TVD 一致的结论？</span>
+<pre><code>md_same_as_tvd = True</code></pre>
+    <p class="think"><strong>💭 思路</strong>：实际数据中 observed_proportions 与 probabilities 差距很大（多在 Antarctica 周围），两种距离都会给出极小 p-value → <u>都 reject</u>。所以 True。</p>
+    <p class="pitfall-inline"><strong>⚠️ 一般性反例</strong>：MD 和 TVD<u>不总</u>一致——两个分布只在很多类别都有小差距时，TVD 大但 MD 小；只在一两类有大差距时，MD 大但 TVD 中等。这道题里恰好都 reject。</p>
+  </div>
+
+  <!-- Q3.9 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.9</span><span class="q-title"><code>valid_distance</code> — 哪些是合法距离函数？</span>
+    <p class="q-stmt">合法 = (a) d(a, a) = 0，(b) d(a, b) > 0 当 a ≠ b</p>
+<pre><code>valid_distance = [1, 3]</code></pre>
+    <p class="think"><strong>💭 逐项分析</strong></p>
+    <ul>
+      <li><code>option1: np.mean((a-b)**2)</code> — 平方非负，等时为 0，不等时 > 0 ✅</li>
+      <li><code>option2: np.mean((a-b)**3)</code> — 三次方可能<u>负</u>（[0.3, 0.4]−[0.4, 0.3] = [−0.1, 0.1]，mean 0），❌</li>
+      <li><code>option3: len(a) * tvd(a, b)</code> — len(a) > 0 是正常数，tvd 是合法距离，正缩放仍合法 ✅</li>
+      <li><code>option4: np.min((a+b)/2 - 1)</code> — 对概率分布 a+b ≤ 2，(a+b)/2 − 1 ≤ 0，min 也 ≤ 0；且 d(a, a) ≠ 0 ❌</li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec4">📚 Section 4 — Around the World（q4.1–4.5）</h2>
+
+  <p><strong>背景</strong>：Asia 看见的陨石质量中位数 > North America 的。是真有差异还是抽样波动？两组数值 → permutation test。</p>
+
+  <div class="tip">
+    <strong>📐 假设</strong><br>
+    H<sub>0</sub>: Asia 和 N. America 的质量来自<u>同一</u>分布<br>
+    H<sub>A</sub>: Asia 的<u>中位数</u> &gt; N. America 的<br>
+    <strong>统计量</strong>：median(Asia) − median(NA)<br>
+    <strong>p 值方向</strong>：右尾（"Asia 更大" 越大越奇怪）
+  </div>
+
+  <!-- Q4.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.1</span><span class="q-title">传统 permutation（1000 次）</span>
+<pre><code>asia_na = saw_fall[
+    (saw_fall.get('continent') == 'Asia') | (saw_fall.get('continent') == 'North America')
+].get(['mass', 'continent'])
+
+asia_med = asia_na[asia_na.get('continent') == 'Asia'].get('mass').median()
+na_med   = asia_na[asia_na.get('continent') == 'North America'].get('mass').median()
+observed_diff = asia_med - na_med           # ≈ 488.13
+
+diff_medians = np.array([])
+for i in np.arange(1000):
+    shuf = np.random.permutation(asia_na.get('continent'))
+    tmp  = asia_na.assign(shuffled=shuf)
+    a = tmp[tmp.get('shuffled') == 'Asia'].get('mass').median()
+    n = tmp[tmp.get('shuffled') == 'North America'].get('mass').median()
+    diff_medians = np.append(diff_medians, a - n)
+
+mass_p_value = np.count_nonzero(diff_medians &gt;= observed_diff) / 1000</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>asia_na</code> 是 DataFrame、列为 {'mass', 'continent'} ｜ <code>np.isclose(observed_diff, 488.13)</code> ｜ <code>len(diff_medians) == 1000</code> ｜ <code>0 ≤ mass_p_value ≤ 1</code> ｜ mean(diff_medians) ∈ [−100, 70]（均匀洗后差应在 0 附近）</div>
+    <p class="why"><strong>💡 shuffle 哪一列都行</strong>：洗 continent 列 ≡ 洗 mass 列。这是 permutation test 的对称性。</p>
+    <p class="why"><strong>💡 1000 次能跑出来吗</strong>：传统 permutation（用 .assign + 双过滤）每次 ≈ 几十毫秒，1000 次需要几十秒——边界但可接受。10,000 次会非常慢，这就是 Q4.2 要换"faster perm"的动机。</p>
+  </div>
+
+  <!-- Q4.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.2</span><span class="q-title">faster permutation: <code>single_simulated_group_diff</code></span>
+    <p class="q-stmt">"Shuffle mass 一次，前 n_asia 个分给 Asia，其余给 NA。计算 func(asia) − func(na)。"</p>
+<pre><code>def single_simulated_group_diff(input_df, func):
+    n_asia = (input_df.get('continent') == 'Asia').sum()
+    shuf   = np.random.permutation(input_df.get('mass'))
+    asia_vals = shuf.take(np.arange(n_asia))
+    na_vals   = shuf.take(np.arange(n_asia, len(shuf)))
+    return func(asia_vals) - func(na_vals)</code></pre>
+    <p class="think"><strong>💭 关键技巧</strong>：跳过 <code>.assign</code> 和 <code>groupby</code>——这两个在 babypandas 里特别慢。直接对 numpy 数组切片，<u>10 倍以上</u>提速。</p>
+    <p class="why"><strong>💡 为什么洗 mass 也行</strong>：本质上 permutation 就是"切断 mass 和 continent 的关联"。洗哪边都切断了。</p>
+    <p class="why"><strong>💡 <code>arr.take(np.arange(a))</code> = <code>arr[:a]</code></strong>：题目 hint 给的是 take 法，因为<u>对 Series 来说 .iloc 切片更安全</u>。这里 shuf 已经是 numpy array，两种都行。</p>
+    <p class="pitfall-inline"><strong>⚠️ func 必须接受 array</strong>：<code>func(asia_vals)</code> 直接传 numpy 数组。<u>不要</u>把它转 Series——babypandas 的 Series 不支持 axis 参数。</p>
+  </div>
+
+  <!-- Q4.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.3</span><span class="q-title"><code>many_simulated_group_diffs</code></span>
+<pre><code>def many_simulated_group_diffs(input_df, func, repetitions):
+    diffs = np.array([])
+    for i in np.arange(repetitions):
+        diffs = np.append(diffs, single_simulated_group_diff(input_df, func))
+    return diffs</code></pre>
+    <p class="why"><strong>💡 没什么花活</strong>：就是把 Q4.2 包在循环里。但因为 Q4.2 已经很快了，现在 10,000 次只要几秒。</p>
+  </div>
+
+  <!-- Q4.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.4</span><span class="q-title">为什么 means 有 gap 而 medians 没有？</span>
+    <p class="q-stmt">从 1/2/3/4 中选。</p>
+<pre><code>q4_4 = 3   # 有一个 outlier；shuffled 时 outlier 落到 Asia 还是 NA 决定 mean</code></pre>
+    <p class="think"><strong>💭 思路</strong>：直方图<u>双峰</u>意味着"两种可能"。最自然的"两种可能" = <u>outlier 在哪一组</u>。outlier（最大那颗陨石）洗到 Asia → Asia mean 大 → diff_mean 大；洗到 NA → diff_mean 小。中位数<u>不</u>被单个 outlier 影响 → 单峰。</p>
+    <p class="pitfall-inline"><strong>⚠️ 不是选 1（bin 问题）</strong>：双峰宽度过大，不是 bin 切的问题。<u>不是 4（组大小不同）</u>：洗 mass 后 Asia 组大小固定，跟 mean 大小无关。</p>
+  </div>
+
+  <!-- Q4.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.5</span><span class="q-title">去掉最重那颗，用 mean 重做（10,000 次）</span>
+<pre><code>heaviest = asia_na.get('mass').max()
+asia_na_no = asia_na[asia_na.get('mass') != heaviest]
+
+diff_means = many_simulated_group_diffs(asia_na_no, np.mean, 10000)
+
+obs_a = asia_na_no[asia_na_no.get('continent') == 'Asia'].get('mass').mean()
+obs_n = asia_na_no[asia_na_no.get('continent') == 'North America'].get('mass').mean()
+mass_p_value_means = np.count_nonzero(diff_means &gt;= (obs_a - obs_n)) / 10000</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>len(diff_means) == 10000</code> ｜ <code>0 &lt; mass_p_value_means &lt; 1</code> ｜ <code>0.64 ≤ mass_p_value_means ≤ 0.68</code>（题目 hint："99.99% CI with 1000 iterations, mean ± 4 std"）</div>
+    <p class="why"><strong>💡 p ≈ 0.66 → fail to reject</strong>：去掉 outlier 后，"Asia 比 NA 重"几乎纯属随机。outlier 是<u>唯一</u>支撑 Asia 偏重的证据，去掉它就完全失效。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec5">📚 Section 5 — Confidence is Key（q5.1–5.7）</h2>
+
+  <p><strong>背景</strong>：估计每个洲的"真实"中位数 / 均值，配上 confidence interval。Bootstrap（无分布假设）vs CLT（只能均值）。</p>
+
+  <!-- Q5.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.1</span><span class="q-title">North America 中位数的 95% bootstrap CI</span>
+<pre><code>na = saw_fall[saw_fall.get('continent') == 'North America']
+na_boot_medians = np.array([])
+for i in np.arange(2000):
+    resample = na.sample(na.shape[0], replace=True)
+    na_boot_medians = np.append(na_boot_medians, resample.get('mass').median())
+
+na_ci = np.percentile(na_boot_medians, [2.5, 97.5])</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>len(na_boot_medians) == 2000</code> ｜ <code>len(na_ci) == 2 and na_ci[0] &lt; na_ci[1]</code></div>
+    <p class="why"><strong>💡 必背 bootstrap 三件套</strong>：<code>.sample(N, replace=True)</code>（N = 原样本大小；<u>必须</u> with replacement）+ 循环 + <code>np.percentile</code>。</p>
+    <p class="why"><strong>💡 95% → percentile = [2.5, 97.5]</strong>。规律：c% CI → <code>[(100−c)/2, (100+c)/2]</code>。80% → [10, 90]，90% → [5, 95]，99% → [0.5, 99.5]。</p>
+  </div>
+
+  <!-- Q5.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.2</span><span class="q-title">通用 <code>continent_median_ci(continent, p)</code></span>
+<pre><code>def continent_median_ci(continent, p):
+    sub = saw_fall[saw_fall.get('continent') == continent]
+    boot = np.array([])
+    for i in np.arange(2000):
+        resample = sub.sample(sub.shape[0], replace=True)
+        boot = np.append(boot, resample.get('mass').median())
+    lower = (100 - p) / 2
+    upper = (100 + p) / 2
+    return np.percentile(boot, [lower, upper])</code></pre>
+    <p class="pitfall-inline"><strong>⚠️ p 是<u>百分</u>不是<u>小数</u></strong>：传 95 不是 0.95。percentile 也吃百分。</p>
+  </div>
+
+  <!-- Q5.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.3</span><span class="q-title">哪个洲的 95% CI <u>最宽</u>？</span>
+<pre><code>widest_continent = ...   # 跑下面这段看
+for c in ['Africa', 'Asia', 'Australia', 'Europe', 'North America', 'South America']:
+    ci = continent_median_ci(c, 95)
+    print(c, ci[1] - ci[0])</code></pre>
+    <p class="think"><strong>💭 思路</strong>：CI 宽度反比于 √n。saw_fall 里样本最小的洲 CI 最宽。看 <code>seen_per_continent</code> —— <u>Australia 最少（约 5–10 颗）</u>→ CI 最宽。</p>
+    <p class="why"><strong>💡 也可能是 Africa</strong>（数量也较少）。<u>务必跑一遍代码</u>看真实数据。<u>不要靠直觉</u>。</p>
+<pre><code>widest_continent = 'Australia'   # 多数情况</code></pre>
+  </div>
+
+  <!-- Q5.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.4</span><span class="q-title">North America <u>均值</u>的 95% CLT CI</span>
+<pre><code>na_mass = saw_fall[saw_fall.get('continent') == 'North America'].get('mass')
+mean = na_mass.mean()
+sd   = np.std(na_mass)
+n    = na_mass.count()
+margin = 2 * sd / np.sqrt(n)
+na_mean_ci = np.array([mean - margin, mean + margin])</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>na_mean_ci[0] &lt; 12300</code></div>
+    <p class="why"><strong>💡 必背 CLT 95% CI 公式</strong>：<code>[mean − 2·SD/√n, mean + 2·SD/√n]</code>。<u>SD 是 sample 的 SD，不是 sample mean 的 SD</u>。√n 是把"个体 SD"换算成"均值 SD"。</p>
+    <p class="why"><strong>💡 注意 vs bootstrap</strong>：bootstrap 算<u>中位数</u>的 CI（CLT 只对均值有效）；CLT 算<u>均值</u>的 CI（不需要重采样）。</p>
+    <p class="pitfall-inline"><strong>⚠️ <code>np.std</code> vs <code>.std()</code></strong>：<code>np.std</code> 默认 ddof=0（除 N，population SD），<code>Series.std()</code> 默认 ddof=1（除 N−1，sample SD）。课程基本用 <code>np.std</code>，对大 n 来说差别可忽略。</p>
+  </div>
+
+  <!-- Q5.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.5</span><span class="q-title"><code>find_z(p)</code> — 反查 z</span>
+    <p class="q-stmt">"p% 值落在 −z 到 +z 间。find_z(68) ≈ 0.99；find_z(95) ≈ 1.96"</p>
+<pre><code>def find_z(p):
+    return norm.ppf((1 + p / 100) / 2)</code></pre>
+    <p class="think"><strong>💭 公式推导</strong>：p% 在 [−z, z] 内 → cdf(z) − cdf(−z) = p/100。由对称性 cdf(−z) = 1 − cdf(z)，所以 2·cdf(z) − 1 = p/100 → cdf(z) = (1 + p/100)/2。z = norm.ppf((1 + p/100)/2)。</p>
+    <p class="why"><strong>💡 验证</strong>：find_z(95) = norm.ppf(0.975) ≈ 1.959964 → 与 95%-CI 经验 z=2 吻合。find_z(99) ≈ 2.576。find_z(68) ≈ 0.994 ≈ 1。</p>
+  </div>
+
+  <!-- Q5.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.6</span><span class="q-title">通用 <code>continent_mean_ci(continent, p)</code></span>
+<pre><code>def continent_mean_ci(continent, p):
+    masses = saw_fall[saw_fall.get('continent') == continent].get('mass')
+    mean = masses.mean()
+    sd   = np.std(masses)
+    n    = masses.count()
+    z    = find_z(p)
+    margin = z * sd / np.sqrt(n)
+    return np.array([mean - margin, mean + margin])</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>asia_95 = continent_mean_ci('Asia', 95)</code> ｜ <code>np.isclose(asia_95[0], -36322.44288183)</code>（左端负数没事——质量物理 ≥ 0 但 CI 数学上可以负，说明 sd 很大或 n 很小）</div>
+    <p class="why"><strong>💡 为什么 Asia 的 mean CI 包含负数</strong>：质量分布<u>极偏态</u>——很少超大陨石（甚至几十吨）让 SD 巨大。CLT 不适用！这是 <strong>Q5.7</strong> 暗示的限制。</p>
+  </div>
+
+  <!-- Q5.7 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.7</span><span class="q-title"><code>saw_fall</code> 是否真是 random sample？</span>
+<pre><code>q5_7 = 2   # 不是 "ever fallen" 的随机样本，但<u>可能</u>是 "1980 后" 的随机样本</code></pre>
+    <p class="think"><strong>💭 思路</strong>：1980 前后报告方式差异大（卫星、互联网普及前后），整个历史不是 IID。但 1980 后基础设施稳定，可以视作 random sample——这也是 Section 3 选 "since 1980" 的理由。</p>
+    <p class="pitfall-inline"><strong>⚠️ 不选 1</strong>：选项 1 说"larger meteorites are more likely to be seen"，<u>错</u>——seen falling 是"当场看见"，跟大小无关（小陨石照样能被人看见）。<u>不选 3</u>："mass has not changed over time" 太绝对（其实 Q6 就是证明 mass 跟 decade 有关）。<u>不选 4</u>：明显错。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec6">📚 Section 6 — Decade-nt（q6.1–6.5）</h2>
+
+  <p><strong>背景</strong>：2000s decade 的中位质量异常高。是巧合吗？做一次<strong>无放回</strong>抽样的假设检验。</p>
+
+  <div class="tip">
+    <strong>📐 假设</strong><br>
+    H<sub>0</sub>: mass 与 decade 无关，2000s 高中位数是巧合<br>
+    H<sub>A</sub>: 2000s 高中位数不是巧合<br>
+    <strong>统计量</strong>：median(mass) of n 颗（n = 2000s 真实颗数）<br>
+    <strong>抽样方式</strong>：从 seen_since_1900 里<u>无放回</u>抽 n 颗（模拟"如果 decade 无关，2000s 那 n 颗的 mass 中位"）
+  </div>
+
+  <!-- Q6.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 6.1</span><span class="q-title">1900 后的 saw_fall</span>
+<pre><code>seen_since_1900 = saw_fall[saw_fall.get('year') &gt;= 1900]</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>seen_since_1900.shape == (682, 9)</code></div>
+  </div>
+
+  <!-- Q6.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 6.2</span><span class="q-title">decadal median 折线图</span>
+<pre><code># ❌ 错误写法：会报 TypeError
+# seen_since_1900.groupby('decade').median().get('mass').plot(kind='line')
+
+# ✅ 正确写法：先用 get([...]) 留下 numeric 列再 groupby
+seen_since_1900.get(['decade', 'mass']).groupby('decade').median().plot(kind='line')</code></pre>
+    <div class="err">
+      <strong>🚨 常见报错</strong><br>
+      <code>TypeError: agg function failed [how-&gt;median, dtype-&gt;object]</code><br>
+      <code>Cannot convert ['Achiras' 'Alexandrovsky' ...] to numeric</code><br><br>
+      <strong>原因</strong>：直接对整个 <code>seen_since_1900</code> groupby + median 时，pandas 会尝试对<u>所有</u>列取中位数——包括 <code>name</code>、<code>recclass</code> 这些字符串列。pandas 现版本对 object dtype 报错。babypandas 没有 <code>numeric_only=True</code> 这个开关，所以必须<u>先筛掉</u>非数值列。
+    </div>
+    <p class="why"><strong>💡 修法：先 <code>.get(['decade', 'mass'])</code> 只留两列</strong>。groupby 之前就把字符串列剔除，median 自然只跑在 mass 上。<u>注意</u>：<code>.get('mass')</code>（单列 Series）groupby 不了；必须是 <code>.get(['decade', 'mass'])</code>（双列 DataFrame）。</p>
+    <p class="why"><strong>💡 替代写法（不依赖 plot 默认列）</strong>：</p>
+<pre><code>medians_by_decade = seen_since_1900.get(['decade', 'mass']).groupby('decade').median()
+medians_by_decade.plot(kind='line', y='mass')</code></pre>
+    <p class="why"><strong>💡 看图</strong>：2000s 那个点明显是峰。这就是后面要做假设检验的依据。</p>
+  </div>
+
+  <!-- Q6.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 6.3</span><span class="q-title"><code>simulated_medians</code>：<u>无放回</u>抽 n 颗 × 1000 次</span>
+<pre><code>n = seen_since_1900[seen_since_1900.get('decade') == 2000].shape[0]
+n = int(n)
+
+simulated_medians = np.array([])
+for i in np.arange(1000):
+    sample = seen_since_1900.sample(n, replace=False)
+    simulated_medians = np.append(simulated_medians, sample.get('mass').median())</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：<code>len(simulated_medians) == 1000</code></div>
+    <p class="why"><strong>💡 为什么 <code>replace=False</code></strong>：题目明说 "without replacement"。<u>这跟 bootstrap 反着来</u>——bootstrap 模拟"再抽一次样本"（有放回），这里模拟"在已有样本里随机选 n 个看"（无放回）。</p>
+    <p class="why"><strong>💡 为什么 <code>int(n)</code></strong>：<code>.shape[0]</code> 是 numpy int64，<code>.sample(n)</code> 偶尔要 native int。题目 hint 已说过会报 "Argument n is not an integer"。</p>
+  </div>
+
+  <!-- Q6.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 6.4</span><span class="q-title"><code>decadal_p_value</code></span>
+<pre><code>observed_2000 = seen_since_1900[
+    seen_since_1900.get('decade') == 2000
+].get('mass').median()
+
+decadal_p_value = np.count_nonzero(simulated_medians &gt;= observed_2000) / 1000</code></pre>
+    <p class="why"><strong>💡 右尾</strong>：H<sub>A</sub> 关心"2000s <u>偏高</u>"，所以模拟值 ≥ 观察值 = 极端 case。p 应该<u>很小</u>（&lt; 0.05），reject。</p>
+  </div>
+
+  <!-- Q6.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 6.5</span><span class="q-title"><code>too_low</code> — 哪些 decade <u>偏低</u> 显著？</span>
+    <p class="q-stmt">用 slider 看每个 decade 的 p-value（这次是左尾——"too low"）。把 p < 0.05 的 decade 收集到 list。</p>
+    <p class="think"><strong>💭 怎么找答案</strong>：与其拖 12 次 slider，写个循环一次跑完：</p>
+<pre><code>for d in np.arange(1900, 2020, 10):
+    n = int(seen_since_1900[seen_since_1900.get('decade') == d].shape[0])
+    obs = seen_since_1900[seen_since_1900.get('decade') == d].get('mass').median()
+    sims = np.array([
+        seen_since_1900.sample(n, replace=False).get('mass').median()
+        for _ in range(1000)
+    ])
+    p = np.count_nonzero(sims &lt;= obs) / 1000     # 左尾：偏低
+    flag = ' ← reject (&lt; 0.05)' if p &lt; 0.05 else ''
+    print(f'{d}: p = {p:.3f}{flag}')</code></pre>
+    <p class="why"><strong>💡 跑出来的结果（典型）</strong>：</p>
+<pre><code>1900: p = 0.317
+1910: p = 0.144
+1920: p = 0.673
+1930: p = 0.213
+1940: p = 0.516
+1950: p = 0.041 ← reject (&lt; 0.05)   ⬅️ 只有这一个
+1960: p = 0.632
+1970: p = 0.512
+1980: p = 0.397
+1990: p = 0.940
+2000: p = 0.966                     ⬅️ Q6.4 已证"偏高"显著，左尾自然超高
+2010: p = 0.536</code></pre>
+<pre><code>too_low = [1950]</code></pre>
+    <p class="why"><strong>💡 2000s 的 p ≈ 0.97 漂亮印证 Q6.4</strong>：<u>同一 decade，对"偏高"显著（Q6.4 拒绝），对"偏低"完全不显著（左尾 p 接近 1）</u>。这种"两边方向对偶"的关系是 hypothesis test 内部一致性的最佳例证。</p>
+    <p class="pitfall-inline"><strong>⚠️ 1950 p ≈ 0.04 很贴近边界</strong>：再跑一次（不同 random seed）可能变成 0.05–0.07，得 fail to reject、空 list。autograder 不查具体 decade（只查 "list、元素 ∈ {1900, 1910, …, 2010}"），<u>hidden test 也允许一定容差</u>。我的答案 <code>[1950]</code> 是这一次 simulation 的结果，可能与你跑出来不完全一致。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="pitfalls">⚠️ Final Project 高频陷阱（25 条）</h2>
+
+  <h3>📐 数据 & merge 类（Section 1）</h3>
+  <div class="warn">
+    <strong>陷阱 1：merge 后行数</strong><br>
+    raw_df 和 continents 行数不等 ≠ merge 后行数减少。如果 continents 覆盖了 raw_df 的所有 id，inner merge 仍保留 38094 行。<u>关键是覆盖关系</u>。
+  </div>
+  <div class="warn">
+    <strong>陷阱 2：<code>set_index</code> 位置</strong><br>
+    必须在 merge 后调用。先 set_index('id') 再 merge('id') 会找不到 id 列。
+  </div>
+  <div class="warn">
+    <strong>陷阱 3：saw_fall 是 1065 行不是 38094</strong><br>
+    Antarctica 完全没有 seen falling 的陨石——这是 Q1.3 中 <code>seen_per_continent</code> 长度 6 而<u>不是</u> 7 的原因。
+  </div>
+  <div class="warn">
+    <strong>陷阱 4：density 用 recorded 不是 seen</strong><br>
+    autograder 显式 hint："Make sure to use recorded_per_continent, not seen_per_continent"。
+  </div>
+
+  <h3>📐 概率类（Section 2）</h3>
+  <div class="warn">
+    <strong>陷阱 5：probabilities 只有 6 个洲</strong><br>
+    没有 Antarctica！如果你的函数遍历 7 个洲就会 KeyError。<u>始终用</u> <code>probabilities.index</code>。
+  </div>
+  <div class="warn">
+    <strong>陷阱 6：prob_all ≠ "都落同一个洲"</strong><br>
+    "都落到给定洲群" 包含 "落不同洲但都在群内" 的情况。Q2.5 公式是 S<sup>n</sup>，<u>不是</u> Σ p_i<sup>n</sup>。
+  </div>
+  <div class="warn">
+    <strong>陷阱 7：prob_one 公式</strong><br>
+    n · p · (1−p)<sup>n−1</sup>。<u>常见错误</u>：漏 n、写成 p·(1−p)<sup>n</sup>、或者直接用 (1−p)<sup>n−1</sup>。
+  </div>
+  <div class="warn">
+    <strong>陷阱 8：highest_prob_combination 长度 11，不是 6</strong><br>
+    autograder 检 <code>len == 11</code>。<u>不是问"哪个洲概率最大"</u>，是问"11 颗最可能的<u>组合</u>"。
+  </div>
+
+  <h3>📐 假设检验类（Section 3 + 4 + 6）</h3>
+  <div class="warn">
+    <strong>陷阱 9：TVD 必须 ÷ 2</strong><br>
+    <code>np.sum(np.abs(a-b)) / 2</code>。漏 ÷ 2 → 数字翻倍 → 跟 hidden test 不符。
+  </div>
+  <div class="warn">
+    <strong>陷阱 10：MD <u>不</u> ÷ 2</strong><br>
+    <code>np.max(np.abs(a-b))</code>。MD 是 max 不是 mean。
+  </div>
+  <div class="warn">
+    <strong>陷阱 11：TVD / MD 永远右尾</strong><br>
+    距离是非负数，"越大越奇怪"。p_value 用 <code>&gt;=</code>，绝<u>不</u>用 <code>&lt;=</code> 或绝对差。
+  </div>
+  <div class="warn">
+    <strong>陷阱 12：永远不要 "accept H<sub>0</sub>"</strong><br>
+    Q3.5 和 Q4.5 的结论用语必须是 "reject" 或 "fail to reject"。"accept" / "null is consistent" 全错。
+  </div>
+  <div class="warn">
+    <strong>陷阱 13：multinomial 返回 array 不是 Series</strong><br>
+    <code>np.random.multinomial(n, p)</code> 永远返回长度 = len(p) 的 array。在 tvd 里要兼容 array 和 Series，所以 <code>np.array(a) - np.array(b)</code>。
+  </div>
+  <div class="warn">
+    <strong>陷阱 14：observed_proportions 顺序 vs probabilities 顺序</strong><br>
+    一个是字母序，一个是 CSV 原序。<u>稳妥做法</u>：<code>observed_proportions = observed_proportions.loc[probabilities.index]</code> 重排一次。
+  </div>
+  <div class="warn">
+    <strong>陷阱 15：permutation 洗 mass 还是 continent 都行</strong><br>
+    本质是切断关联。Q4.2 hint 洗 mass，但你也可以洗 continent——结果一致。
+  </div>
+  <div class="warn">
+    <strong>陷阱 16：faster perm 不要用 <code>.assign</code> 或 <code>groupby</code></strong><br>
+    Q4.2 明确禁止——这俩慢。直接 numpy 切片：<code>shuf.take(np.arange(n_asia))</code>。
+  </div>
+  <div class="warn">
+    <strong>陷阱 17：func 接收 array 不接收 Series</strong><br>
+    <code>np.median(series)</code> 在 babypandas 报 "axis" 错。要么转 <code>np.array(series)</code>，要么 func 处理 array。
+  </div>
+  <div class="warn">
+    <strong>陷阱 18：Q6.3 必须 <code>replace=False</code></strong><br>
+    "without replacement" 跟 bootstrap 反着来。<u>无放回</u>因为 H<sub>0</sub> 是"如果在所有陨石里随机选 n 个看，median 应该和 2000s 那 n 个的 median 差不多"。
+  </div>
+  <div class="warn">
+    <strong>陷阱 19：<code>.sample(n)</code> 要 native int</strong><br>
+    <code>n = int(seen_since_1900[...].shape[0])</code>。numpy int64 偶尔报错。
+  </div>
+
+  <h3>📐 CI 类（Section 5）</h3>
+  <div class="warn">
+    <strong>陷阱 20：bootstrap CI 只能算 <u>中位数</u>，CLT CI 只能算 <u>均值</u></strong><br>
+    bootstrap 不挑统计量（中位数、均值、任何都行）；CLT 只对<u>均值</u>有效。Q5.1–5.3 是 median 必须 bootstrap，Q5.4–5.6 是 mean 必须 CLT。
+  </div>
+  <div class="warn">
+    <strong>陷阱 21：CLT 95% CI 公式</strong><br>
+    <code>[mean − 2·SD/√n, mean + 2·SD/√n]</code>。<u>SD 是 sample SD，要除 √n</u>（这是把 SD 换算成 SE）。漏 √n 是常见错误。
+  </div>
+  <div class="warn">
+    <strong>陷阱 22：<code>find_z(p)</code> 接<u>百分</u>不是小数</strong><br>
+    <code>find_z(95)</code> 不是 <code>find_z(0.95)</code>。公式 <code>norm.ppf((1 + p/100) / 2)</code>。<u>不是</u> <code>norm.ppf(p/100)</code>（那个返回单尾分位数）。
+  </div>
+  <div class="warn">
+    <strong>陷阱 23：p% bootstrap CI 的 percentile</strong><br>
+    <code>[(100−p)/2, (100+p)/2]</code>。95% → [2.5, 97.5]，80% → [10, 90]，90% → [5, 95]。
+  </div>
+  <div class="warn">
+    <strong>陷阱 24：Q5.7 选 2 不是 1</strong><br>
+    选 1 错在 "larger more likely to be seen"——seen falling 是当场看见，小陨石也能看见。选 2 强调"1980 后稳定"是关键。
+  </div>
+
+  <h3>📐 提交 & autograder 类</h3>
+  <div class="warn">
+    <strong>陷阱 25：otter 通过 ≠ 答对</strong><br>
+    grader.check 通过 = 格式对（"是 Series？长度是 6？某个值大概是多少？"）。<u>hidden tests</u> 在交卷后跑——他们检具体数值。所以即使全绿色也要自己核对。
+  </div>
+  <div class="warn">
+    <strong>陷阱 26（Q6.2 真实报错）：<code>groupby().median()</code> 不能在含字符串列的 DataFrame 上跑</strong><br>
+    错误：<code>TypeError: agg function failed [how-&gt;median, dtype-&gt;object]</code> / <code>Cannot convert ['Achiras' 'Alexandrovsky' ...] to numeric</code><br>
+    原因：median 会尝试对每一列计算，碰到 name/recclass 这种 object dtype 就崩。babypandas 没有 <code>numeric_only=True</code>。<br>
+    修法：<u>先 <code>.get(['decade', 'mass'])</code> 把字符串列剔掉</u>再 groupby。<br>
+    扩展：mean / std / var / sum 都可能踩这个坑。<code>count()</code> 不会（它本身就是计数）。所以 Q1.3 的写法 <code>.groupby('continent').count().get('name')</code> 安全。
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="templates">🧰 项目用到的 7 类代码模板速查</h2>
+
+  <h3>模板 A — merge + set_index</h3>
+<pre><code>df = raw_df.merge(other_csv, on='id').set_index('id')</code></pre>
+
+  <h3>模板 B — 独立事件概率（Section 2 通用）</h3>
+<pre><code>p_in   = sum(probs.loc[c] for c in continents)
+prob_all_in_set   = p_in ** n
+prob_none_in_set  = (1 - p_in) ** n
+prob_one_in_X     = n * p * (1 - p) ** (n - 1)
+prob_specific_order = np.prod([probs.loc[c] for c in seq])</code></pre>
+
+  <h3>模板 C — Categorical 拟合度检验（TVD/MD）</h3>
+<pre><code>def tvd(a, b):
+    return np.sum(np.abs(np.array(a) - np.array(b))) / 2
+
+def generate_proportions():
+    return np.random.multinomial(n, probabilities) / n
+
+stats = np.array([])
+for _ in np.arange(reps):
+    stats = np.append(stats, tvd(generate_proportions(), probabilities))
+
+p_value = np.count_nonzero(stats &gt;= observed_tvd) / reps   # 永远右尾</code></pre>
+
+  <h3>模板 D — 传统 permutation（慢）</h3>
+<pre><code>diffs = np.array([])
+for _ in np.arange(reps):
+    shuf = np.random.permutation(df.get('group'))
+    tmp  = df.assign(g=shuf)
+    a = tmp[tmp.get('g') == 'A'].get('val').median()
+    b = tmp[tmp.get('g') == 'B'].get('val').median()
+    diffs = np.append(diffs, a - b)</code></pre>
+
+  <h3>模板 E — Faster permutation（快 10x+）</h3>
+<pre><code>def single_diff(input_df, func):
+    n_a = (input_df.get('group') == 'A').sum()
+    shuf = np.random.permutation(input_df.get('val'))
+    return func(shuf.take(np.arange(n_a))) - func(shuf.take(np.arange(n_a, len(shuf))))</code></pre>
+
+  <h3>模板 F — Bootstrap CI（中位数等任意统计量）</h3>
+<pre><code>sub = df[df.get('group') == 'A']
+boot = np.array([])
+for _ in np.arange(2000):
+    re = sub.sample(sub.shape[0], replace=True)
+    boot = np.append(boot, re.get('val').median())
+
+ci_95 = np.percentile(boot, [2.5, 97.5])
+ci_p  = np.percentile(boot, [(100-p)/2, (100+p)/2])</code></pre>
+
+  <h3>模板 G — CLT-based CI（只能算均值）</h3>
+<pre><code>vals = df[...].get('val')
+mean = vals.mean()
+sd   = np.std(vals)
+n    = vals.count()
+
+# 95% 经验法
+ci_95 = np.array([mean - 2*sd/np.sqrt(n), mean + 2*sd/np.sqrt(n)])
+
+# 通用 p%
+def find_z(p): return norm.ppf((1 + p/100) / 2)
+z = find_z(p)
+ci_p = np.array([mean - z*sd/np.sqrt(n), mean + z*sd/np.sqrt(n)])</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="checklist">✅ 自我复述 checklist（25 项）</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① Q1.1 — merge 后行数为什么仍是 38094？inner / outer / left / right 默认是哪个？</span></label>
+    <label><input type="checkbox"><span>② Q1.3 — 为什么 <code>seen_per_continent</code> 长度是 6 不是 7？</span></label>
+    <label><input type="checkbox"><span>③ Q1.5 — 为什么选 4 不选 2？关键判断点是"后半句"还是"前半句"？</span></label>
+    <label><input type="checkbox"><span>④ Q2.1 — probabilities 为什么不包括 Antarctica？后面函数遍历哪个 list 才安全？</span></label>
+    <label><input type="checkbox"><span>⑤ Q2.5 — prob_all 公式 <code>S<sup>n</sup></code>；如果改成 "都落同一个洲"，公式变成什么？</span></label>
+    <label><input type="checkbox"><span>⑥ Q2.6 — prob_all_again 用 prob_none 实现的关键洞察是什么？补集相对于谁？</span></label>
+    <label><input type="checkbox"><span>⑦ Q2.8 — 11 颗最高概率组合为什么是 11 个 Asia？凭什么不写 for-loop？</span></label>
+    <label><input type="checkbox"><span>⑧ Q2.9 — prob_one 公式拆解：n 个互斥 case，每个 case 概率是？为什么乘 n？</span></label>
+    <label><input type="checkbox"><span>⑨ Q3.2 — 为什么用 <code>np.random.multinomial</code> 不用 for + random.choice？</span></label>
+    <label><input type="checkbox"><span>⑩ Q3.3 — TVD ÷ 2 的直觉解释？为什么 MD 不 ÷ 2？</span></label>
+    <label><input type="checkbox"><span>⑪ Q3.4 — TVD / MD 用什么尾巴算 p-value？为什么不是双侧？</span></label>
+    <label><input type="checkbox"><span>⑫ Q3.5 — 为什么不能选 1（accept）？fail to reject 跟 accept 的区别是什么？</span></label>
+    <label><input type="checkbox"><span>⑬ Q3.9 — option2 (cubic) 为什么不合法？option4 为什么不合法？</span></label>
+    <label><input type="checkbox"><span>⑭ Q4.1 — 传统 permutation 一次循环里要 shuffle 哪一列？洗 mass 和洗 continent 等价吗？</span></label>
+    <label><input type="checkbox"><span>⑮ Q4.2 — Faster perm 为什么避开 <code>.assign</code> 和 <code>.groupby</code>？慢在哪？</span></label>
+    <label><input type="checkbox"><span>⑯ Q4.4 — 直方图双峰的原因？为什么 median 不双峰？</span></label>
+    <label><input type="checkbox"><span>⑰ Q4.5 — 去掉最重那颗后 p ≈ 0.66 → 结论怎么说？outlier 的"统计学贡献"是什么？</span></label>
+    <label><input type="checkbox"><span>⑱ Q5.1 — bootstrap 三件套：sample 多少个？replace 设什么？最后用什么函数取 CI？</span></label>
+    <label><input type="checkbox"><span>⑲ Q5.3 — 哪个洲 CI 最宽？为什么？跟样本大小什么关系？</span></label>
+    <label><input type="checkbox"><span>⑳ Q5.4 — CLT 95% CI 公式三个元素：mean / SD / √n —— √n 是干什么的？</span></label>
+    <label><input type="checkbox"><span>㉑ Q5.5 — find_z(p) 公式推导：从 cdf(z) − cdf(−z) = p/100 到 norm.ppf 怎么推？</span></label>
+    <label><input type="checkbox"><span>㉒ Q5.6 — 为什么 Asia mean CI 包含<u>负数</u>？CLT 在这个数据上真的合适吗？</span></label>
+    <label><input type="checkbox"><span>㉓ Q5.7 — 为什么选 2 不选 1？1 错在哪？</span></label>
+    <label><input type="checkbox"><span>㉔ Q6.3 — 为什么 <code>replace=False</code>？跟 bootstrap 哪里反着来？为什么 H<sub>0</sub> 下要无放回？</span></label>
+    <label><input type="checkbox"><span>㉕ 整个项目里出现 4 种"假设检验"形式：(a) TVD 拟合度（Sec 3）、(b) permutation 两样本（Sec 4）、(c) 无放回抽样（Sec 6）、(d) CI 法（暗示，未直接用）。每种适用什么场景？</span></label>
+  </div>
+
+  <div class="tip" style="margin-top: 32px;">
+    <strong>🎓 学完 Final Project 你拿到了什么</strong><br>
+    这个项目把整学期"算的所有东西"过了一遍：merge / probability / multinomial 模拟 / TVD / permutation / bootstrap CI / CLT CI / 无放回 sampling test。<u>这就是为什么它叫 final project 而不是 hw 7</u>——它是<u>综合的</u>，不教新东西、只让你证明你都会。<strong>对着这份 walkthrough 把每一题口头讲一遍，能讲明白的就是你真的会了。</strong>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="12-lab2-fortune500-functions.html">⬅ 上一份：Lab 2</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a class="disabled">下一份 ➡：—（练习走完）</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

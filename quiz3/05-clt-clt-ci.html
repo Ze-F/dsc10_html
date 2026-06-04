@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 5 · CLT & CLT-based CI - DSC10 Quiz3</title>
+<style>
+  :root {
+    --bg: #fafaf7; --text: #1f2328; --muted: #57606a;
+    --accent: #0969da; --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e; --code-text: #cdd6f4;
+    --warn-bg: #fff8c5; --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff; --tip-border: #54aeff;
+    --danger-bg: #ffebe9; --danger-border: #cf222e;
+    --ok-bg: #dafbe1; --ok-border: #1a7f37;
+    --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781;
+    --border: #d0d7de; --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+  .z-table { font-family: "Menlo", "Monaco", monospace; font-size: 14px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 Quiz3 总目录</a></span>
+  <span><a href="04-chebyshev-normal.html">← 上一节</a> <a href="06-sample-size-models.html">下一节: Sample Size & Models →</a></span>
+</nav>
+
+<main>
+  <h1>Section 5 · Central Limit Theorem & CLT-based CI</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 17（The Central Limit Theorem）｜
+    <strong>Quiz3 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1 (6/7)</span>｜
+    <strong>预计学习时间</strong>：2-3 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+  <p>本节是 Quiz3 的<strong>第二个绝对核心</strong>。CLT 公式 + 反向推 SD/n 是 W26 新趋势的重心。</p>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>形式</th></tr></thead>
+    <tbody>
+      <tr><td><strong>CLT 三特征</strong>（Shape / Center / Spread）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>T/F 经典</td></tr>
+      <tr><td><strong>Square root law</strong> SD = pop_SD / √n</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>填空和反推都考</td></tr>
+      <tr><td><strong>95% CLT-based CI 公式</strong> sample_mean ± 2·SD/√n</td><td><span class="tier tier-1">⭐⭐⭐ (6/7)</span></td><td>每年填空</td></tr>
+      <tr><td><strong>反推 SD 或 n</strong>（W26 新题型）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>给 CI 宽度 + n → 求 SD</td></tr>
+      <tr><td><strong>CI 宽度 ∝ 1/√n</strong>（n 翻 4 倍 → 宽度减半）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>W26 Q4.2</td></tr>
+      <tr><td><strong>非标准置信度</strong>（92% 需查 norm.cdf）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>W26 Q4.3</td></tr>
+      <tr><td><strong>CLT 不需要 population normal</strong></td><td><span class="tier tier-2">⭐⭐</span></td><td>F24 Q2.3</td></tr>
+      <tr><td><strong>Bootstrap vs CLT 对比</strong></td><td><span class="tier tier-2">⭐⭐</span></td><td>概念T/F</td></tr>
+      <tr><td>区分 SD of data vs SD of sample mean (SE)</td><td><span class="tier tier-2">⭐⭐</span></td><td>W26 Q1.2 陷阱</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. The Central Limit Theorem (CLT) <span class="highlight">— 必背原文</span></h3>
+  <div class="ok">
+    <strong>The Central Limit Theorem says</strong>:<br>
+    The probability distribution of the <strong>sum or mean</strong> of a <strong>large random sample drawn with replacement</strong> will be <strong>roughly normal</strong>, <strong>regardless of the distribution of the population</strong> from which the sample is drawn.
+  </div>
+
+  <h4>关键词解释</h4>
+  <ul>
+    <li><strong>"sum or mean"</strong>：CLT 只适用于 sum 和 mean——不适用于 median / max / min。</li>
+    <li><strong>"large random sample"</strong>：n 需要"足够大"，通常 n ≥ 30 已可。</li>
+    <li><strong>"with replacement"</strong>：理论上有放回；但如果 population 远大于 sample，无放回也基本等价。</li>
+    <li><strong>"regardless of population distribution"</strong>：population 即使 skewed / 双峰，sample mean 仍 normal。</li>
+  </ul>
+
+  <h3>2. Distribution of the Sample Mean（必背三特征）</h3>
+
+  <table>
+    <thead><tr><th>特征</th><th>值</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Shape（形状）</strong></td><td>近似 <strong>normal</strong>，无论 population 是什么形状</td></tr>
+      <tr><td><strong>Center（中心）</strong></td><td>= <strong>population mean</strong></td></tr>
+      <tr><td><strong>Spread（宽度，SD）</strong></td><td>= <strong>population SD / √n</strong>　← <span class="highlight">Square Root Law</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="formula formula-big">
+    SD of distribution of sample means = Population SD / √(sample size)
+  </div>
+
+  <h4>样本量与 spread 的关系（必背）</h4>
+  <ul>
+    <li>n 增大 → spread <strong>减小</strong>（分布变窄）</li>
+    <li>n 变 <strong>4 倍</strong> → spread 减 <strong>1/2</strong>（即宽度减半）</li>
+    <li>n 变 <strong>9 倍</strong> → spread 减 <strong>1/3</strong></li>
+    <li>spread ∝ <strong>1/√n</strong>，不是 1/n！</li>
+  </ul>
+
+  <div class="warn">
+    <strong>⚠️ 极易错点</strong>：增大 sample size 让"<strong>sample mean 的分布</strong>"变窄。<br>
+    它<strong>不</strong>会让"原始数据本身的 SD"减小——数据本身 SD 是个体值的 spread，跟 n 无关。
+  </div>
+
+  <h3>3. Using CLT with Just <span class="highlight">One</span> Sample（核心实用工具）</h3>
+  <p><strong>问题</strong>：CLT 公式里要 population SD，但实际我们只有一个 sample，不知道 population SD。</p>
+  <p><strong>解决</strong>：用 <strong>sample SD</strong> 近似 population SD（依据：大数定律 + 大 sample）：</p>
+
+  <div class="formula">
+    SD of sample mean distribution ≈ <strong>Sample SD / √n</strong>
+  </div>
+
+  <p>所以三个数字就够了：sample mean、sample SD、sample size n。这就是 CLT 比 bootstrap 强的地方——不用反复模拟。</p>
+
+  <h3>4. CLT-based 95% Confidence Interval <span class="highlight">— 必背公式</span></h3>
+
+  <div class="formula formula-big">
+    [ sample_mean − 2 · sample_SD/√n　,　sample_mean + 2 · sample_SD/√n ]
+  </div>
+
+  <h4>为什么是 2？</h4>
+  <p>因为 normal 分布的 mean ± 2 SDs 覆盖约 95%（其实 1.96，但课程默认用 2）。</p>
+
+  <h4>例（Lec17）：sample mean = 13.008, sample SD = 28.0, n = 500</h4>
+<pre><code>SE = 28.0 / sqrt(500) ≈ 1.251
+95% CI = [13.008 - 2*1.251, 13.008 + 2*1.251]
+       = [10.51, 15.51]</code></pre>
+
+  <h3>5. General z-based CI（非 95% 置信度）</h3>
+  <div class="formula">
+    [ sample_mean − <strong>z</strong> · sample_SD/√n,　sample_mean + z · sample_SD/√n ]
+  </div>
+  <p>不同置信度对应不同 z：</p>
+
+  <table class="z-table">
+    <thead><tr><th>置信度 c%</th><th>z</th><th>怎么算 z</th></tr></thead>
+    <tbody>
+      <tr><td>50%</td><td>≈ 0.67</td><td>cdf(0.67) ≈ 0.75</td></tr>
+      <tr><td>68%</td><td>1</td><td>经验法则</td></tr>
+      <tr><td>80%</td><td>≈ 1.28</td><td>cdf(1.28) ≈ 0.90</td></tr>
+      <tr><td>90%</td><td>≈ 1.645</td><td>cdf(1.645) ≈ 0.95</td></tr>
+      <tr><td>92%</td><td>≈ 1.75</td><td>cdf(1.75) ≈ 0.96 (W26 给出)</td></tr>
+      <tr><td>95%</td><td>2 (精确 1.96)</td><td>cdf(1.96) ≈ 0.975</td></tr>
+      <tr><td>99%</td><td>≈ 2.58</td><td>cdf(2.58) ≈ 0.995</td></tr>
+    </tbody>
+  </table>
+
+  <h4>如何从置信度反推 z（W26 新趋势）</h4>
+  <div class="formula">
+    z 满足: cdf(z) = (1 + c) / 2
+  </div>
+  <p>例：92% CI → cdf(z) = (1 + 0.92) / 2 = 0.96 → z = 1.75（题目通常给 <code>norm.cdf(1.75) = 0.96</code> 这样的提示）。</p>
+
+  <h3>6. CI 宽度的反推（W26 Q4.1 新题型）</h3>
+  <p><strong>给 CI 宽度 + n + 置信度</strong>，反推 SD：</p>
+  <div class="formula">
+    Width = 2 · z · SD / √n　⇒　SD = (Width · √n) / (2z)
+  </div>
+
+  <p><strong>例（W26）</strong>：95% CI = [60.5, 100.5]，n = 25，求 SD：</p>
+<pre><code>Width = 100.5 - 60.5 = 40
+half-width = 20 = z · SD/√n = 2 · SD/√25 = 2 · SD / 5
+20 = 2·SD/5
+SD = 20 · 5 / 2 = 50</code></pre>
+
+  <h3>7. CI 宽度如何随 n 变化</h3>
+  <div class="formula">
+    Width(n) ∝ 1 / √n
+  </div>
+  <ul>
+    <li>n 变 4 倍 → √n 变 2 倍 → 宽度变 <strong>1/2</strong>（W26 Q4.2 直接考）</li>
+    <li>n 变 9 倍 → 宽度变 1/3</li>
+    <li>n 变 100 倍 → 宽度变 1/10</li>
+  </ul>
+
+  <h3>8. Bootstrap vs CLT（对比表）</h3>
+
+  <table>
+    <thead><tr><th></th><th>Bootstrap</th><th>CLT</th></tr></thead>
+    <tbody>
+      <tr><th>适用统计量</th><td>任何（mean, median, max, SD...）</td><td><strong>只</strong> mean 和 sum</td></tr>
+      <tr><th>计算成本</th><td>高（要跑 5000-10000 次）</td><td>低（只需 3 个数）</td></tr>
+      <tr><th>需要的信息</th><td>整个 sample</td><td>sample mean、sample SD、n</td></tr>
+      <tr><th>population 假设</th><td>原 sample 代表性好</td><td>n 大 + 有放回（CLT 自动保证 normal）</td></tr>
+      <tr><th>population normal?</th><td>不要求</td><td><strong>也不要求</strong>（CLT 的精髓）</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip">
+    <strong>💡 选哪个？</strong> 课程默认：能用 CLT 就用 CLT（快），要 CI for median / 其他 statistic 才用 bootstrap。
+  </div>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="danger">
+    <strong>陷阱 1 · CLT 只适用于 mean/sum，不适用于 median/max</strong><br>
+    如果题目要求 CI for population <strong>median</strong>，必须用 bootstrap，不能用 CLT 公式。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 2 · 别把 sample SD 和 SD of sample mean 搞混</strong><br>
+    <code>np.std(my_sample.get('Delay'))</code> = <strong>sample SD</strong>（数据的 spread，约等于 population SD）<br>
+    <code>np.std(my_sample.get('Delay')) / np.sqrt(n)</code> = <strong>SE</strong>（sample mean 分布的 SD）<br>
+    CI 公式里用的是 SE = sample_SD/√n。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 3 · "95% 的 sample 值在 mean ± 2·SD 内" vs "95% 的 sample mean 在 mean ± 2·SE 内"</strong><br>
+    W26 Q1.2 直接考。前者关于<strong>个体数据值</strong>（要 population normal）；后者关于<strong>sample mean</strong>（CLT 自动）。两者的 ± 半径完全不同（SE &lt;&lt; SD）。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 4 · CI 宽度 ∝ 1/√n，不是 1/n</strong><br>
+    n 变 4 倍 → 宽度<strong>减半</strong>（不是 1/4）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5 · CLT 不需要 population 是 normal</strong><br>
+    F24 Q2.3 直接考。CLT 保证的是 <strong>sample mean</strong> 接近 normal，与 population 形状无关。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6 · CLT 的 normal approximation 对个体值不成立</strong><br>
+    Population 不 normal 时，用 norm.cdf 估"个体值在某区间的比例"是错的；但估"sample mean 在某区间的概率"是对的。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7 · 增大 n 让 sampling distribution 变窄，但不会让 population SD 减小</strong><br>
+    Population SD 是 population 的固有性质，跟你怎么 sample 无关。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 8 · CLT 比 bootstrap 给出的 CI 略不同</strong><br>
+    两者都近似真实的 sampling distribution，但用不同方法。差别小，但 CI 端点可能略有不同。两者都是合理 CI。
+  </div>
+
+  <div class="tip">
+    <strong>💡 CLT 题模板</strong>：
+    <ol>
+      <li>读题找 sample mean、sample SD、n、置信度。</li>
+      <li>SE = sample_SD / √n</li>
+      <li>z 来自置信度（95% → 2；其他从 norm.cdf 查）</li>
+      <li>CI = [mean − z·SE, mean + z·SE]</li>
+    </ol>
+  </div>
+
+  <div class="tip">
+    <strong>💡 反推题模板（W26）</strong>：
+    <ul>
+      <li>已知宽度 W、n、z，求 SD：<code>SD = W · √n / (2z)</code></li>
+      <li>已知 SD、想要的宽度 W，求 n：<code>n = (2z · SD / W)²</code>（Section 6 sample size 公式）</li>
+      <li>n 从 n₁ 变 n₂，宽度变化倍数：<code>√(n₁/n₂)</code></li>
+    </ul>
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 3 · Problem 2.1（CLT 95% CI 标准计算）</div>
+    <p>You collect a sample of n = 400 whingdingdillies. Sample mean = 30 m, sample SD = 4 m. Find the endpoints of a CLT-based 95% confidence interval for the mean height.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：[29.6, 30.4]</strong></p>
+<pre><code>SE = 4 / sqrt(400) = 4/20 = 0.2
+95% CI = [30 - 2·0.2, 30 + 2·0.2]
+       = [29.6, 30.4]</code></pre>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2024 Quiz 4 · Problem 3.4（CLT 95% CI · 数字版）</div>
+    <p>Given <code>my_sample.get("rating").mean() == 61.25</code> and <code>np.std(my_sample.get("rating")) == 15</code>, with sample size n = 400, find the endpoints of a 95% CLT-based CI for the mean rating.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：[59.75, 62.75]</strong></p>
+<pre><code>SE = 15 / sqrt(400) = 15/20 = 0.75
+95% CI = [61.25 - 2·0.75, 61.25 + 2·0.75]
+       = [59.75, 62.75]</code></pre>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 4.1（反推 SD · 新趋势）</div>
+    <p>Ray calculated a 95% CLT-based CI for the population mean of plays per song: <strong>[60.5, 100.5]</strong>. If the sample size used was <strong>25 songs</strong>, what is the SD of Ray's plays? Give a number or "not enough information."</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：SD = 50</strong></p>
+<pre><code>Width = 100.5 - 60.5 = 40
+half-width = 20 = z · SD / √n
+           = 2 · SD / √25 = 2·SD / 5
+20 = 2·SD/5
+SD = 50</code></pre>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 4.2（宽度 vs n 的反比例平方根）</div>
+    <p>If Ray increases the sample size from 25 to 100, how does the width of his 95% CLT-based CI change?</p>
+    <ul>
+      <li>(A) Doubles　(B) Halves　(C) Becomes 1/4 as wide　(D) Stays the same</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(B) Halves</strong></p>
+      <p>n 从 25 → 100，<strong>变 4 倍</strong> → √n 变 2 倍 → width ∝ 1/√n → 变 <strong>1/2</strong>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 4.3（92% CI · 非标准置信度）</div>
+    <p>Given <code>stats.norm.cdf(1.75) = 0.96</code>, calculate the endpoints of a <strong>92%</strong> CLT-based CI for Ray's population mean. (Sample mean = 80.5, SD = 50, n = 25 from 4.1.)</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：[63.0, 98.0]</strong></p>
+<pre><code>z 满足 cdf(z) = (1+0.92)/2 = 0.96 → z = 1.75
+SE = 50 / √25 = 10
+half-width = 1.75 · 10 = 17.5
+CI = [80.5 - 17.5, 80.5 + 17.5] = [63.0, 98.0]</code></pre>
+      <p>关键技巧：c% CI 的 z 由 <code>cdf(z) = (1+c)/2</code> 得到。题目通常给你 <code>norm.cdf(z) = ...</code> 提示。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 4.4（99% vs 95% 宽度对比）</div>
+    <p>If Ray then constructs a 99% CLT-based CI from the same data. Select all that could be possible:</p>
+    <ul>
+      <li>99% CI is wider than 95%</li>
+      <li>99% CI is smaller than 95%</li>
+      <li>They have the same width</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：仅"99% CI is wider than 95%"</strong></p>
+      <p>同一份数据，z(99%) ≈ 2.58 &gt; z(95%) = 2，所以 99% CI <strong>严格更宽</strong>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 3 · Problem 2.3（CLT 不需要 normal）</div>
+    <p>2.1 = CLT-based CI for mean height（n=400）; 2.2 = use normal CDF to estimate proportion of <strong>individuals</strong> in [30, 33]. For which part(s) did we need the assumption that heights are normally distributed?</p>
+    <ul><li>(A) 2.1 only　(B) 2.2 only　(C) both　(D) neither</li></ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(B) 2.2 only</strong></p>
+      <p>CLT 自动保证 sample mean 的分布近似 normal，与 population 形状无关。所以 2.1 (CI for mean) <strong>不</strong>需要 population normal。<br>2.2 估个体值比例，需要个体值分布是 normal。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 3 · Problem 2.4（直方图对比 n=400 vs n=900）</div>
+    <p>You bootstrap from a sample of size 400 (vs hypothetically size 900). Which overlaid histogram (Option A, B, or C) correctly shows the two bootstrap distributions?</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：n=900 那张应该比 n=400 那张更窄且更高（density 总和=1，窄 → 高）。center 不变。</strong></p>
+      <p>原理：CLT 的 square root law —— SD ∝ 1/√n。900/400 = 9/4 → √(9/4) = 3/2 → n=900 的宽度是 n=400 的 2/3。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Quiz 3 · Problem 2.2（一词回答）</div>
+    <p>500 SRS × 100 students 的 sample mean 分布画了直方图。现在换成 500 SRS × <strong>1000</strong> students——直方图会有什么变化？用<strong>一个词</strong>回答。</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：Narrower</strong>（也可以是 thinner / tighter）</p>
+      <p>n 从 100 → 1000，spread 缩小 √10 倍 → narrower。center 不变。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 1.2（关键陷阱：SD vs SE）</div>
+    <p>We expect that approximately 95% of all <strong>sample means</strong> lie within 2 standard deviations of the population mean.</p>
+    <ul>
+      <li>(A) Yes, due to CLT　(B) Yes, due to Chebyshev's　(C) No, due to CLT　(D) No, due to Chebyshev's</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(A) Yes, due to CLT</strong>（⚠️ 措辞陷阱 — 官方答案）</p>
+      <p><strong>官方解读</strong>：CLT → sample means 的分布近似 normal；对该 normal 分布，95% 的值在距 mean ± 2 个 SD 内。题目"2 standard deviations of the population mean"中的"SDs"按官方解读 = <strong>sample means 分布的 SD（即 SE = pop_SD/√n）</strong>，不是 population SD。所以 95% 的 sample means 在 pop_mean ± 2·SE 内 → 由 CLT 保证 → 答 Yes。</p>
+      <p class="warn"><strong>⚠️ 陷阱提醒</strong>：第一直觉很可能答 (C) No, due to CLT（理由：把 SDs 当成 population SD，95% sample means 集中在更窄的 ± 2 SE 内）。这条逻辑本身没错，但官方判 (A) Yes——因为他们把"the standard deviations" 默认解读为 "the SD of the relevant distribution"（讨论 sample means 时即 SE）。<strong>务必记住：这道题答 Yes, due to CLT</strong>。</p>
+      <p>核心考点：<strong>分清 SD（个体数据）和 SE（sample mean 分布的 SD）</strong>。这里 CLT 给的"2 SDs"实际意味着 2·SE。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 3 · Problem 2.3（综合 T/F）</div>
+    <p>True/False:</p>
+    <ul>
+      <li>(C) We could instead use the CLT to construct a CI for the population mean from this same sample.</li>
+      <li>(D) The SD of <code>geisel_sample</code> ≈ SD of the full <code>geisel</code> population.</li>
+      <li>(F) The data in <code>geisel_sample</code> is roughly normally distributed.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p class="tip"><strong>注</strong>：本题为讲义改编版（从官方 6 选项中挑了 (C)(D)(F) 三项作 T/F 练习）。<strong>官方原题</strong>共 6 选项，<strong>官方答案 = Option 4 + Option 5</strong>（即"could also use CLT"、"sample SD ≈ pop SD"——对应我们这里的 (C) 和 (D)，(F) 是 false 干扰项之一）。完整原题见 <code>practice_site/wi25-quiz3/index.html</code> Problem 2.3。</p>
+      <p><strong>(C) ✅ True</strong>：用 CLT 比 bootstrap 还快，只要统计量是 mean 就可以。</p>
+      <p><strong>(D) ✅ True</strong>：大数定律告诉我们 sample SD ≈ pop SD（前提是 sample 不太小）。这是 CLT 实用化的关键依据。</p>
+      <p><strong>(F) ❌ False</strong>：CLT 保证 <strong>sample mean</strong> 近似 normal，<strong>不</strong>保证 sample 本身（个体值的分布）是 normal。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Lec17 Activity（z 反推）</div>
+    <p>What value of z should we use to create an <strong>80%</strong> CI? <strong>90%</strong>?</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>80% CI</strong>: cdf(z) = (1+0.80)/2 = 0.90 → z ≈ 1.28</p>
+      <p><strong>90% CI</strong>: cdf(z) = (1+0.90)/2 = 0.95 → z ≈ 1.645</p>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍，能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>陈述 <strong>CLT 原文</strong>：sum/mean of large random sample with replacement → roughly normal, regardless of population.</span></label>
+    <label><input type="checkbox"><span>说出 sample mean 分布的 <strong>三特征</strong>：Shape、Center、Spread 分别是什么。</span></label>
+    <label><input type="checkbox"><span>背出 <strong>square root law</strong>：SD of sample mean = pop_SD / √n。</span></label>
+    <label><input type="checkbox"><span>解释为什么 n 变 4 倍 → 宽度变 1/2（不是 1/4）。</span></label>
+    <label><input type="checkbox"><span>默写 95% CLT-based CI 公式：[mean − 2·SD/√n, mean + 2·SD/√n]。</span></label>
+    <label><input type="checkbox"><span>解释为什么实际能用 sample SD 代替 pop SD。</span></label>
+    <label><input type="checkbox"><span>给 mean=30, SD=4, n=400，能不查代码算出 95% CI = [29.6, 30.4]。</span></label>
+    <label><input type="checkbox"><span>给 CI = [60.5, 100.5], n=25，能反推 SD = 50。</span></label>
+    <label><input type="checkbox"><span>给 cdf(1.75) = 0.96 提示，能造 <strong>92%</strong> CI。</span></label>
+    <label><input type="checkbox"><span>解释通用公式: z 由 cdf(z) = (1+c)/2 得来。</span></label>
+    <label><input type="checkbox"><span>判断: "CLT 要求 population normal" —— True or False？</span></label>
+    <label><input type="checkbox"><span>判断: "CLT 可以给 median 造 CI" —— True or False？</span></label>
+    <label><input type="checkbox"><span>解释 SD of data 与 SE (SD of sample mean) 的区别。</span></label>
+    <label><input type="checkbox"><span>对比 Bootstrap 和 CLT 的 Pro / Con。</span></label>
+    <label><input type="checkbox"><span>解释 99% CI 为什么<strong>必</strong>比 95% CI 宽（同一份数据）。</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="04-chebyshev-normal.html">← 上一节</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="06-sample-size-models.html">下一节: Sample Size & Models →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

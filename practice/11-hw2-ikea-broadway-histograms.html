@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 11 · HW 2 — IKEA · Broadway · Histograms · DSC10</title>
+<style>
+  :root { --bg:#fafaf7; --text:#1f2328; --muted:#57606a; --accent:#0969da; --code-bg:#1e1e2e; --code-text:#cdd6f4; --warn-bg:#fff8c5; --warn-border:#d4a72c; --tip-bg:#ddf4ff; --tip-border:#54aeff; --ok-bg:#dafbe1; --ok-border:#1a7f37; --tier-1:#cf222e; --tier-2:#bf8700; --tier-3:#6e7781; --border:#d0d7de; }
+  * { box-sizing: border-box; } html { scroll-behavior: smooth; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.7; font-size:16px; }
+  .nav-top, .nav-bottom { background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:14px; flex-wrap:wrap; gap:8px; }
+  .nav-bottom { border-bottom:none; border-top:1px solid var(--border); margin-top:60px; }
+  .nav-top a, .nav-bottom a { color:var(--accent); text-decoration:none; margin-right:16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration:underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color:var(--muted); cursor:not-allowed; text-decoration:none; }
+  main { max-width:880px; margin:0 auto; padding:32px 24px 60px; }
+  h1 { font-size:28px; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:22px; margin-top:48px; border-left:4px solid var(--accent); padding-left:12px; }
+  p, ul, ol { margin:12px 0; } ul, ol { padding-left:28px; } li { margin:4px 0; }
+  code { font-family:"Menlo","Monaco","Consolas",monospace; background:#eef0f2; padding:2px 6px; border-radius:4px; font-size:14px; color:#cf222e; }
+  pre { background:var(--code-bg); color:var(--code-text); padding:16px; border-radius:8px; overflow-x:auto; font-size:14px; line-height:1.5; margin:16px 0; }
+  pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:14px; }
+  .tier { display:inline-block; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:600; margin-right:8px; }
+  .tier-1 { background:#ffebe9; color:var(--tier-1); border:1px solid #ffcecb; }
+  .tier-2 { background:#fff8c5; color:var(--tier-2); border:1px solid #d4a72c; }
+  .meta { background:#f6f8fa; border-left:4px solid var(--accent); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .warn { background:var(--warn-bg); border-left:4px solid var(--warn-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .tip { background:var(--tip-bg); border-left:4px solid var(--tip-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .ok { background:var(--ok-bg); border-left:4px solid var(--ok-border); padding:10px 14px; margin:12px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .q-block { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:18px 0; }
+  .q-id { display:inline-block; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:4px; margin-right:10px; letter-spacing:0.5px; }
+  .q-title { font-size:15px; font-weight:600; }
+  .why { margin:8px 0; font-size:14px; } .why strong { color:#1f883d; }
+  .checklist { background:#f0f9ff; border:1px solid #54aeff; border-radius:8px; padding:16px 20px; }
+  .checklist label { display:block; margin:8px 0; cursor:pointer; user-select:none; }
+  .checklist input[type="checkbox"] { margin-right:8px; transform:scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration:line-through; color:var(--muted); }
+  .toc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:24px 0; }
+  .toc ul { list-style:none; padding-left:0; } .toc li { margin:4px 0; } .toc a { color:var(--accent); text-decoration:none; }
+  .crosslink { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:20px 0; font-size:14px; }
+  .crosslink h4 { margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600; }
+  .crosslink ul { margin:4px 0; padding-left:20px; } .crosslink a { color:var(--accent); text-decoration:none; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="10-lab3-dataframes-control-probability.html">⬅ 上一份：Lab 3</a> | <a href="12-lab2-fortune500-functions.html">下一份 ➡：Lab 2</a></span>
+</nav>
+
+<main>
+  <h1>Practice 11 · HW 2 — IKEA, Broadway, Density Histograms</h1>
+  <p class="meta">
+    <strong>对应模块</strong>：Midterm（前 5 节内容） ｜ <strong>主题</strong>：DataFrame indexing & 布尔过滤、字符串方法、groupby + sort + index[0]、density histograms 解读 ｜ <strong>预计时长</strong>：2 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#sec1">📚 Section 1 — IKEA（Q1.1–1.8）查询 + groupby 入门</a></li>
+      <li><a href="#sec2">📚 Section 2 — Broadway Bound（Q2.1–2.10）综合</a></li>
+      <li><a href="#sec3">📚 Section 3 — Final Stretch（Q3.1–3.3）density histogram 读图</a></li>
+      <li><a href="#pitfalls">⚠️ 典型陷阱</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链：</h4>
+    <ul>
+      <li>DataFrame 索引、布尔过滤 → <a href="../midterm/01-dataframes-indexing.html">midterm/01-dataframes-indexing</a></li>
+      <li>查询、groupby、字符串 → <a href="../midterm/02-querying-groupby.html">midterm/02-querying-groupby</a></li>
+      <li>Density histogram → <a href="../midterm/03-visualization-histograms.html">midterm/03-visualization-histograms</a></li>
+    </ul>
+  </div>
+
+  <h2 id="sec1">📚 Section 1 — IKEA</h2>
+
+  <div class="q-block"><span class="q-id">Q 1.1</span><span class="q-title">取 6 列</span>
+<pre><code>ikea = ikea_full.get(['name', 'item_id', 'category', 'price', 'short_description', 'height'])</code></pre>
+    <p class="why"><strong>💡 <code>.get([list])</code> 返回 DataFrame</strong>（保留多列）。<code>.get('col')</code> 返回 Series。区别<u>必背</u>。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.2</span><span class="q-title">"shelving"（不区分大小写）+ 按 price 排序</span>
+<pre><code>shelves = ikea[ikea.get('short_description').str.lower().str.contains('shelving')].sort_values(by='price')</code></pre>
+    <p class="why"><strong>💡 <code>.str.lower().str.contains('shelving')</code></strong>：先全部转小写，再查找 'shelving'。处理 "Shelving" / "SHELVING" / "shelving" 都能命中。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.3</span><span class="q-title">双条件过滤（AND）</span>
+<pre><code>no_eket = shelves[(shelves.get('category') == 'Tables &amp; desks') & (shelves.get('name') != 'EKET')]</code></pre>
+    <p class="why"><strong>💡 babypandas 双条件</strong>：<code>&</code> 不是 <code>and</code>。每条件外加括号（<code>==</code> 优先级低于 <code>&</code>）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.4</span><span class="q-title">不是最贵也不是最便宜</span>
+<pre><code>max_price = no_eket.get('price').max()
+min_price = no_eket.get('price').min()
+middle = no_eket[(no_eket.get('price') != max_price) & (no_eket.get('price') != min_price)]
+final_choice = middle.get('item_id').iloc[0]</code></pre>
+    <p class="why"><strong>💡 <code>!= max & != min</code></strong>：双重排除。<code>.iloc[0]</code> 取任意一个（中间可能有多个，任选）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.5</span><span class="q-title">OR 过滤 + 排除 height ≤ 0</span>
+<pre><code>chairs_sofas = ikea[((ikea.get('category') == 'Chairs') |
+                     (ikea.get('category') == 'Sofas &amp; armchairs')) &
+                    (ikea.get('height') &gt; 0)]
+chairs_sofas.plot(kind='hist', y='height', density=True, ec='w')</code></pre>
+    <p class="why"><strong>💡 <code>|</code> 不是 <code>or</code></strong>。OR 在外层用括号包起来，跟 AND 一起作用。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.6</span><span class="q-title">[75, 100] 之间的比例</span>
+<pre><code>prop = ((chairs_sofas.get('height') &gt;= 75) & (chairs_sofas.get('height') &lt;= 100)).sum() / chairs_sofas.shape[0]</code></pre>
+    <p class="why"><strong>💡 bool Series 的 .sum()</strong>：True 当 1。所以 sum / total = 比例。等价 <code>.mean()</code>。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.7</span><span class="q-title"><code>typical_prices</code>：category → median price</span>
+<pre><code>typical_prices = ikea.get(['category', 'price']).groupby('category').median()</code></pre>
+    <p class="why"><strong>💡 先 .get([..]) 再 groupby</strong>：保证 median 只对数值列运算（前几个 walkthrough 已强调）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.8</span><span class="q-title">按 median price 升序 → array of categories</span>
+<pre><code>ranked_categories = np.array(typical_prices.sort_values(by='price').index)</code></pre>
+    <p class="why"><strong>💡 <code>np.array(df.index)</code></strong>：把 index 转 numpy array。<code>.index</code> 不带括号（是属性不是方法）。</p>
+  </div>
+
+  <h2 id="sec2">📚 Section 2 — Broadway Bound</h2>
+
+  <div class="q-block"><span class="q-id">Q 2.1</span><span class="q-title">收入最高的 show</span>
+<pre><code>show_revenue = broadway.groupby('Show').sum()
+most_revenue_show = show_revenue.sort_values(by='Weekly Gross', ascending=False).index[0]</code></pre>
+    <p class="why"><strong>💡 模板</strong>：groupby + sum + sort_values(desc) + <code>.index[0]</code>。<u>每年</u> midterm 都考。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.2</span><span class="q-title">在 Broadway 演最多周的 show</span>
+<pre><code>show_weeks = broadway.groupby('Show').count()
+most_weeks_show = show_weeks.sort_values(by='Week Ending', ascending=False).index[0]</code></pre>
+    <p class="why"><strong>💡 用 count 数行数</strong>：每个 show 在 broadway 中的行数 = 它在榜的周数。注意 sort_values 任意一列即可（count 后所有列值相同）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.3</span><span class="q-title">加 AvgTicket 列</span>
+<pre><code>broadway = broadway.assign(AvgTicket=broadway.get('Weekly Gross') / broadway.get('Seats Sold'))</code></pre>
+    <p class="why"><strong>💡 Series 算术广播</strong>。<code>列 / 列</code> 是逐行除法。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.4</span><span class="q-title">Wicked 的 AvgTicket 折线图</span>
+<pre><code>wicked = broadway[broadway.get('Show') == 'Wicked']
+wicked.plot(kind='line', x='Week Ending', y='AvgTicket')</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.5</span><span class="q-title">提取月份字符串</span>
+<pre><code>with_month = broadway.assign(Month=broadway.get('Week Ending').str.split('-').str.get(1))</code></pre>
+    <p class="why"><strong>💡 链式字符串方法</strong>：日期 'YYYY-MM-DD' → <code>.str.split('-')</code> 拆成 list-like → <code>.str.get(1)</code> 取第二个元素 = MM 字符串。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.6</span><span class="q-title">月度平均 + 最贵月份</span>
+<pre><code>monthly_avg = with_month.get(['Month', 'AvgTicket']).groupby('Month').mean()
+monthly_avg.plot(kind='line', y='AvgTicket')
+most_expensive = monthly_avg.sort_values(by='AvgTicket', ascending=False).index[0]</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.7</span><span class="q-title">Theatre proportion of performances</span>
+<pre><code>total_perf = broadway.get('Performances').sum()
+theatre_perf = broadway.groupby('Theatre').sum().get(['Performances'])
+theatre_proportions = (theatre_perf
+    .assign(Proportion=theatre_perf.get('Performances') / total_perf)
+    .get(['Proportion'])
+    .sort_values(by='Proportion', ascending=False))</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.8</span><span class="q-title">Hamilton density histogram，宽度 $250K</span>
+<pre><code>hamilton = broadway[broadway.get('Show') == 'Hamilton']
+hamilton.plot(kind='hist', y='Weekly Gross', density=True, ec='w',
+             bins=np.arange(0, hamilton.get('Weekly Gross').max() + 250000, 250000))</code></pre>
+    <p class="why"><strong>💡 bins=np.arange(start, stop, step)</strong>。<code>stop + step</code> 是为了把 max 也包含进去（arange 右端开）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.9</span><span class="q-title">从图读 $3M–$3.25M 比例</span>
+<pre><code>prop_between = 0.35</code></pre>
+    <p class="why"><strong>💡 density × width = proportion</strong>。柱高（density） ≈ 1.4×10⁻⁶；宽度 = 250,000。乘起来 = 0.35。<u>必背</u>：density histogram 的 area = proportion。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.10</span><span class="q-title">单词 show 名称占比</span>
+<pre><code>show_counts = broadway.groupby('Show').count()
+total_shows = show_counts.shape[0]
+show_names  = show_counts.reset_index().get('Show')
+one_word = (~show_names.str.contains(' ')).sum() / total_shows</code></pre>
+    <p class="why"><strong>💡 <code>~</code> 取反</strong>：bool Series 的逐元素 NOT。"不含空格" = "单个单词"。</p>
+  </div>
+
+  <h2 id="sec3">📚 Section 3 — Final Stretch（直方图读图）</h2>
+
+  <div class="q-block"><span class="q-id">Q 3.1</span><span class="q-title">Histogram A 来自哪行代码？</span>
+<pre><code>which_code = 4   # data.plot(kind='hist', density=True, y='y')</code></pre>
+    <p class="why"><strong>💡 三个线索</strong>：
+      <ul>
+        <li>X 轴范围 2-10 → 跟 y 列的范围匹配 → <code>y='y'</code></li>
+        <li>Y 轴是小数（最高 0.35）→ <code>density=True</code>（如果 density=False，Y 轴是 count，应该是整数）</li>
+      </ul>
+    </p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.2</span><span class="q-title">x ÷ 5 后 histogram 的变化</span>
+<pre><code>histogram_difference = 3   # narrower &amp; taller</code></pre>
+    <p class="why"><strong>💡 area = 1 守恒</strong>：x 范围压缩 5 倍 → histogram <u>窄</u> 5 倍。为了保持<u>面积 = 1</u>（density），高必须放大 5 倍 → <u>高</u> 5 倍。<u>这是 density histogram 的核心性质</u>。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.3</span><span class="q-title">Histogram B 中 [-4, -2) 占多少？</span>
+<pre><code>percent_between = 3   # 27%</code></pre>
+    <p class="why"><strong>💡 用 area</strong>：[-4, -3) 高 ≈ 0.125，[-3, -2) 高 ≈ 0.15。各宽 1。area = 0.125×1 + 0.15×1 = 0.275 ≈ <strong>27%</strong>。</p>
+  </div>
+
+  <h2 id="pitfalls">⚠️ 典型陷阱</h2>
+  <div class="warn"><strong>陷阱 1</strong>：<code>&</code> / <code>|</code> 不是 <code>and</code> / <code>or</code>，每条件外加括号。</div>
+  <div class="warn"><strong>陷阱 2</strong>：<code>.str.contains</code> 默认 regex=True——简单查找加 <code>regex=False</code> 安全（HW 2 这题不要求，但好习惯）。</div>
+  <div class="warn"><strong>陷阱 3</strong>：先 <code>.get([...])</code> 再 groupby（含非数值列时）。</div>
+  <div class="warn"><strong>陷阱 4</strong>：<code>.index</code> 是属性<u>不带括号</u>。</div>
+  <div class="warn"><strong>陷阱 5</strong>：density × width = proportion（Q2.9, Q3.3）。永远不能直接读 density 值当 proportion。</div>
+  <div class="warn"><strong>陷阱 6</strong>：x ÷ 5 → narrower 5x + taller 5x（area=1 守恒）。</div>
+
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① <code>.get('col')</code> vs <code>.get(['col'])</code> 返回什么？为什么区分？</span></label>
+    <label><input type="checkbox"><span>② <code>.str.lower().str.contains('x')</code> 处理大小写不敏感查找的标准模式？</span></label>
+    <label><input type="checkbox"><span>③ <code>.str.split('-').str.get(1)</code> 怎么从 'YYYY-MM-DD' 提取月份？</span></label>
+    <label><input type="checkbox"><span>④ 模板：找"最 X 的 group" = groupby + agg + sort + .index[0]。复述一遍。</span></label>
+    <label><input type="checkbox"><span>⑤ density histogram：area = proportion。Q2.9 怎么从高 1.4×10⁻⁶ 算出 0.35？</span></label>
+    <label><input type="checkbox"><span>⑥ Q3.2：横轴压缩 5 倍，纵轴怎么变？为什么？area=1 守恒？</span></label>
+    <label><input type="checkbox"><span>⑦ <code>~bool_series</code> 取反；为什么 Q2.10 用 ~contains(' ') 数"单词"？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="10-lab3-dataframes-control-probability.html">⬅ 上一份：Lab 3</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="12-lab2-fortune500-functions.html">下一份 ➡：Lab 2</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

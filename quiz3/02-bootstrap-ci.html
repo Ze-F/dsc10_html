@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 2 · Bootstrap & Confidence Intervals - DSC10 Quiz3</title>
+<style>
+  :root {
+    --bg: #fafaf7; --text: #1f2328; --muted: #57606a;
+    --accent: #0969da; --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e; --code-text: #cdd6f4;
+    --warn-bg: #fff8c5; --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff; --tip-border: #54aeff;
+    --danger-bg: #ffebe9; --danger-border: #cf222e;
+    --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781;
+    --border: #d0d7de; --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 10px 16px; margin: 12px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; }
+  .ci-table { font-family: "Menlo", "Monaco", monospace; font-size: 14px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 Quiz3 总目录</a></span>
+  <span><a href="01-distributions-sampling.html">← 上一节</a> <a href="03-ci-interpretation-spread.html">下一节: CI解读&Spread →</a></span>
+</nav>
+
+<main>
+  <h1>Section 2 · Bootstrap & Confidence Intervals</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 14（Bootstrapping and Confidence Intervals）｜
+    <strong>Quiz3 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1 (7/7)</span>｜
+    <strong>预计学习时间</strong>：2-3 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+  <p>本节是 Quiz3 的<strong>绝对核心</strong>。<strong>7/7 历年 Quiz 3 都考</strong>。每次都有 bootstrap loop 填空题，以及构造对应置信度的 CI。</p>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>形式</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Bootstrap loop 代码填空</strong></td><td><span class="tier tier-1">⭐⭐⭐ (7/7)</span></td><td>每次都考。固定模板，背下来</td></tr>
+      <tr><td><strong>构造 c% CI：找对应的 percentile</strong></td><td><span class="tier tier-1">⭐⭐⭐ (7/7)</span></td><td>95% → 2.5/97.5；90% → 5/95；80% → 10/90</td></tr>
+      <tr><td><strong>"Bootstrap distribution 近似的是什么"</strong></td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>= sampling distribution of the sample statistic</td></tr>
+      <tr><td><strong>为什么 with replacement</strong></td><td><span class="tier tier-2">⭐⭐</span></td><td>否则每个 resample 都相同</td></tr>
+      <tr><td><strong>Bootstrap 必须从 sample 采样</strong></td><td><span class="tier tier-2">⭐⭐</span></td><td>从 population 采不叫 bootstrap (F24 Q1.2)</td></tr>
+      <tr><td><strong><code>np.percentile(arr, p)</code> 用法</strong></td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>左右端点都用这个函数</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. 为什么需要 Bootstrap？</h3>
+  <p><strong>问题</strong>：我们有一个 sample（如 500 个员工工资），算出 sample statistic（如 sample median）。但 statistic 是随机的——换一个 sample 答案会不同。我们想知道<strong>"如果换一个 sample，估计值能差多远"</strong>。</p>
+
+  <p><strong>理想做法</strong>：从 population 反复抽 sample → 算很多次 statistic → 看分布。<br>
+  <strong>但</strong>：现实里我们只有<strong>一个</strong> sample，没法回到 population 再抽。</p>
+
+  <div class="tip">
+    <strong>💡 关键洞察</strong>：<strong>sample 看起来很像 population</strong>。所以我们可以<strong>把 sample 当作 population</strong>，从 sample 里 with replacement 再抽 sample——这就是 <strong>bootstrapping</strong>。
+  </div>
+
+  <h3>2. Bootstrap 的精确定义</h3>
+  <p><strong>Bootstrapping = 从 sample（不是 population！）中 with replacement 抽取与原 sample 同样大小的 resample。</strong></p>
+
+  <p>每个 resample 算一次 statistic，重复 N 次（通常 5000-10000），得到 statistic 的<strong>经验分布</strong>，叫 <strong>bootstrap distribution</strong>。</p>
+
+  <h3>3. 为什么必须 <code>with replacement</code>？</h3>
+  <p>如果 <strong>without replacement</strong>，每次 resample 都会选出 sample 里的<strong>所有元素</strong>（顺序可能不同），但内容一模一样 → statistic 永远不变 → 完全没用。</p>
+<pre><code># Without replacement（错误示范）
+# 原 sample = [7, 9, 4]，每次都返回 [7,9,4] 的某个排列
+# 三个数的 median 永远 = 7
+
+# With replacement（正确）
+# 可能得到 [9,4,9] → median = 9
+# 可能得到 [4,4,9] → median = 4
+# 可能得到 [7,4,7] → median = 7
+# 不同 resample 给不同 statistic ✓</code></pre>
+
+  <div class="tip">
+    <strong>🤔 常见困惑：「抽 n 次，不就会把 sample 里每个人都抽一遍吗？只有一种结果？」</strong><br><br>
+    <strong>不会。</strong>关键在「with replacement」——每次抽都是<strong>独立</strong>地从原 sample 里随便挑一个，所以同一个 individual 可以被抽<strong>多次</strong>，也可能<strong>一次都没被抽到</strong>。<br><br>
+    原 sample = <code>[A, B, C]</code>（n=3），抽 3 个：可能 <code>[A,A,A]</code> / <code>[A,B,B]</code> / <code>[C,A,C]</code> / <code>[A,B,C]</code> / <code>[B,B,A]</code> / ... 总共 <strong>3³ = 27</strong> 种。<br><br>
+    <strong>「每个 individual 恰好被抽一次」的概率 = n! / nⁿ：</strong>
+    <ul style="margin:6px 0 0 0;">
+      <li>n=3：6/27 ≈ <strong>22%</strong></li>
+      <li>n=10：≈ <strong>0.036%</strong></li>
+      <li>n=100：≈ 10⁻⁴²（几乎不可能）</li>
+    </ul>
+    <p style="margin-top:8px;">所以当 sample 不太小（n ≥ 几十），<strong>几乎每次 resample 都和原 sample 不同</strong>——有些个体重复、有些缺席。这正是 bootstrap 能模拟「从 population 反复抽 sample」的关键：<strong>差异性来自 with replacement，而不是来自"抽得不全"</strong>。</p>
+  </div>
+
+  <h3>4. <span class="highlight">Bootstrap 标准模板（必背！）</span></h3>
+
+<pre><code>np.random.seed(38)  # 老师代码里常见，考试不要求
+
+n_resamples = 5000
+boot_stats = np.array([])
+
+for i in np.arange(n_resamples):
+    # 1. Resample from my_sample WITH REPLACEMENT, same size
+    resample = my_sample.sample(my_sample.shape[0], replace=True)
+
+    # 2. Compute statistic on this resample
+    stat = resample.get('column').median()  # 或 mean / 其他
+
+    # 3. Store it
+    boot_stats = np.append(boot_stats, stat)</code></pre>
+
+  <div class="warn">
+    <strong>三个必背要点</strong>：
+    <ol>
+      <li><code>.sample(<strong>n</strong>, replace=True)</code> 的 <strong>n</strong> 必须是 <strong>原 sample 大小</strong>（通常写 <code>my_sample.shape[0]</code> 或题目给的 sample_size）</li>
+      <li><code>replace=True</code> 不能漏</li>
+      <li>累加用 <code>boot_stats = np.append(boot_stats, stat)</code>——<strong>必须重新赋值</strong></li>
+    </ol>
+  </div>
+
+  <h3>5. Percentiles（百分位数）</h3>
+  <p><strong>定义</strong>：<code>p</code>th percentile 是一个数，<strong>≥ 数据中至少 p% 的值</strong>。</p>
+<pre><code>np.percentile(array, p)  # array 不需要事先排序
+
+np.percentile([4, 6, 9, 2, 7], 50)  # 6.0（即 median）
+np.percentile([2, 4, 6, 7, 9], 50)  # 6.0（排过序结果一样）</code></pre>
+
+  <h3>6. 构造 c% Confidence Interval（CI）</h3>
+  <p><strong>步骤</strong>：</p>
+  <ol>
+    <li>把 boot_stats 的中间 <strong>c%</strong> 取出来。</li>
+    <li>左右两端各砍掉 <strong>(100 − c) / 2</strong> 百分点。</li>
+  </ol>
+
+<pre><code># 95% CI（最常见）
+left  = np.percentile(boot_stats, 2.5)
+right = np.percentile(boot_stats, 97.5)
+ci = [left, right]</code></pre>
+
+  <h4>各置信度对应的百分位（必背）</h4>
+  <table class="ci-table">
+    <thead><tr><th>Confidence c%</th><th>每端砍掉 (100−c)/2 %</th><th>左 percentile</th><th>右 percentile</th></tr></thead>
+    <tbody>
+      <tr><td>99%</td><td>0.5%</td><td>0.5</td><td>99.5</td></tr>
+      <tr><td>95%</td><td>2.5%</td><td>2.5</td><td>97.5</td></tr>
+      <tr><td>92%</td><td>4%</td><td>4</td><td>96</td></tr>
+      <tr><td>90%</td><td>5%</td><td>5</td><td>95</td></tr>
+      <tr><td>88%</td><td>6%</td><td>6</td><td>94</td></tr>
+      <tr><td>85%</td><td>7.5%</td><td>7.5</td><td>92.5</td></tr>
+      <tr><td>80%</td><td>10%</td><td>10</td><td>90</td></tr>
+      <tr><td>50%</td><td>25%</td><td>25</td><td>75</td></tr>
+    </tbody>
+  </table>
+  <div class="tip"><strong>口诀</strong>：左 percentile = (100−c)/2，右 percentile = 100 − 左 = (100+c)/2。</div>
+
+  <h3>7. Bootstrap distribution 近似的是什么？</h3>
+  <p>这是<strong>极高频概念题</strong>（W26 Q3.4 直接考）。答案：</p>
+  <div class="formula">
+    Bootstrap distribution of a statistic ≈ <strong>sampling distribution / probability distribution of that statistic</strong>
+  </div>
+  <p>它<strong>不是</strong>：</p>
+  <ul>
+    <li>❌ population distribution（不是单个 value 的分布）</li>
+    <li>❌ probability distribution of population（同上）</li>
+    <li>❌ distribution of parameters（parameter 是固定数，没有分布）</li>
+  </ul>
+
+  <h3>8. 完整流程示例（Lec14 San Diego salary）</h3>
+<pre><code># Setup: we have ONE sample of 500 employees
+my_sample = population.sample(500)
+sample_median = my_sample.get('TotalWages').median()  # 82508.0
+
+# Bootstrap
+np.random.seed(38)
+n_resamples = 5000
+boot_medians = np.array([])
+for i in range(n_resamples):
+    resample = my_sample.sample(500, replace=True)
+    median = resample.get('TotalWages').median()
+    boot_medians = np.append(boot_medians, median)
+
+# 95% CI for population median
+left  = np.percentile(boot_medians, 2.5)   # 70671.5
+right = np.percentile(boot_medians, 97.5)  # 86405.0
+ci = [left, right]
+
+# 解读: "A 95% confidence interval for the population median
+#         is $70,671.50 to $86,405."</code></pre>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="danger">
+    <strong>陷阱 1 · 漏 <code>replace=True</code></strong><br>
+    Bootstrap 必须 with replacement。漏掉 = 每个 resample 都是原 sample 的排列 = statistic 永远不变。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 2 · resample 大小错</strong><br>
+    必须等于<strong>原 sample 大小</strong>（不是 population 大小，不是 100）。若题目说 sample 有 500 个，<code>sample(500, replace=True)</code>。常见错误是写 <code>.sample(1000, ...)</code>。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 3 · Percentile 算错</strong><br>
+    90% CI 不是 <code>np.percentile(arr, 10)</code> 和 <code>np.percentile(arr, 90)</code>——其实就是 5/95！记忆口诀：(100−c)/2 和 (100+c)/2。<br>
+    ✅ 90% → 5, 95<br>
+    ✅ 80% → 10, 90（注意：80% 才是 10/90）<br>
+    ✅ 85% → 7.5, 92.5<br>
+    ✅ 88% → 6, 94<br>
+    ✅ 92% → 4, 96
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 4 · 从 population 采样不叫 bootstrap</strong><br>
+    F24 Q1.2 直接考。Bootstrap 严格意义是<strong>从 sample 中</strong>再采样。如果你"有 population 的所有数据"还做 <code>.sample(n, replace=True)</code>，那也只是普通采样，不是 bootstrap。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5 · 累加忘记重新赋值</strong><br>
+    <code>np.append(boot_stats, stat)</code> 不会修改原数组；必须 <code>boot_stats = np.append(boot_stats, stat)</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6 · "bootstrap distribution 是 distribution of population values" — False</strong><br>
+    Boot 分布是 <strong>statistic</strong> 的分布，不是 individual values 的分布。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7 · "boot_means 是 distribution of parameters" — False</strong><br>
+    Parameter 是固定数，没有分布；分布的是<strong>统计量</strong>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 8 · CI 宽度与置信度的关系</strong><br>
+    更高置信度 → 区间更宽（包住更多）<br>
+    更低置信度 → 区间更窄<br>
+    举例: 99% CI > 95% CI > 80% CI（同一份数据）
+  </div>
+
+  <div class="tip">
+    <strong>💡 关于解读 CI 的陷阱</strong>，详见 Section 3。Section 2 重点是<strong>构造</strong> CI（找 percentile），Section 3 是<strong>解读</strong> CI（避开那些"X% chance"的错误说法）。
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2025 Quiz 3 · Problem 1.1（Bootstrap 填空 · 含 subset）</div>
+    <p>Setup：<code>cats</code> 是 sample，含 <code>name, breed, treats, sleepy</code>。我们想构造 sample 中"获得 ≥10 个 treat 的 sleepy 猫的比例"的 bootstrap 分布。</p>
+<pre><code>n_resamples = 5000
+boot_props = np.array([])
+for i in np.arange(n_resamples):
+    resample = cats.sample(__(a)__, replace=__(b)__)
+    subset = resample[__(c)__]
+    prop = subset.shape[0] / resample.shape[0]
+    boot_props = np.append(boot_props, prop)</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(a)</strong> <code>cats.shape[0]</code>（resample 必须等于原 sample 大小）</p>
+      <p><strong>(b)</strong> <code>True</code></p>
+      <p><strong>(c)</strong> <code>(resample.get('sleepy')) &amp; (resample.get('treats') >= 10)</code>（注意用 <code>&amp;</code>、用 <code>resample</code> 不是 <code>cats</code>，每个条件加括号）</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2025 Quiz 3 · Problem 1.2（90% CI percentile）</div>
+    <p>承上：要从 <code>boot_props</code> 构造一个 <strong>90%</strong> bootstrap confidence interval，填空：</p>
+<pre><code>left  = np.percentile(boot_props, __(a)__)
+right = np.percentile(boot_props, __(b)__)</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(a)</strong> <code>5</code>　<strong>(b)</strong> <code>95</code></p>
+      <p>90% CI: 砍掉两端各 5%。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Quiz 3 · Problem 2.1（Bootstrap 函数填空）</div>
+    <p>函数 <code>boot_meal_price</code> 应该返回意大利餐厅 meal_price 的 bootstrap sample mean（一个值）。<code>restaurants</code> 是 sample，含 <code>cuisine</code> 列。</p>
+<pre><code>def boot_meal_price():
+    italian = __(a)__
+    return italian.sample(__(b)__, __(c)__).get(__(d)__).mean()</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(a)</strong> <code>restaurants[restaurants.get('cuisine') == 'Italian']</code></p>
+      <p><strong>(b)</strong> <code>italian.shape[0]</code></p>
+      <p><strong>(c)</strong> <code>replace=True</code></p>
+      <p><strong>(d)</strong> <code>'meal_price'</code></p>
+      <p>常考组合：先按某条件过滤出 subset，再对 subset 做 bootstrap。注意 resample size = <strong>subset 大小</strong>，不是原 DataFrame 大小！</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Quiz 3 · Problem 2.2（88% CI · 不常见置信度）</div>
+    <p>跑 <code>boot_meal_price</code> 10000 次得到 array <code>boot_means</code>。构造一个 <strong>88%</strong> confidence interval：</p>
+<pre><code>left  = np.percentile(boot_means, __(a)__)
+right = np.percentile(boot_means, __(b)__)</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(a)</strong> <code>6</code>　<strong>(b)</strong> <code>94</code></p>
+      <p>88% CI: (100−88)/2 = 6%，所以左 6、右 94。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Quiz 3 · Problem 1.1（estimate_attendance）</div>
+    <p>从 <code>concerts</code> sample 中估计 mean attendance，写一个 bootstrap helper 函数：</p>
+<pre><code>def estimate_attendance():
+    return concerts.sample(__(a)__).get(__(b)__).mean()</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(a)</strong> <code>concerts.shape[0], replace=True</code></p>
+      <p><strong>(b)</strong> <code>'attendance'</code></p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Quiz 3 · Problem 1.2（85% CI）</div>
+    <p>构造 <strong>85%</strong> CI：</p>
+    <details>
+      <summary>显示答案</summary>
+      <p>左 = <code>np.percentile(boot_means, 7.5)</code>，右 = <code>np.percentile(boot_means, 92.5)</code>。</p>
+      <p>(100−85)/2 = 7.5。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 3 · Problem 2.1（SRS + Bootstrap 95% CI）</div>
+    <p>从 <code>geisel</code> DataFrame（含所有 Geisel 学生）取 SRS of 50，然后构造 95% CI for mean study hours。填空：</p>
+<pre><code>my_sample = geisel.sample(__(a)__)
+n_resamples = 10000
+boot_means = np.array([])
+for i in np.arange(n_resamples):
+    resample = my_sample.sample(__(b)__, replace=__(c)__)
+    boot_means = np.append(boot_means, resample.get('hours').mean())
+ci = [np.percentile(boot_means, __(d)__),
+      np.percentile(boot_means, __(e)__)]</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(a)</strong> <code>50</code>　<strong>(b)</strong> <code>50</code>　<strong>(c)</strong> <code>True</code>　<strong>(d)</strong> <code>2.5</code>　<strong>(e)</strong> <code>97.5</code></p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 3 · Problem 2.2（角色辨析）</div>
+    <p>在 bootstrap 代码里：</p>
+<pre><code>for i in np.arange(n_resamples):
+    resample = my_sample.sample(50, replace=True)
+    x = resample.get('hours').mean()
+    boot_means = np.append(boot_means, x)
+# y = histogram of boot_means</code></pre>
+    <p>(a) <code>x</code> 是什么？　(b) <code>y</code>（boot_means 的 histogram）是什么？</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(a) x</strong>：a statistic computed from a single resample（这是 <em>sample mean of one bootstrap resample</em>）。</p>
+      <p><strong>(b) y</strong>：an <strong>empirical distribution of the sample mean</strong>（即 bootstrap distribution），<strong>近似</strong> sampling/probability distribution of the sample mean。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 3.1（Bootstrap resample 填空）</div>
+    <p>对 <code>ray_playlist</code>（Ray 的 sample of songs）做 bootstrap：</p>
+<pre><code>resample = ray_playlist.sample(__(a)__, replace=True)</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(a)</strong> <code>ray_playlist.shape[0]</code></p>
+      <p>不能写常数（题没告诉你大小）；必须用 <code>.shape[0]</code> 表达"原 sample 大小"。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 3.2（80% CI · 反直觉百分位）</div>
+    <p>从 <code>boot_means</code> 构造一个 <strong>80%</strong> bootstrap confidence interval：</p>
+<pre><code>left  = np.percentile(boot_means, __(a)__)
+right = np.percentile(boot_means, __(b)__)</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(a)</strong> <code>10</code>　<strong>(b)</strong> <code>90</code></p>
+      <p>反直觉点：很多人误以为 80% CI 是 percentile 20/80。其实砍掉两端各 (100−80)/2 = 10%，所以 10/90。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 3.4（Bootstrap 分布近似的是什么）</div>
+    <p>After generating 1000 bootstrap means, the distribution of <code>boot_means</code> approximates...</p>
+    <ul>
+      <li>(A) the sampling distribution of the sample mean</li>
+      <li>(B) the population distribution</li>
+      <li>(C) the empirical distribution of the population</li>
+      <li>(D) the probability distribution of a single observation</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(A)</strong> the sampling distribution of the sample mean（即 probability distribution of the sample mean）。</p>
+      <p>不是 population distribution（那是 individual values 的分布，不是 mean 的分布）。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2024 Quiz 4 · Problem 3.1（SRS + Bootstrap）</div>
+    <p>从 <code>oscars</code> DataFrame 取 SRS of 400，然后 10000 次 bootstrap sample means of <code>rating</code>：</p>
+<pre><code>my_sample = __(x)__
+n_resamples = 10000
+boot_means = np.array([])
+for i in np.arange(n_resamples):
+    resample = __(y)__
+    mean = __(z)__
+    boot_means = np.append(boot_means, mean)</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(x)</strong> <code>oscars.sample(400)</code>（SRS = without replacement，default）</p>
+      <p><strong>(y)</strong> <code>my_sample.sample(400, replace=True)</code></p>
+      <p><strong>(z)</strong> <code>resample.get('rating').mean()</code></p>
+      <p>注意 (x) 不能写 <code>.sample(400, replace=True)</code>——题目要 SRS。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 3 · Problem 2.4（直方图对比）</div>
+    <p>展示两张 overlaid 的 bootstrap mean histograms：一张用 sample size 400，一张用 sample size 900（都从同一 population 取 SRS 后 bootstrap）。问哪张较窄？哪张 center 相同？</p>
+    <details>
+      <summary>显示答案</summary>
+      <p>n=900 的 histogram <strong>更窄</strong>（更小 spread）。两张 center 相近（都接近 population mean）。<strong>不会</strong> shifted left/right。</p>
+      <p>原理：sample mean 的 sampling distribution 的 SD = pop_SD / √n（详见 Section 5 CLT）。所以 n 越大 → spread 越小。</p>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍，能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>解释 <strong>为什么</strong> 我们需要 bootstrap：现实只有一个 sample，无法回到 population 多采样。</span></label>
+    <label><input type="checkbox"><span>说出 <strong>"key insight"</strong>：sample 看起来像 population，所以从 sample 重采样 ≈ 从 population 采样。</span></label>
+    <label><input type="checkbox"><span>写出 <strong>bootstrap loop 完整模板</strong>（无参考），包含 <code>.sample(n, replace=True)</code>、计算统计量、<code>np.append</code> 累加。</span></label>
+    <label><input type="checkbox"><span>解释为什么 bootstrap 必须 <code>replace=True</code>（否则每个 resample 都一样，没用）。</span></label>
+    <label><input type="checkbox"><span>resample 的大小应该等于什么？（原 sample 大小，<code>my_sample.shape[0]</code>）</span></label>
+    <label><input type="checkbox"><span>背出常用置信度对应的 percentile：99% / 95% / 90% / 88% / 85% / 80%。</span></label>
+    <label><input type="checkbox"><span>推导公式：c% CI 的 percentile 是 (100−c)/2 和 (100+c)/2。</span></label>
+    <label><input type="checkbox"><span>解释 <code>boot_means</code> 的 histogram 是<strong>什么</strong>分布，它<strong>近似</strong>什么分布。（empirical / sampling distribution of sample mean）</span></label>
+    <label><input type="checkbox"><span>判断: 「从 population 中 with replacement 采样叫 bootstrap」—— True or False？为什么？</span></label>
+    <label><input type="checkbox"><span>判断: 「bootstrap distribution 是 distribution of population values」—— True or False？</span></label>
+    <label><input type="checkbox"><span>判断: 「99% CI 比 95% CI 窄」—— True or False？为什么？</span></label>
+    <label><input type="checkbox"><span>如果题目说"先过滤出 Italian restaurants 再 bootstrap"，resample size 应该用什么 <code>.shape[0]</code>？（subset 的，不是原 df 的）</span></label>
+    <label><input type="checkbox"><span>能默写出: 用 <code>np.percentile(boot_stats, p)</code> 取左右端点的两行代码。</span></label>
+    <label><input type="checkbox"><span>解释: 大数定律告诉我们 <code>n_resamples</code> 越大，bootstrap 分布越接近什么？（true sampling distribution）</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="01-distributions-sampling.html">← 上一节</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="03-ci-interpretation-spread.html">下一节: CI解读&Spread →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

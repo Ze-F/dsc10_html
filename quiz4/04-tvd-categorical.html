@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 4 · TVD for Categorical Distributions - DSC10 Quiz4</title>
+<style>
+  :root { --bg: #fafaf7; --text: #1f2328; --muted: #57606a; --accent: #0969da; --accent-bg: #ddf4ff; --code-bg: #1e1e2e; --code-text: #cdd6f4; --warn-bg: #fff8c5; --warn-border: #d4a72c; --tip-bg: #ddf4ff; --tip-border: #54aeff; --danger-bg: #ffebe9; --danger-border: #cf222e; --ok-bg: #dafbe1; --ok-border: #1a7f37; --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781; --border: #d0d7de; --q-bg: #f6f8fa; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📕 Quiz4 总目录</a></span>
+  <span><a href="03-pvalues-decisions.html">← 上一节</a> <a href="05-ci-as-hypothesis-test.html">下一节: CI as Test →</a></span>
+</nav>
+
+<main>
+  <h1>Section 4 · TVD for Categorical Distributions</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 20-21（Total Variation Distance） ｜
+    <strong>Quiz 4 出现率</strong>：<span class="tier tier-2">⭐⭐ Tier 2</span>（Fa24、Wi26、Sp24 Q5 都直接考） ｜
+    <strong>预计学习时间</strong>：1 小时
+  </p>
+
+  <div class="meta">
+    <strong>🎯 本节定位</strong>：TVD 是"用 categorical distribution 做 hypothesis test"时的 test statistic。本节核心要做到三件事：(1) 会按手算 TVD（很简单的公式）；(2) 知道它<strong>只用于 categorical distribution</strong>（Wi26 Q4 P6 直接考）；(3) 会按代码模板跑一个 TVD test（Sp24 Q5 P2 直接考）。
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 真题 &amp; 练习</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>一句话</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>TVD 公式</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td><code>np.abs(dist1 - dist2).sum() / 2</code></td>
+      </tr>
+      <tr>
+        <td>TVD <strong>只</strong>用于 categorical distribution</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>Wi26 Q4 P6 直接考；Lec 21 summary 强调"NOT used for permutation tests"</td>
+      </tr>
+      <tr>
+        <td>"除以 2" 的原因</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>over-representation 总量 = under-representation 总量；两者相等，所以除以 2 表示"距离"</td>
+      </tr>
+      <tr>
+        <td>TVD ∈ [0, 1]</td>
+        <td><span class="tier tier-3">⭐</span></td>
+        <td>0 = 两个分布完全一样；1 = 完全无 overlap</td>
+      </tr>
+      <tr>
+        <td>用 TVD 做 hypothesis test 的模板</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>multinomial 生成 categorical sample → 算 TVD → 重复</td>
+      </tr>
+      <tr>
+        <td>TVD 是 test stat 时只看右尾</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>TVD 非负，大 = 更不同。p-value 总是 <code>np.count_nonzero(tvds &gt;= obs) / N</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. TVD 是什么</h3>
+
+  <div class="formula formula-big">
+    Total Variation Distance (TVD)<br>
+    = sum of absolute differences of proportions, divided by 2
+  </div>
+
+  <p>对两个 categorical distribution（同样 k 个类别，按相同顺序排）：</p>
+
+  <div class="formula">
+    TVD(dist1, dist2) = Σ|dist1[i] − dist2[i]| / 2
+  </div>
+
+  <p>用 numpy 一行写：</p>
+
+  <pre><code>def total_variation_distance(dist1, dist2):
+    return np.abs(dist1 - dist2).sum() / 2</code></pre>
+
+  <h3>2. 手算示例（Lec 20 Alameda jury）</h3>
+
+  <table>
+    <thead><tr><th>Ethnicity</th><th>Eligible (dist1)</th><th>Panels (dist2)</th><th>Difference</th><th>|Difference|</th></tr></thead>
+    <tbody>
+      <tr><td>Asian</td><td>0.15</td><td>0.26</td><td>+0.11</td><td>0.11</td></tr>
+      <tr><td>Black</td><td>0.18</td><td>0.08</td><td>−0.10</td><td>0.10</td></tr>
+      <tr><td>Latino</td><td>0.12</td><td>0.08</td><td>−0.04</td><td>0.04</td></tr>
+      <tr><td>White</td><td>0.54</td><td>0.54</td><td>0.00</td><td>0.00</td></tr>
+      <tr><td>Other</td><td>0.01</td><td>0.04</td><td>+0.03</td><td>0.03</td></tr>
+      <tr><td colspan="3"><strong>Sum</strong></td><td><strong>0</strong>（永远 = 0）</td><td><strong>0.28</strong></td></tr>
+    </tbody>
+  </table>
+
+  <p>TVD = 0.28 / 2 = <strong>0.14</strong>。</p>
+
+  <h3>3. 为什么除以 2</h3>
+
+  <p>注意三个事实：</p>
+  <ol>
+    <li>两个 distribution 都是 proportion，<strong>各自和 = 1</strong>。</li>
+    <li>所以差值 (dist2 − dist1) 的<strong>和 = 0</strong>。</li>
+    <li>正差值之和 = 负差值之和的绝对值（互补）。</li>
+  </ol>
+
+  <p>具体到 Alameda 例子：</p>
+  <ul>
+    <li><strong>正差值</strong>（Panels 比 Eligible 多的类别）：Asian +0.11、Other +0.03 → 总 over-representation = 0.14</li>
+    <li><strong>负差值</strong>（Panels 比 Eligible 少的类别）：Black −0.10、Latino −0.04 → 总 under-representation = 0.14</li>
+  </ul>
+
+  <p>正负两边数值<strong>必然相等</strong>。所以 <code>sum(|diff|)</code> 会把这个 0.14 算<em>两次</em>。除以 2 才是真正的"距离"。</p>
+
+  <h3>4. TVD 的几何含义</h3>
+
+  <div class="tip">
+    <strong>三种等价说法（任选一种背）</strong>：
+    <ul>
+      <li>TVD = total amount of <strong>over-representation</strong> across all categories</li>
+      <li>TVD = total amount of <strong>under-representation</strong> across all categories</li>
+      <li>TVD = "half of the sum of absolute differences" between two categorical distributions</li>
+    </ul>
+  </div>
+
+  <h3>5. ⭐ TVD <strong>只</strong>用于 categorical distribution</h3>
+
+  <div class="danger">
+    <strong>这是 Wi26 Q4 P6 的精确考点。考试给的选项里：</strong>
+    <ul>
+      <li>❌ "TVD 是两个 group 的均值差" —— 错（那是 difference in means）</li>
+      <li>❌ "TVD 是两个分布的距离"（不说明类型）—— <strong>错</strong>，太泛</li>
+      <li>❌ "TVD 是两个 numerical distribution 的距离" —— 错</li>
+      <li>✅ "TVD 是两个 <strong>categorical</strong> distribution 的距离" —— <strong>对</strong></li>
+    </ul>
+  </div>
+
+  <p>为什么不能用于 numerical？因为 numerical 是连续的，没有"类别比例"概念。TVD 公式 <code>Σ|p1 − p2|</code> 在 numerical 上没意义。</p>
+
+  <p>这也是 Lec 22 强调的："<strong>TVD is not used for permutation tests</strong>" —— permutation test 通常处理两个数值 sample（如 smokers' baby weights vs non-smokers'），不能用 TVD。permutation test 该用 difference of means / abs diff of means。</p>
+
+  <h3>6. TVD 作为 test statistic 的特性</h3>
+
+  <ul>
+    <li><strong>TVD ≥ 0</strong>（绝对值的和）—— 永远非负</li>
+    <li><strong>TVD ≤ 1</strong>（两个分布完全无 overlap 时为 1）</li>
+    <li>TVD = 0 当且仅当两个分布完全相同</li>
+    <li><strong>所以 p-value 看右尾</strong>：TVD 越大 → 越不像 null（"分布相同"）→ alt 越可能</li>
+  </ul>
+
+  <p class="meta">📌 注意：TVD 自带 abs 性质，<strong>不需要再加 abs</strong>。直接看大值偏 alt。</p>
+
+  <h3>7. 用 TVD 做 hypothesis test 的代码模板</h3>
+
+  <p>套路：null = "panels 是从 eligible distribution 随机抽的"，test stat = TVD between sample distribution and eligible distribution。</p>
+
+  <pre><code># Setup
+eligible = np.array([0.15, 0.18, 0.12, 0.54, 0.01])  # 5 categories
+observed_panel = np.array([0.26, 0.08, 0.08, 0.54, 0.04])
+n = 1453  # sample size
+
+def total_variation_distance(dist1, dist2):
+    return np.abs(dist1 - dist2).sum() / 2
+
+# Step 1: observed TVD
+observed_tvd = total_variation_distance(observed_panel, eligible)  # 0.14
+
+# Step 2: simulate under null
+tvds = np.array([])
+for i in np.arange(10000):
+    sample_counts = np.random.multinomial(n, eligible)
+    sample_dist = sample_counts / n                              # 转 proportion
+    new_tvd = total_variation_distance(sample_dist, eligible)
+    tvds = np.append(tvds, new_tvd)
+
+# Step 3: p-value（TVD 看右尾）
+p_value = np.count_nonzero(tvds &gt;= observed_tvd) / 10000
+# Alameda 案例里 ≈ 0.0 → reject null</code></pre>
+
+  <h3>8. 一图速记（背在脑子里）</h3>
+
+  <div class="tip">
+    Categorical hypothesis test 三步：
+    <ol>
+      <li><code>np.random.multinomial(n, null_dist) / n</code> → 一次模拟的 sample distribution</li>
+      <li><code>total_variation_distance(sample, null_dist)</code> → 一次 TVD</li>
+      <li><code>np.count_nonzero(tvds &gt;= observed_tvd) / N</code> → p-value</li>
+    </ol>
+  </div>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <h3>陷阱 1：⭐ 忘了除以 2</h3>
+  <p>很多人写成 <code>np.abs(d1 - d2).sum()</code> —— 这<strong>不是 TVD</strong>，是"sum of absolute differences"。考试代码题里这两个会作为对比选项出现。</p>
+
+  <h3>陷阱 2：⭐ TVD 用于 numerical 数据</h3>
+  <p>Smoking &amp; birth weight、bike prices、Patriots pressure drops 这些都是 numerical → <strong>不能用 TVD</strong>。要用 difference of (sample) means / medians。</p>
+
+  <h3>陷阱 3：忘了把 counts 转 proportion</h3>
+  <p><code>np.random.multinomial(1453, eligible)</code> 返回 <em>counts</em>（如 [220, 260, ...]），不是 proportion！要算 TVD 必须先 <code>/ 1453</code>。<br>
+  Sp24 Q5 P2.1 的代码框就在考这里 —— 必须填 <code>np.random.multinomial(500, proposed) / 500</code>。</p>
+
+  <h3>陷阱 4：两个 distribution 类别顺序不一致</h3>
+  <p>TVD 假设两个 array <strong>按相同顺序排</strong>对应类别。如果一个是 [Asian, Black, ...]，另一个是 [Black, Asian, ...]，结果就错了。</p>
+
+  <h3>陷阱 5：把 TVD 当 difference of means</h3>
+  <p>Wi26 Q4 P6 干扰选项之一 "TVD 是 group mean 的差"。<strong>错</strong>。Group mean 的差是 difference of means，用于 permutation test；TVD 是 categorical 分布的距离。</p>
+
+  <h3>陷阱 6：用 TVD 时还加 abs</h3>
+  <p>TVD 内部已经 abs 了。Test stat 写成 <code>abs(observed_tvd)</code> 等于多此一举（TVD 本来就 ≥ 0）。不算错但多余。</p>
+
+  <h3>陷阱 7：TVD 的 p-value 用左尾</h3>
+  <p><strong>错</strong>。TVD 大 = 分布不同（偏 alt） → 永远是<strong>右尾</strong> <code>&gt;=</code>。考试选项里会有干扰的左尾版本，<strong>立刻排除</strong>。</p>
+
+  <h3>陷阱 8：把 sample size 和 distribution 长度搞混</h3>
+  <p><code>np.random.multinomial(<strong>500</strong>, [0.15, 0.20, 0.40, 0.20, 0.05])</code> —— 500 是 sample size（题目里 bikes 有 500 行），<strong>不是</strong> 5（类别数）。</p>
+
+  <h2 id="problems">📝 真题 &amp; 练习</h2>
+
+  <h3>真题 1：Fa24 Q4 P3 ⭐⭐（手算 TVD）</h3>
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 4, Problem 3 (Lec 21)</div>
+    <p>Jack 和 Eric 各自看过的电影分布如下：</p>
+    <table>
+      <thead><tr><th></th><th>Musical</th><th>Comedy</th><th>Action</th><th>Horror</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><td>Jack</td><td>2</td><td>14</td><td>2</td><td>2</td><td>20</td></tr>
+        <tr><td>Eric</td><td>55</td><td>15</td><td>15</td><td>15</td><td>100</td></tr>
+      </tbody>
+    </table>
+    <p>求 Jack 和 Eric 的"genre 分布"之间的 TVD。</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p>先把 counts 转 proportions（必须！）：</p>
+      <table>
+        <thead><tr><th></th><th>Musical</th><th>Comedy</th><th>Action</th><th>Horror</th></tr></thead>
+        <tbody>
+          <tr><td>Jack</td><td>2/20 = 0.10</td><td>14/20 = 0.70</td><td>2/20 = 0.10</td><td>2/20 = 0.10</td></tr>
+          <tr><td>Eric</td><td>55/100 = 0.55</td><td>15/100 = 0.15</td><td>15/100 = 0.15</td><td>15/100 = 0.15</td></tr>
+          <tr><td>|diff|</td><td>0.45</td><td>0.55</td><td>0.05</td><td>0.05</td></tr>
+        </tbody>
+      </table>
+      <p>Σ|diff| = 0.45 + 0.55 + 0.05 + 0.05 = 1.10</p>
+      <p><strong>TVD = 1.10 / 2 = 0.55</strong></p>
+      <p class="warn">陷阱：忘了 / 2 会答 1.10；忘了转 proportion 会答 51 / 2（用 counts 算）—— 都错。</p>
+    </details>
+  </div>
+
+  <h3>真题 2：Wi26 Q4 P6 ⭐⭐⭐（TVD 定义选项陷阱）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 4, Problem 6 (Lec 20)</div>
+    <p>下面哪个是 TVD 的正确描述？</p>
+    <ol type="A">
+      <li>The difference between two group means.</li>
+      <li>A measure of how different two distributions (of any type) are.</li>
+      <li>A measure of how different two <strong>numeric</strong> distributions are.</li>
+      <li>A measure of how different two <strong>categorical</strong> distributions are.</li>
+      <li>The proportion of simulated statistics that are at least as extreme as observed.</li>
+      <li>The width of a 95% confidence interval.</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：D</strong>。</p>
+      <ul>
+        <li>A 错：是 difference of means。</li>
+        <li>B 错：缺少"categorical"限制，太泛。</li>
+        <li>C 错：方向反了，TVD 不能用于 numeric。</li>
+        <li>D 对。</li>
+        <li>E 错：这是 p-value 的定义。</li>
+        <li>F 错：这是 CI width。</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>真题 3：Sp24 Q5 P2 ⭐⭐（TVD 完整 hypothesis test）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Quiz 5, Problem 2 (Lec 21)</div>
+    <p>Bikes 500 行，5 种 style。Proposed: [0.15, 0.20, 0.40, 0.20, 0.05]。Observed: [0.20, 0.20, 0.30, 0.20, 0.10]。用 TVD 测：</p>
+    <pre><code>def total_variation_distance(distr1, distr2):
+    return __(a)__
+
+proposed = np.array([0.15, 0.20, 0.40, 0.20, 0.05])
+observed = np.array([0.20, 0.20, 0.30, 0.20, 0.10])
+tvds = np.array([])
+for i in np.arange(10000):
+    simulated = np.random.multinomial(__(b)__, __(c)__) / 500
+    new_tvd = total_variation_distance(__(d)__, __(e)__)
+    tvds = np.append(tvds, new_tvd)
+
+observed_tvd = total_variation_distance(__(f)__, __(g)__)
+
+# 哪个是正确的 p-value？
+# A. np.count_nonzero(tvds >= observed_tvd) / len(observed)
+# B. np.count_nonzero(tvds >= observed_tvd) / len(tvds)
+# C. np.count_nonzero(tvds <= observed_tvd) / len(observed)
+# D. np.count_nonzero(tvds <= observed_tvd) / len(tvds)</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <ul>
+        <li>(a) <code>np.abs(distr1 - distr2).sum() / 2</code></li>
+        <li>(b) <code>500</code>（sample size）</li>
+        <li>(c) <code>proposed</code>（null 假设下的分布）</li>
+        <li>(d), (e) <code>simulated, proposed</code>（或反过来；TVD 对称）</li>
+        <li>(f), (g) <code>observed, proposed</code>（同样可以反过来）</li>
+        <li>p-value: <strong>B</strong>（<code>tvds &gt;= observed_tvd</code> 右尾、分母用 <code>len(tvds)</code>）</li>
+      </ul>
+      <p class="warn">陷阱：(b) 容易写成 5（类别数）—— 错；要写 500 (sample size)。p-value 选项里 C/D 用 <code>&lt;=</code> 是干扰，TVD 永远右尾。A/C 分母用 <code>len(observed)</code>（=5），也是干扰。</p>
+    </details>
+  </div>
+
+  <h3>练习 4：判断该用 TVD 还是 difference of means</h3>
+  <div class="q-block">
+    <div class="q-source">综合判断</div>
+    <p>下列每个场景，写出适合的 test statistic（TVD / abs diff of means / diff of means / 其他）：</p>
+    <ol>
+      <li>Alameda County 5 种 ethnicity 的 panel 是否随机</li>
+      <li>Smokers vs non-smokers' baby weights 是否同分布</li>
+      <li>Patriots vs Colts 的 pressure drop（数值）是否一样</li>
+      <li>Movies 中 Comedy/Action/Horror/Musical 4 类是否符合预期比例</li>
+      <li>Bikes 价格在 road vs hybrid 间是否有差（permutation）</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <ol>
+        <li><strong>TVD</strong>（categorical 比较）</li>
+        <li><strong>Difference of means</strong>（numeric, two-sample）</li>
+        <li><strong>Difference of means</strong>（numeric）</li>
+        <li><strong>TVD</strong>（categorical）</li>
+        <li><strong>Difference of means</strong>（permutation 涉及 numeric data）</li>
+      </ol>
+      <p class="tip">📌 一句话规则：<em>categorical 比较</em> → TVD；<em>numeric 两 sample 比较</em> → diff (or abs diff) of means / medians。</p>
+    </details>
+  </div>
+
+  <h3>练习 5：手算 TVD</h3>
+  <div class="q-block">
+    <div class="q-source">综合练习</div>
+    <p>计算下列两个分布的 TVD：</p>
+    <p>Dist1 (DSC 10): [0.45 Freshman, 0.35 Sophomore, 0.15 Junior, 0.05 Senior+]</p>
+    <p>Dist2 (DSC 40A): [0.15 Freshman, 0.35 Sophomore, 0.35 Junior, 0.15 Senior+]</p>
+    <details>
+      <summary>显示答案</summary>
+      <p>|diff|: |0.45−0.15| + |0.35−0.35| + |0.15−0.35| + |0.05−0.15| = 0.30 + 0 + 0.20 + 0.10 = 0.60</p>
+      <p><strong>TVD = 0.60 / 2 = 0.30</strong></p>
+      <p>（这道题是 Lec 20 / 21 的 concept check）</p>
+    </details>
+  </div>
+
+  <h3>练习 6：TVD = 0 / TVD = 1 的极端情况</h3>
+  <div class="q-block">
+    <div class="q-source">综合理解</div>
+    <ol>
+      <li>什么情况下 TVD = 0？</li>
+      <li>什么情况下 TVD = 1？给一个例子。</li>
+      <li>TVD 能 &gt; 1 吗？</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <ol>
+        <li>两个分布<strong>完全相同</strong>（所有类别比例相同）</li>
+        <li>两个分布<strong>无 overlap</strong>。例如 dist1 = [1, 0, 0]，dist2 = [0, 0.5, 0.5]。<br>
+            |diff| = 1 + 0.5 + 0.5 = 2，TVD = 2/2 = 1</li>
+        <li><strong>不能</strong>。两个 proportion vector 都满足和为 1，差值的绝对值和不可能 &gt; 2，所以 TVD ≤ 1</li>
+      </ol>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>写出 TVD 一行 numpy 实现：<code>np.abs(d1 - d2).sum() / 2</code></span></label>
+    <label><input type="checkbox"><span>解释为什么除以 2（over-representation = under-representation）</span></label>
+    <label><input type="checkbox"><span>能口头说出 TVD 的 categorical-only 限制并给出反例（smoking & birth weight 不能用 TVD）</span></label>
+    <label><input type="checkbox"><span>口头手算 Fa24 Q4 P3（Jack/Eric 电影）—— 答案 0.55</span></label>
+    <label><input type="checkbox"><span>说出 TVD 的 range（[0, 1]）和两个边界条件</span></label>
+    <label><input type="checkbox"><span>写出用 TVD 做 hypothesis test 的代码骨架（multinomial / proportion / TVD / 重复 / p-value）</span></label>
+    <label><input type="checkbox"><span>解释为什么 TVD 的 p-value 总是右尾</span></label>
+    <label><input type="checkbox"><span>记住"<strong>不要</strong>把 counts 直接喂给 TVD" —— 必须先 / sample size 转 proportion</span></label>
+    <label><input type="checkbox"><span>不看答案做 Wi26 Q4 P6（4 个干扰选项一秒排除 3 个）</span></label>
+    <label><input type="checkbox"><span>解释 TVD 和 difference of means 各自的适用场景</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="03-pvalues-decisions.html">← 上一节</a></span>
+  <span><a href="index.html">📕 返回目录</a></span>
+  <span><a href="05-ci-as-hypothesis-test.html">下一节: CI as Test →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

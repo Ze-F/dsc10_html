@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSC10 系统性 walkthrough - 总目录</title>
+<style>
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", -apple-system, "Segoe UI", sans-serif;
+    background: #fafaf7;
+    color: #1f2328;
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+  }
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+  h1 {
+    font-size: 32px;
+    border-bottom: 3px solid #0969da;
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: #57606a;
+    font-size: 16px;
+    margin-bottom: 40px;
+  }
+  .intro {
+    background: #ddf4ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0 40px;
+    font-size: 14px;
+  }
+  .module-card {
+    background: #fff;
+    border: 1px solid #d0d7de;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .module-card:hover {
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+  .module-tag {
+    color: #0969da;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .module-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 6px 0 10px;
+  }
+  .module-desc {
+    color: #57606a;
+    font-size: 14px;
+    margin: 10px 0;
+  }
+  .module-desc code {
+    background: #f6f8fa;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .meta-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+  .badge {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 12px;
+    padding: 2px 10px;
+    color: #57606a;
+  }
+  .badge-active { background: #dafbe1; color: #1a7f37; border-color: #aceebb; font-weight: 600; }
+  .badge-planned { background: #f0f0f0; color: #6e7781; border-color: #d0d7de; }
+  .module-card.planned { opacity: 0.55; cursor: not-allowed; }
+  .module-card.planned:hover { box-shadow: none; transform: none; }
+  .footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #d0d7de;
+    color: #57606a;
+    font-size: 13px;
+    text-align: center;
+  }
+  .footer code {
+    background: #f6f8fa;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+/* Inline-color index pages — override hex literals */
+[data-theme="dark"] body { background: #0f1419 !important; color: #d8dee4 !important; }
+[data-theme="dark"] h1 { border-bottom-color: #58a6ff !important; }
+[data-theme="dark"] h2 { border-left-color: #58a6ff !important; color: #d8dee4 !important; }
+[data-theme="dark"] .subtitle,
+[data-theme="dark"] .module-desc,
+[data-theme="dark"] .section-desc,
+[data-theme="dark"] .footer { color: #8b949e !important; }
+[data-theme="dark"] .intro,
+[data-theme="dark"] .quick-ref { background: #1c2a3a !important; border-color: #4485c4 !important; color: #d8dee4 !important; }
+[data-theme="dark"] .module-card,
+[data-theme="dark"] .section-card,
+[data-theme="dark"] .section-card-planned { background: #161a1f !important; border-color: #30363d !important; }
+[data-theme="dark"] .module-card:hover,
+[data-theme="dark"] .section-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.5) !important; }
+[data-theme="dark"] .module-tag,
+[data-theme="dark"] .section-num,
+[data-theme="dark"] .module-link,
+[data-theme="dark"] a.back { color: #58a6ff !important; }
+[data-theme="dark"] .module-title,
+[data-theme="dark"] .section-title { color: #d8dee4 !important; }
+[data-theme="dark"] .module-desc code,
+[data-theme="dark"] .section-desc code,
+[data-theme="dark"] .footer code { background: #2a2e35 !important; color: #ff8088 !important; }
+[data-theme="dark"] .badge { background: #161a1f !important; border-color: #30363d !important; color: #8b949e !important; }
+[data-theme="dark"] .badge-active { background: #1a2e1f !important; color: #5acc7f !important; border-color: #3a5238 !important; }
+[data-theme="dark"] .badge-planned { background: #2a2e35 !important; color: #8b949e !important; border-color: #30363d !important; }
+[data-theme="dark"] .badge-final { background: #1c2a3a !important; color: #7aa7ff !important; border-color: #4485c4 !important; }
+[data-theme="dark"] .badge-midterm { background: #3a1f2f !important; color: #f0a3c8 !important; border-color: #7a3a5a !important; }
+[data-theme="dark"] .badge.tier-1 { background: #3a1f1f !important; color: #ff8088 !important; border-color: #5a2f2f !important; }
+[data-theme="dark"] .badge.tier-2 { background: #3a2e00 !important; color: #f0e6c0 !important; border-color: #a18419 !important; }
+[data-theme="dark"] .badge.tier-3 { background: #2a2e35 !important; color: #c0c4ca !important; border-color: #30363d !important; }
+[data-theme="dark"] .footer { border-top-color: #30363d !important; }
+[data-theme="dark"] .group-header { color: #d8dee4 !important; border-bottom-color: #30363d !important; }
+[data-theme="dark"] .progress-check { color: #8b949e !important; }
+[data-theme="dark"] .progress-check.done { color: #5acc7f !important; }
+[data-theme="dark"] .stats { background: #161a1f !important; border-color: #30363d !important; color: #d8dee4 !important; }
+[data-theme="dark"] .meta-row { color: #8b949e !important; }
+[data-theme="dark"] .section-card.checked { background: #1a2e1f !important; border-color: #3a5238 !important; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+<main>
+  <h1>📚 DSC10 系统性 walkthrough</h1>
+  <p class="subtitle">UCSD · Principles of Data Science · 按考试节点拆分模块，逐 section 推进</p>
+
+  <div class="intro">
+    <strong>📦 组织方式</strong>：每个考试节点是一个模块，模块下若干 section（每 section 一个 HTML）。
+    <br><strong>🎯 使用方法</strong>：点进模块后按顺序学习，读完一个 section 对 Claude 口头复述 checklist，确认无误后进入下一节。
+    <br><strong>🗂️ 配套材料</strong>：<code>Lec_PDFs/</code>（lec1-22）、<code>MTs/</code>（6 份历年 midterm）、<code>Quiz3/</code>（7 份历年 quiz 3）、<code>Quiz4/</code>（8 份历年 quiz 4/5）。
+  </div>
+
+  <a class="module-card" href="midterm/index.html">
+    <div class="module-tag">Module · Midterm</div>
+    <div class="module-title">📘 Midterm 备考</div>
+    <div class="module-desc">
+      覆盖 <code>Lec 1-12</code>：Python 基础、DataFrame 索引、查询与 groupby、可视化与直方图、函数与 <code>.apply</code>、多列 groupby 与 merge、条件与循环、概率与模拟。基于 6 份历年 midterm 提炼考点。
+    </div>
+    <div class="meta-row">
+      <span class="badge">9 sections</span>
+      <span class="badge">Lec 1-12</span>
+      <span class="badge">📝 6 份真题</span>
+      <span class="badge badge-active">● Active</span>
+    </div>
+  </a>
+
+  <a class="module-card" href="quiz3/index.html">
+    <div class="module-tag">Module · Quiz 3</div>
+    <div class="module-title">📗 Quiz 3 备考</div>
+    <div class="module-desc">
+      覆盖 <code>Lec 13-18</code>：sampling distributions、bootstrap CI、CI 解读与 spread、Chebyshev & normal、CLT 与 CLT-based CI、sample size 与 models。基于 7 份历年 Quiz 3 提炼考点。
+    </div>
+    <div class="meta-row">
+      <span class="badge">7 sections</span>
+      <span class="badge">Lec 13-18</span>
+      <span class="badge">📝 7 份真题</span>
+      <span class="badge badge-active">● Active</span>
+    </div>
+  </a>
+
+  <a class="module-card" href="quiz4/index.html">
+    <div class="module-tag">Module · Quiz 4</div>
+    <div class="module-title">📕 Quiz 4 备考</div>
+    <div class="module-desc">
+      覆盖 <code>Lec 18-22</code>：sample size & models、hypothesis testing fundamentals、p-values & decisions、TVD for categorical、CI as hypothesis test、permutation testing & A/B testing。基于 8 份历年 Quiz 4/5 提炼考点（past quiz 范围不完全重合，已综合处理）。
+    </div>
+    <div class="meta-row">
+      <span class="badge">7 sections</span>
+      <span class="badge">Lec 18-22</span>
+      <span class="badge">📝 8 份真题</span>
+      <span class="badge badge-active">● Active</span>
+    </div>
+  </a>
+
+  <a class="module-card" href="final/index.html">
+    <div class="module-tag">Module · Final</div>
+    <div class="module-title">📗 Final 备考</div>
+    <div class="module-desc">
+      覆盖 <code>Lec 23-25</code> 新内容（correlation、regression & least squares、residuals & inference）+ <strong>Final 综合冲刺</strong>。前 3 个模块复习 Lec 1-22；本模块只新增 Lec 23-25 + 模拟卷（covers 1-25 全部范围）。基于 17 套历年 Final 真题。
+    </div>
+    <div class="meta-row">
+      <span class="badge">4 sections</span>
+      <span class="badge">Lec 23-25 + 综合</span>
+      <span class="badge">📝 17 套真题</span>
+      <span class="badge badge-active">● Active</span>
+    </div>
+  </a>
+
+  <a class="module-card" href="practice/index.html">
+    <div class="module-tag">Module · Practice</div>
+    <div class="module-title">🛠 Practice — Labs &amp; Homeworks</div>
+    <div class="module-desc">
+      12 份课堂作业的系统 walkthrough（6 份 Lab + 5 份 HW + Midterm Project）。每页按 PDF 题目顺序逐题讲解（思路 + 代码 + 为什么 + 易错点 + 知识点回链），作为复习时的练习/总结资源 —— 整套作业讲下来比 section 内散落的真题更 coherent。按复习紧迫度倒序产出（Lab 7 起步）。
+    </div>
+    <div class="meta-row">
+      <span class="badge">12 walkthroughs</span>
+      <span class="badge">Lab 2-7 + HW 2-6 + Midterm Project</span>
+      <span class="badge">📂 Labs_HWs/ 源材料</span>
+      <span class="badge badge-active">● Active</span>
+    </div>
+  </a>
+
+  <div class="footer">
+    💡 单 section HTML 用 <code>file://</code> 协议直接浏览器打开即可。<br>
+    🤖 项目由 Claude 基于 Lec PDFs 与历年真题分模块构建。
+  </div>
+</main>
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

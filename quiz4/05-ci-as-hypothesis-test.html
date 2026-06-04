@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 5 · CI as Hypothesis Test - DSC10 Quiz4</title>
+<style>
+  :root { --bg: #fafaf7; --text: #1f2328; --muted: #57606a; --accent: #0969da; --accent-bg: #ddf4ff; --code-bg: #1e1e2e; --code-text: #cdd6f4; --warn-bg: #fff8c5; --warn-border: #d4a72c; --tip-bg: #ddf4ff; --tip-border: #54aeff; --danger-bg: #ffebe9; --danger-border: #cf222e; --ok-bg: #dafbe1; --ok-border: #1a7f37; --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781; --border: #d0d7de; --q-bg: #f6f8fa; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📕 Quiz4 总目录</a></span>
+  <span><a href="04-tvd-categorical.html">← 上一节</a> <a href="06-permutation-testing.html">下一节: Permutation Testing →</a></span>
+</nav>
+
+<main>
+  <h1>Section 5 · CI as Hypothesis Test</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 21（CI for Hypothesis Testing） ｜
+    <strong>Quiz 4 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1</span>（Wi26 Q4 P5 直接考；Wi25 Q4 P3.5 T/F） ｜
+    <strong>预计学习时间</strong>：45 分钟 - 1 小时
+  </p>
+
+  <div class="meta">
+    <strong>🎯 本节定位</strong>：这是 Quiz 4 的"小巧但高频"知识点。Lec 21 教了一个<strong>巧妙的捷径</strong>：当 null 形如 "param = some value"（且 alt 是双边）时，我们<strong>不用 simulate</strong>，直接用 Quiz 3 学过的 CI 就能做 hypothesis test。Wi26 Q4 P5 直接考这个方法。<br>
+    本节短，但必须把"什么时候能用 CI"和"如何匹配 cutoff 与 confidence level"搞清楚。
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 真题 &amp; 练习</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>一句话</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>适用条件：null = "param = x"（双边）</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>仅当 null 是某个 single value（如 "mean = 98.6"），alt 是 "param ≠ x" 时可用</td>
+      </tr>
+      <tr>
+        <td>(100−p)% CI 配 p% 显著性</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>p = 0.05 → 95% CI；p = 0.01 → 99% CI</td>
+      </tr>
+      <tr>
+        <td>决策：x 在 CI 内 → fail to reject</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>x ∈ CI 说明 x 是 plausible value；x ∉ CI → reject</td>
+      </tr>
+      <tr>
+        <td>构造 CI 的两条路径</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>Bootstrap CI（任何 statistic）｜ CLT-based CI（仅 mean）</td>
+      </tr>
+      <tr>
+        <td>什么时候<strong>不能</strong>用 CI 法</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>(1) Alt 是单边 ("&gt;" 或 "&lt;")；(2) Null 涉及两个 sample 比较（应用 permutation）；(3) Null 不是 "param = x" 形式</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. 核心 idea：CI 给的就是 "plausible values"</h3>
+
+  <p>Quiz 3 学过：c% CI 给出 population parameter 的 c% plausible range。</p>
+
+  <p>Hypothesis testing 在问："null 提出的 param = x 这个值是否 plausible？"</p>
+
+  <p>把这两个一拼：</p>
+
+  <div class="formula formula-big">
+    构造一个 (100 − p)% CI ↔ 等价于 p% significance level 的 hypothesis test
+  </div>
+
+  <ul>
+    <li>如果 <strong>x ∈ CI</strong> → x 是 plausible → 与 null 一致 → <strong>fail to reject null</strong></li>
+    <li>如果 <strong>x ∉ CI</strong> → x 不 plausible → 与 null 不一致 → <strong>reject null</strong></li>
+  </ul>
+
+  <h3>2. 严格的适用条件</h3>
+
+  <div class="danger">
+    <strong>必须同时满足三条</strong>：
+    <ol>
+      <li><strong>Null 形式</strong>是 "population parameter = some value x"（如 "mean = 98.6"、"proportion = 0.5"）</li>
+      <li><strong>Alt 形式</strong>是 "population parameter ≠ x"（<strong>双边</strong>，不是 "&gt;" 或 "&lt;"）</li>
+      <li>能构造该 parameter 的 CI（用 bootstrap 或 CLT）</li>
+    </ol>
+  </div>
+
+  <p>⚠️ 这个方法<strong>不能</strong>用于：</p>
+  <ul>
+    <li>Permutation test 类问题（two-sample comparison，如 smoking & birth weight）</li>
+    <li>Categorical distribution 比较（TVD test）</li>
+    <li>单边 alt 题（如 "score 比 70 高的比例 &gt; 0.20"）—— 严格来说不能直接用</li>
+  </ul>
+
+  <h3>3. 匹配 cutoff 和 confidence level</h3>
+
+  <table>
+    <thead><tr><th>显著性 (α)</th><th>对应 CI</th><th>Bootstrap percentiles</th><th>CLT 公式</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>5% (α = 0.05)</td>
+        <td><strong>95%</strong> CI</td>
+        <td>2.5, 97.5</td>
+        <td>mean ± 2·SD/√n</td>
+      </tr>
+      <tr>
+        <td>1% (α = 0.01)</td>
+        <td><strong>99%</strong> CI</td>
+        <td>0.5, 99.5</td>
+        <td>mean ± 2.576·SD/√n</td>
+      </tr>
+      <tr>
+        <td>10% (α = 0.10)</td>
+        <td>90% CI</td>
+        <td>5, 95</td>
+        <td>mean ± 1.645·SD/√n</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="tip">📌 记法：<strong>α + c = 100%</strong>。<br>
+  在 DSC 10 范围内最常用 95% CI ↔ 0.05 显著性。</p>
+
+  <h3>4. 完整例子：Body Temperature 98.6°F（Lec 21）</h3>
+
+  <ul>
+    <li>大家都说人类平均体温是 98.6°F</li>
+    <li>研究者收集了 130 个人的样本，sample mean ≈ 98.25，sample SD ≈ 0.73</li>
+    <li>问：sample 是否与 "population mean = 98.6" 这个 null 一致？</li>
+  </ul>
+
+  <h4>4.1 用 Bootstrap CI</h4>
+
+  <pre><code>resample_means = np.array([])
+for i in np.arange(10000):
+    resample = temperatures.sample(130, replace=True)
+    resample_means = np.append(resample_means,
+                                resample.get('temperature').mean())
+
+# 95% CI
+[np.percentile(resample_means, 2.5),
+ np.percentile(resample_means, 97.5)]
+# ≈ [98.126, 98.375]</code></pre>
+
+  <h4>4.2 用 CLT CI</h4>
+
+  <pre><code>sample_mean = 98.25  # 实际是 98.249...
+sample_sd = 0.73
+n = 130
+
+SE = sample_sd / np.sqrt(n)  # ≈ 0.064
+[sample_mean - 2*SE, sample_mean + 2*SE]
+# ≈ [98.121, 98.377]</code></pre>
+
+  <h4>4.3 决策</h4>
+
+  <p>两种方法 CI 几乎一致：约 <strong>[98.12, 98.38]</strong>。98.6 <strong>不在</strong>这个 CI 内 → <strong>reject the null</strong> at the 5% significance level。</p>
+
+  <p>结论：sample 不支持 "人类平均体温 = 98.6°F" 的说法（事实上现代 Yale 的研究也指出原始 98.6 是 Wunderlich 老旧温度计的产物，真实约 97.9）。</p>
+
+  <h3>5. Wi26 Q4 P5 的完整逻辑（最高频考法）</h3>
+
+  <p>题目说：Jeffrey 反驳"分数 &lt; 70 的真比例 = 0.20"。研究者构造 95% CI 得到 <strong>[0.14, 0.40]</strong>。问 5% 显著性下结论。</p>
+
+  <ul>
+    <li><strong>Null</strong>：proportion = 0.20</li>
+    <li><strong>Alt</strong>：proportion ≠ 0.20（双边）</li>
+    <li><strong>α = 0.05</strong> → 95% CI（匹配！）</li>
+    <li><strong>0.20 ∈ [0.14, 0.40]</strong> → x 是 plausible value → <strong>fail to reject</strong></li>
+  </ul>
+
+  <p>正确解释："because 0.20 lies inside the confidence interval, the data are <strong>consistent</strong> with Jeffrey's claim"。</p>
+
+  <p class="warn">⚠️ Wi26 Q4 P5.1 干扰选项里有 "Accept" —— <strong>错</strong>。永远只能 fail to reject。</p>
+
+  <h3>6. 何时<strong>不能</strong>用 CI 法（Wi25 Q4 P3.5）</h3>
+
+  <p>Wi25 Q4 的整道大题里，null 是 "每个 field 80% 概率被 fertilized"，alt 是 "不是 80%"。P3.5 问 T/F: "We could construct a CI to test these hypotheses"。</p>
+
+  <p>表面看：null 是 "param = 0.80"，看起来能用 CI 法。<strong>但实际更细想</strong>：</p>
+  <ul>
+    <li>这里 sample 已经在 hand，sample proportion 可以算</li>
+    <li>但 sample proportion 本身就是 estimate；对它做 bootstrap CI / CLT CI 来看 0.80 是否在内 —— 完全 OK</li>
+    <li>所以答案是 <strong>True</strong>（可以）</li>
+  </ul>
+
+  <p>关键判断 —— 是否能用 CI 法：</p>
+  <div class="tip">
+    <strong>能 ✅</strong>：null = "param = x"，且 sample 直接对应该 param。例如：<br>
+    - 体温 mean = 98.6（sample 是体温数据，可 bootstrap mean）<br>
+    - Proportion = 0.20（sample 是 0/1 数据，可 bootstrap proportion）<br><br>
+    <strong>不能 ❌</strong>：<br>
+    - Two-sample comparison（smoking vs non-smoking）→ permutation<br>
+    - Categorical distribution match → TVD<br>
+    - Single-sided alt（"&gt; x"）严格来说也不能直接用 CI（虽然有变通办法）
+  </div>
+
+  <h3>7. CI 法 vs 模拟 (simulate under null) 比较</h3>
+
+  <table>
+    <thead><tr><th></th><th>CI 法</th><th>Simulate under null</th></tr></thead>
+    <tbody>
+      <tr><td><strong>适用</strong></td><td>"param = x" 双边</td><td>任何 hypothesis test</td></tr>
+      <tr><td><strong>需要 simulate</strong></td><td>是（bootstrap）<em>或</em>否（CLT）</td><td>是（multinomial / permutation）</td></tr>
+      <tr><td><strong>返回什么</strong></td><td>CI（一个 range）</td><td>p-value（一个数）</td></tr>
+      <tr><td><strong>决策标准</strong></td><td>x ∈ CI?</td><td>p &lt; α?</td></tr>
+      <tr><td><strong>等价性</strong></td><td colspan="2">两种方法在 "param = x" 双边题上结论等价</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <h3>陷阱 1：⭐ "Accept the null" 选项</h3>
+  <p>Wi26 Q4 P5.1 出现 4 选项：Reject / Fail to reject / <strong>Accept</strong> / Not enough info。"Accept" 永远错。</p>
+
+  <h3>陷阱 2：⭐ Cutoff 和 confidence level 不匹配</h3>
+  <p>"95% CI ↔ 0.05 显著"。考题如果说 "test at 1% significance"，应该用 99% CI，<strong>不</strong>是 95%。Wi26 Q4 P5 都是用 95% CI ↔ 5% α，比较 standard。</p>
+
+  <h3>陷阱 3：⭐ Null 不是 "param = x" 形式还用 CI</h3>
+  <p>permutation 类问题（"smokers' babies 比 non-smokers' 轻"）不能用 CI 法 —— 因为没有"single value"做 null。要用 Lec 22 的 permutation test。</p>
+
+  <h3>陷阱 4：方向混淆</h3>
+  <p>"x 在 CI 内 → fail to reject"，<strong>不是</strong> reject。这是反方向最常见的低级失误。</p>
+
+  <h3>陷阱 5：误用 CI 的解释</h3>
+  <p>Wi26 Q4 P5.2 干扰选项 "Because the midpoint of the interval is 0.27, we have evidence against Jeffrey's claim"。<strong>错</strong> —— midpoint 在 reject 判断里不重要，重要的是 x 是否落在 CI 内。</p>
+
+  <h3>陷阱 6：把 "CI 宽" 当 "no power"</h3>
+  <p>Wi26 Q4 P5.2 另一个干扰选项 "the interval has width 0.26 which is much wider than we wanted ... cannot reject any claim"。<strong>错</strong>。CI 宽度跟"能否 reject"无关；只看 x 是否在 CI 内。</p>
+
+  <h3>陷阱 7：单边 alt 想用 CI</h3>
+  <p>严格意义上 CI 法是双边判断（"param = x" 双边 alt）。如果 alt 是 "param &gt; x"，标准做法是 simulate（不是直接用 CI）。<br>
+  当然 DSC 10 范围内只要看到 "param = x" 类 null 就可以用 CI；如果 alt 是单边，<em>题目通常会指明用 simulation</em>。</p>
+
+  <h3>陷阱 8：忘了构造哪个 CI</h3>
+  <p>CI 是对 <strong>population parameter</strong> 的估计区间，<strong>不是</strong>对 sample statistic 的。Sample mean 是确定的（计算后是单值），不需要 CI。</p>
+
+  <h2 id="problems">📝 真题 &amp; 练习</h2>
+
+  <h3>真题 1：Wi26 Q4 P5 ⭐⭐⭐（CI 反推决策）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 4, Problem 5 (Lec 21)</div>
+    <p>Jeffrey 主张"分数 &lt; 70 的真比例 = 0.20"。Detective Peter 构造 95% CI 得到 <strong>[0.14, 0.40]</strong>。</p>
+    <p><strong>5.1</strong>：在 5% 显著性下，多选下面正确的：</p>
+    <ol type="A">
+      <li>Reject</li>
+      <li>Fail to reject</li>
+      <li>Accept</li>
+      <li>Not enough information</li>
+    </ol>
+    <p><strong>5.2</strong>：哪个最准确解释了这个结论？</p>
+    <ol type="A">
+      <li>Because 0.20 lies inside the CI, the data are <em>consistent</em> with Jeffrey's claim.</li>
+      <li>Because 0.20 lies inside the CI, the data are <em>inconsistent</em> with Jeffrey's claim.</li>
+      <li>Because the interval has width 0.26 which is wider than we wanted, we don't have enough precision to reject any claim.</li>
+      <li>Because the midpoint of the interval is 0.27, we have evidence against Jeffrey's claim.</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>5.1 答案：B（Fail to reject）</strong></p>
+      <ul>
+        <li>0.20 在 [0.14, 0.40] 内 → fail to reject null</li>
+        <li>C "Accept" 永远错（hypothesis test 从不 accept）</li>
+        <li>D 不对，信息够</li>
+      </ul>
+      <p><strong>5.2 答案：A</strong></p>
+      <ul>
+        <li>A 对：0.20 在 CI 内 → consistent</li>
+        <li>B 错：方向反了</li>
+        <li>C 错：CI 宽度跟决策无关</li>
+        <li>D 错：midpoint 跟决策无关</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>真题 2：Wi25 Q4 P3.5 ⭐⭐（能否用 CI）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 4, Problem 3.5 (Lec 21)</div>
+    <p>给定 null/alt：null = "每个 flower field 80% 概率被 fertilized"，alt = "不是"。能否构造 CI 来 test？</p>
+    <p>T / F?</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：True</strong>。</p>
+      <p>因为 null 形式是 "proportion = 0.80"（single value），alt 是 "≠ 0.80"（双边）→ 满足 CI 法的两个条件。<br>
+      具体做法：对 sample 的 proportion 做 bootstrap 或 CLT CI（注意 0/1 data → SD 上界 0.5 可用），看 0.80 是否在内。</p>
+    </details>
+  </div>
+
+  <h3>练习 3：判断能否用 CI 法</h3>
+  <div class="q-block">
+    <div class="q-source">综合判断</div>
+    <p>下面每个 hypothesis test，判断能否用 CI 法（而不是 simulate）：</p>
+    <ol>
+      <li>Null: 人类平均身高 = 170 cm。Alt: ≠ 170 cm</li>
+      <li>Null: smoker's babies 和 non-smoker's babies 平均出生重相同。Alt: smoker's 更轻</li>
+      <li>Null: Alameda jury panel 是从 eligible 分布随机抽的。Alt: 不是</li>
+      <li>Null: 这枚硬币 P(heads) = 0.5。Alt: P(heads) ≠ 0.5</li>
+      <li>Null: 美国总统得票率 = 50%。Alt: &gt; 50%</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <ol>
+        <li><strong>能</strong>。Null 是 "mean = 170"，双边 alt → 95% CI 看 170 是否在内</li>
+        <li><strong>不能</strong>。这是 two-sample 比较 + 单边 alt → permutation test</li>
+        <li><strong>不能</strong>。比较 categorical distributions（5 类）→ TVD test</li>
+        <li><strong>能</strong>。Null 是 "P = 0.5"，双边 → bootstrap / CLT CI for proportion</li>
+        <li><strong>不能</strong>（严格意义）。Alt 是单边 ("&gt; 50%")，CI 法默认双边。但实际操作里如果 50% 落在 CI 一端外，依然可以下结论</li>
+      </ol>
+    </details>
+  </div>
+
+  <h3>练习 4：综合应用</h3>
+  <div class="q-block">
+    <div class="q-source">综合 - Section 1 复用</div>
+    <p>研究 UCSD 学生平均 sleep 时间。Sample n=100，sample mean = 6.8 小时，sample SD = 1.5 小时。Null: 平均 sleep = 7 小时。在 5% 显著性下测：</p>
+    <details>
+      <summary>显示答案</summary>
+      <p>用 CLT-based CI（Lec 17）：</p>
+      <ul>
+        <li>SE = 1.5 / √100 = 0.15</li>
+        <li>95% CI = [6.8 − 2·0.15, 6.8 + 2·0.15] = [6.5, 7.1]</li>
+        <li>7 在 [6.5, 7.1] 内 → <strong>fail to reject</strong> null at 5% level</li>
+      </ul>
+      <p>结论：数据与"平均 sleep = 7 小时"一致。</p>
+    </details>
+  </div>
+
+  <h3>练习 5：从 CI 反推 sample 信息</h3>
+  <div class="q-block">
+    <div class="q-source">Section 1 + Section 5 综合</div>
+    <p>已知 95% CLT CI 为 [10.4, 13.6]，sample SD = 4 days。求 sample mean 和 sample size。</p>
+    <details>
+      <summary>显示答案</summary>
+      <p>（这是 Sp25 Q4 P3 原题）</p>
+      <ul>
+        <li>CI midpoint = sample mean = (10.4 + 13.6) / 2 = <strong>12</strong></li>
+        <li>CI half-width = 2 · SD/√n = 13.6 − 12 = 1.6</li>
+        <li>解出：2·4/√n = 1.6 → √n = 5 → <strong>n = 25</strong></li>
+      </ul>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>口头说出 "用 CI 做 hypothesis test" 的两个核心条件（null 形式 + 双边 alt）</span></label>
+    <label><input type="checkbox"><span>解释 "x 在 CI 内 → fail to reject" 的直观（CI 是 plausible range）</span></label>
+    <label><input type="checkbox"><span>背 cutoff ↔ CI confidence 的对应：5% ↔ 95%；1% ↔ 99%</span></label>
+    <label><input type="checkbox"><span>讲清楚什么情况下不能用 CI 法（two-sample / categorical / 单边 alt）</span></label>
+    <label><input type="checkbox"><span>用 Body Temperature 98.6 例子完整跑一遍：构造 CI、看 98.6 是否在内、决策</span></label>
+    <label><input type="checkbox"><span>不看答案做 Wi26 Q4 P5.1 和 P5.2（B + A，秒答）</span></label>
+    <label><input type="checkbox"><span>识别 "Accept the null" 选项 → 直接排除</span></label>
+    <label><input type="checkbox"><span>识别 "CI 宽不能下结论" / "midpoint" 这类干扰选项 → 排除</span></label>
+    <label><input type="checkbox"><span>用 bootstrap 和 CLT 两种方法分别构造 95% CI</span></label>
+    <label><input type="checkbox"><span>不看答案做 Sp25 Q4 P3（CI 反推 n 和 mean）</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="04-tvd-categorical.html">← 上一节</a></span>
+  <span><a href="index.html">📕 返回目录</a></span>
+  <span><a href="06-permutation-testing.html">下一节: Permutation Testing →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

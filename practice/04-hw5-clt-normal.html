@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 04 · HW 5 — CLT &amp; Normal Distribution · DSC10</title>
+<style>
+  :root { --bg:#fafaf7; --text:#1f2328; --muted:#57606a; --accent:#0969da; --code-bg:#1e1e2e; --code-text:#cdd6f4; --warn-bg:#fff8c5; --warn-border:#d4a72c; --tip-bg:#ddf4ff; --tip-border:#54aeff; --ok-bg:#dafbe1; --ok-border:#1a7f37; --tier-1:#cf222e; --tier-2:#bf8700; --tier-3:#6e7781; --border:#d0d7de; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.7; font-size:16px; }
+  .nav-top, .nav-bottom { background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:14px; flex-wrap:wrap; gap:8px; }
+  .nav-bottom { border-bottom:none; border-top:1px solid var(--border); margin-top:60px; }
+  .nav-top a, .nav-bottom a { color:var(--accent); text-decoration:none; margin-right:16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration:underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color:var(--muted); cursor:not-allowed; text-decoration:none; }
+  main { max-width:880px; margin:0 auto; padding:32px 24px 60px; }
+  h1 { font-size:28px; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:22px; margin-top:48px; border-left:4px solid var(--accent); padding-left:12px; }
+  h3 { font-size:18px; margin-top:28px; }
+  p, ul, ol { margin:12px 0; }
+  ul, ol { padding-left:28px; }
+  li { margin:4px 0; }
+  code { font-family:"Menlo","Monaco","Consolas",monospace; background:#eef0f2; padding:2px 6px; border-radius:4px; font-size:14px; color:#cf222e; }
+  pre { background:var(--code-bg); color:var(--code-text); padding:16px; border-radius:8px; overflow-x:auto; font-size:14px; line-height:1.5; margin:16px 0; }
+  pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:14px; }
+  .tier { display:inline-block; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:600; margin-right:8px; }
+  .tier-1 { background:#ffebe9; color:var(--tier-1); border:1px solid #ffcecb; }
+  .tier-2 { background:#fff8c5; color:var(--tier-2); border:1px solid #d4a72c; }
+  .meta { background:#f6f8fa; border-left:4px solid var(--accent); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .warn { background:var(--warn-bg); border-left:4px solid var(--warn-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .tip { background:var(--tip-bg); border-left:4px solid var(--tip-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .ok { background:var(--ok-bg); border-left:4px solid var(--ok-border); padding:10px 14px; margin:12px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .q-block { background:#fff; border:1px solid var(--border); border-radius:8px; padding:18px 20px; margin:22px 0; }
+  .q-id { display:inline-block; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:4px; margin-right:10px; letter-spacing:0.5px; }
+  .q-title { font-size:16px; font-weight:600; }
+  .q-stmt { color:var(--muted); font-size:14px; margin:10px 0; border-left:3px solid #d0d7de; padding-left:10px; font-style:italic; }
+  .think, .why { margin:12px 0; font-size:14.5px; }
+  .think strong { color:#6f42c1; }
+  .why strong { color:#1f883d; }
+  .checklist { background:#f0f9ff; border:1px solid #54aeff; border-radius:8px; padding:16px 20px; }
+  .checklist label { display:block; margin:8px 0; cursor:pointer; user-select:none; }
+  .checklist input[type="checkbox"] { margin-right:8px; transform:scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration:line-through; color:var(--muted); }
+  .toc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:24px 0; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { margin:4px 0; }
+  .toc a { color:var(--accent); text-decoration:none; }
+  .crosslink { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:20px 0; font-size:14px; }
+  .crosslink h4 { margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600; }
+  .crosslink ul { margin:4px 0; padding-left:20px; }
+  .crosslink a { color:var(--accent); text-decoration:none; }
+  table { border-collapse:collapse; width:100%; margin:16px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 12px; text-align:left; }
+  th { background:#f6f8fa; font-weight:600; }
+  hr { border:none; border-top:1px solid var(--border); margin:40px 0; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="03-lab6-hypothesis-fundamentals.html">⬅ 上一份：Lab 6</a> | <a href="05-lab5-su-chebyshev-sample-size.html">下一份 ➡：Lab 5</a></span>
+</nav>
+
+<main>
+  <h1>Practice 04 · HW 5 — Normal Distribution &amp; CLT</h1>
+  <p class="meta">
+    <strong>原始截止</strong>：Monday, May 18th 2026, 11:59 PM ｜
+    <strong>涵盖讲义</strong>：CIT 14.2–14.6 ｜
+    <strong>对应模块</strong>：Quiz 3 / Quiz 4 ｜
+    <strong>主题</strong>：CLT 公式 + 0/1 SD 公式 + Normal-based CI（无 bootstrap）+ 样本量公式 ｜
+    <strong>预计时长</strong>：2 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#overview">📋 作业概览 + 知识点回链</a></li>
+      <li><a href="#sec1">📚 Section 1 — Testing CLT: Coin Flips &amp; Ramen（Q1.1–1.3）</a></li>
+      <li><a href="#sec2">📚 Section 2 — Til' Death Duo: Duolingo（Q2.1–2.6）proportions vs counts</a></li>
+      <li><a href="#sec3">📚 Section 3 — Drake vs Kendrick（Q3.1–3.5）Normal-based CI + 样本量</a></li>
+      <li><a href="#sec4">📚 Section 4 — Key Concepts（Q4.1–4.4）4 道概念选择</a></li>
+      <li><a href="#pitfalls">⚠️ 本作业典型陷阱</a></li>
+      <li><a href="#formulas">📐 必背公式与速查</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="overview">📋 作业概览</h2>
+
+  <p>HW 5 是 Quiz 3 的<strong>主干</strong>——把 CLT 的两个核心声明都用 simulation 验证，再用纯<u>公式</u>（不 bootstrap）做 CI 和样本量。难度递进：</p>
+  <ol>
+    <li>Sec 1：用模拟<u>看到</u> CLT 是真的（sample mean 分布近似 normal）</li>
+    <li>Sec 2：proportions（每次除 n）vs counts（不除 n）的<u>对比</u>——SD 的 scale 完全不同</li>
+    <li>Sec 3：Drake vs Kendrick 民意调查——<strong>不许用 bootstrap</strong>，只能用 CLT + 0/1 SD 公式倒推 CI 和样本量</li>
+    <li>Sec 4：纯概念——SU 公式、Chebyshev、CLT 适用范围、SD ∝ 1/√n</li>
+  </ol>
+
+  <p><strong>Tier 速览</strong>：</p>
+  <ul>
+    <li><span class="tier tier-1">⭐⭐⭐</span> CLT 公式 <code>SD_sample_mean = pop_SD / √n</code>——必背。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> 0/1 SD = √(p₀ × p₁)——Quiz 3 / Quiz 4 反复用。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q3.3 normal-based CI = mean ± 2·SD（不许 bootstrap）。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q3.4 样本量公式：要 SD ≤ w，<code>n ≥ pop_SD² / w²</code>。向上取整！</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q4.3 CLT 只对 mean/sum 适用，<u>不</u>对 median；Chebyshev 对<u>任何</u>分布，Normal-95-rule 只对 normal。</li>
+    <li><span class="tier tier-2">⭐⭐</span> Q2.6 counts 和 proportions 的 SD 趋势相反（n 增加，counts SD 增加，proportion SD 减小）。</li>
+  </ul>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链：</h4>
+    <ul>
+      <li>CLT、square root law → <a href="../quiz3/05-clt-clt-ci.html">quiz3/05-clt-clt-ci</a></li>
+      <li>0/1 SD 公式、sample size → <a href="../quiz3/06-sample-size-models.html">quiz3/06-sample-size-models</a></li>
+      <li>Chebyshev / Normal 68-95-99.7 → <a href="../quiz3/04-chebyshev-normal.html">quiz3/04-chebyshev-normal</a></li>
+      <li>Bootstrap CI（HW 5 不用，但对比要知道）→ <a href="../quiz3/02-bootstrap-ci.html">quiz3/02-bootstrap-ci</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec1">📚 Section 1 — Testing the CLT: Coin Flips &amp; Ramen Ratings</h2>
+
+  <!-- Q1.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.1</span><span class="q-title"><code>simulate_sample_n(n)</code></span>
+    <p class="q-stmt">"Repeat 5000 times: flip n fair coins, find proportion of heads. Return array of 5000 proportions."</p>
+<pre><code>def simulate_sample_n(n):
+    proportions = np.array([])
+    for i in np.arange(5000):
+        sample = np.random.choice([0, 1], n)
+        proportions = np.append(proportions, np.mean(sample))
+    return proportions</code></pre>
+    <p class="why"><strong>💡 为什么 mean of (0/1) = proportion</strong>：1 表示正面、0 表示反面，array 平均 = (正面数 + 0) / n = 正面比例。这是"proportion as mean"——Quiz 3 / Quiz 4 反复用，必须烂熟。</p>
+    <p class="why"><strong>💡 题干图意</strong>：随着 n 从 2 → 400，histogram 越来越像钟形 + 越来越窄（per CLT）。Lab 看图就能感受 CLT。</p>
+  </div>
+
+  <!-- Q1.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.2</span><span class="q-title"><code>predict_sd(n)</code>（CLT 公式预测，不模拟）</span>
+    <p class="q-stmt">"Should return the predicted SD (according to the CLT) of the sample mean's distribution. <strong>Do not</strong> use or modify <code>simulate_sample_n</code>. You should not actually take any samples."</p>
+<pre><code>def predict_sd(n):
+    return ramen_std / np.sqrt(n)</code></pre>
+    <p class="why"><strong>💡 必背 CLT 公式</strong>：<u>样本均值分布的 SD</u> = <u>总体 SD</u> / √n。题干预先算了 <code>ramen_std = np.std(ramen.get('Stars'))</code>，直接用。</p>
+    <p class="why"><strong>💡 为什么"不用采样"</strong>：CLT 是<u>定理</u>，不需要模拟就能给出预测值。整道题想让你区分"公式预测"（predict_sd）与"实测"（empirical_sd）。</p>
+    <div class="ok"><strong>✅ 反推</strong>：<code>predict_sd(75) = 1.0151 / √75 ≈ 0.11722</code>，autograder 验 <code>int(predict_sd(75) × 10¹⁰ % 10⁶) == 175288</code> ✓</div>
+  </div>
+
+  <!-- Q1.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.3</span><span class="q-title"><code>empirical_sd(n)</code>（用模拟验证）</span>
+<pre><code>def empirical_sd(n):
+    sample_means = np.array([])
+    for i in np.arange(1000):
+        sample = ramen.sample(n, replace=True)
+        sample_means = np.append(sample_means, sample.get('Stars').mean())
+    return np.std(sample_means)</code></pre>
+    <p class="why"><strong>💡 这跟 bootstrap 几乎一样的代码</strong>：抽 1000 次、每次大小 n、有放回。区别只是这里用 <code>np.std(sample_means)</code>——bootstrap 用 percentile，empirical_sd 用 std。<u>同一段代码不同后处理</u>。</p>
+    <p class="why"><strong>💡 题目意图</strong>：图上散点 (predicted_sd, empirical_sd) 几乎重合，确认 CLT 公式正确。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec2">📚 Section 2 — Til' Death Duo: Duolingo（Q2.1–2.6）</h2>
+
+  <p><strong>背景</strong>：193 个国家的 Duolingo 最热门语言数据。134 个国家最热门 = English（≈ 69.4%）。把 duolingo 当总体，每次 SRS 抽 100 个国家。</p>
+
+  <!-- Q2.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.1</span><span class="q-title"><code>props</code>：10000 个 English 比例</span>
+<pre><code>props = np.array([])
+for i in np.arange(10000):
+    sample = duolingo.sample(100)
+    prop = np.count_nonzero(sample.get('most_pop_language') == 'English') / 100
+    props = np.append(props, prop)</code></pre>
+    <p class="why"><strong>💡 <code>duolingo.sample(100)</code> 默认无放回（SRS）</strong>。题目明确说 "simple random sample"。babypandas 的 <code>.sample(n)</code> 不带参数时是 without replacement。如果要 with replacement，加 <code>replace=True</code>。</p>
+    <p class="why"><strong>💡 为什么用 <code>np.count_nonzero</code></strong>：<code>sample.get('most_pop_language') == 'English'</code> 是 boolean Series。<code>count_nonzero</code> 数 True 的个数。也可以用 <code>.sum()</code>，因为 True 当作 1。</p>
+  </div>
+
+  <!-- Q2.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.2</span><span class="q-title"><code>theoretical_props_mean</code> vs <code>actual_props_mean</code></span>
+    <p class="q-stmt">"You should <strong>not</strong> access the data in <code>props</code> when calculating theoretical."</p>
+<pre><code>theoretical_props_mean = np.count_nonzero(duolingo.get('most_pop_language') == 'English') / duolingo.shape[0]
+actual_props_mean      = props.mean()</code></pre>
+    <p class="why"><strong>💡 CLT 关于 mean of sample means</strong>：sample mean 分布的<u>均值</u> = 总体均值（CLT 的 unbiasedness）。这里总体比例 = 134/193 ≈ 0.6943。实际 props.mean() ≈ 0.6943 ± noise。</p>
+    <p class="why"><strong>💡 为什么不能访问 props 算 theoretical</strong>：theoretical 是<u>理论预测</u>，必须从总体（duolingo）算出；如果用 props 那就等于 actual 了，没区别。</p>
+  </div>
+
+  <!-- Q2.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.3</span><span class="q-title"><code>counts</code>：10000 个 English <u>数量</u>（不除 100）</span>
+<pre><code>counts = np.array([])
+for i in np.arange(10000):
+    sample = duolingo.sample(100)
+    cnt = np.count_nonzero(sample.get('most_pop_language') == 'English')
+    counts = np.append(counts, cnt)</code></pre>
+    <p class="why"><strong>💡 跟 Q2.1 唯一区别</strong>：不除以 100。counts 是 0–100 的整数（每个样本中 English 国家数），props 是 0–1 的比例。</p>
+  </div>
+
+  <!-- Q2.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.4</span><span class="q-title"><code>theoretical_counts_mean</code></span>
+    <p class="q-stmt">Hint: "A count is not a mean, so CLT does not <em>directly</em> apply. However, you can use <code>theoretical_props_mean</code> to help."</p>
+<pre><code>theoretical_counts_mean = 100 * theoretical_props_mean
+actual_counts_mean      = counts.mean()</code></pre>
+    <p class="why"><strong>💡 count = size × proportion</strong>：每个 sample 中 count = 100 × proportion；对平均也是 mean(counts) = 100 × mean(props) = 100 × 0.6943 ≈ 69.43。</p>
+    <p class="why"><strong>💡 sample mean 公式不直接给 count 用</strong>：CLT 说 sample <u>mean</u> 分布趋近 normal。count = sum，不是 mean。但 sum 跟 mean 差 n 倍线性变换，所以 sum 的分布也是 normal（CLT 的<u>第二种形式</u>）——只是公式不一样。</p>
+  </div>
+
+  <!-- Q2.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.5</span><span class="q-title"><code>count_most_pop_language(size)</code> 泛化</span>
+<pre><code>def count_most_pop_language(size):
+    counts = np.array([])
+    for i in np.arange(10000):
+        sample = duolingo.sample(size)
+        cnt = np.count_nonzero(sample.get('most_pop_language') == 'English')
+        counts = np.append(counts, cnt)
+    return counts</code></pre>
+    <p class="why"><strong>💡 把 100 改成 size</strong>。然后 Q2.6 看 size = 10, 25, 50, 100 时 histogram 的变化。</p>
+  </div>
+
+  <!-- Q2.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.6</span><span class="q-title">观察 counts 分布的 mean / SD 随 size 怎么变？</span>
+    <p class="q-stmt">4 选项：1=mean 增加；2=mean 减小；3=SD 增加；4=SD 减小。选所有 true 的。</p>
+<pre><code>q2_6 = [1, 3]</code></pre>
+    <p class="why"><strong>💡 mean 增加（选 1）</strong>：mean(counts) = size × p。size 越大 mean 越大。</p>
+    <p class="why"><strong>💡 SD 增加（选 3）</strong>：counts 的 SD = √(size × p × (1−p))——size 越大 SD 越大。<u>注意</u>是 √size，不是 size 本身。</p>
+    <div class="warn"><strong>⚠️ 跟 proportions 对比</strong>：proportions 的 SD = √(p(1−p)) / √size——size 越大 SD <u>越小</u>。同一个 sample，count 和 proportion 的 SD 趋势<u>相反</u>。这是高频陷阱：count 的 SD 与 √size 成正比；proportion 的 SD 与 1/√size 成正比。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec3">📚 Section 3 — Drake vs Kendrick Lamar（Q3.1–3.5）</h2>
+
+  <p><strong>背景</strong>：UCSD 有 43,533 名学生。Sofia 调查 580 人，203 选 Drake，377 选 Kendrick（≈ 65%）。本节<strong>禁止</strong>用 <code>kendrick_proportions</code> 数组——只能用 CLT + 0/1 SD 公式。</p>
+
+  <div class="tip">
+    <strong>📐 必备公式</strong><br>
+    0/1 数据 SD: <code>√(p₀ × p₁)</code> 其中 p₀ 是 0 的比例、p₁ 是 1 的比例<br>
+    Sample mean SD（CLT）: <code>pop_SD / √n</code><br>
+    Normal 95% rule: <code>mean ± 2·SD</code><br>
+    样本量（约束 SD ≤ w）: <code>n ≥ pop_SD² / w²</code>
+  </div>
+
+  <!-- Q3.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.1</span><span class="q-title"><code>approximate_sd</code>（不许用 kendrick_proportions）</span>
+<pre><code>approximate_sd = np.sqrt(0.35 * 0.65) / np.sqrt(sample_size)
+# sample_size = 580
+# ≈ 0.4770 / 24.083 ≈ 0.01981</code></pre>
+    <p class="why"><strong>💡 套路</strong>：sample proportion 的 SD = 总体 0/1 SD / √n = √(p·(1−p)) / √n。总体 p 未知，用 sample 比例代入（0.35 / 0.65）。</p>
+    <p class="why"><strong>💡 为什么 sample 比例可以替代总体</strong>：sample 比例是总体比例的<u>一致估计</u>（unbiased estimate）。当 n 较大（580 ≫ 30），二者非常接近。这是"plug-in"思想。</p>
+    <div class="ok"><strong>✅ autograder 反推</strong>：<code>int(approximate_sd × 10⁶ % 10⁴) == 9805</code> → <strong>approximate_sd ≈ 0.01980</strong> ✓</div>
+  </div>
+
+  <!-- Q3.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.2</span><span class="q-title"><code>exact_sd</code>（实测，与 Q3.1 对比）</span>
+<pre><code>exact_sd = np.std(kendrick_proportions)</code></pre>
+    <p class="why"><strong>💡 跟 Q3.1 数值应该非常接近</strong>——这就是 CLT 在实际场景的验证。</p>
+  </div>
+
+  <!-- Q3.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.3</span><span class="q-title">95% CI（Normal-based，不用 bootstrap）</span>
+    <p class="q-stmt">"<strong>Without accessing <code>kendrick_proportions</code> in any way</strong>, compute an approximate 95% CI."</p>
+<pre><code>lower_limit = 0.65 - 2 * approximate_sd
+upper_limit = 0.65 + 2 * approximate_sd
+# ≈ [0.6104, 0.6896]</code></pre>
+    <p class="why"><strong>💡 Normal-based CI 公式</strong>：95% CI = sample mean ± 2 × SD_sample_mean。这就是 Quiz 3 的"必背 8 件套"之第 3 条。Kendrick 比例的中心是 0.65（样本观测），SD 用 approximate_sd。</p>
+    <p class="why"><strong>💡 跟 Bootstrap CI 的对比</strong>：
+      <ul>
+        <li>Bootstrap：从 sample 有放回采样 1000 次 → 取 2.5/97.5 percentile（数据驱动，慢）。</li>
+        <li>Normal-based（CLT-based）：直接 mean ± 2·SD（公式驱动，快，但要先估 SD）。</li>
+      </ul>
+      两种 CI 应该非常接近——这是 CLT 的另一层验证。题目专门"不准用 bootstrap"是为了考你 normal 公式。
+    </p>
+  </div>
+
+  <!-- Q3.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.4</span><span class="q-title">样本量计算 → <code>new_sample_size</code></span>
+    <p class="q-stmt">"Sofia wants SD ≤ 0.004. Compute the smallest sample size. Use the SD ≈ sample SD assumption."</p>
+<pre><code>new_sample_size = int(np.ceil(0.35 * 0.65 / (0.004 ** 2)))
+# = ceil(0.2275 / 0.000016) = ceil(14218.75) = 14219</code></pre>
+    <p class="why"><strong>💡 推导</strong>：要 SD = pop_SD / √n ≤ 0.004 → √n ≥ pop_SD / 0.004 → n ≥ pop_SD² / 0.004² = 0.2275 / 1.6×10⁻⁵ = 14218.75。<strong>必须向上取整</strong>到 14219（取 14218 的话 SD 会略 &gt; 0.004，不满足约束）。</p>
+    <div class="warn"><strong>⚠️ 必须 <code>np.ceil</code> 不是 <code>round</code> 或 <code>int</code></strong>：14218.75 round → 14219（碰巧对），但 14218.25 round → 14218（小于约束）。<u>"smallest such that"</u> 永远向上取整。autograder 给出 "Rounded up - 4/4 tests correct" 提示就是这意思。</div>
+    <p class="why"><strong>💡 一般公式</strong>："SD ≤ w" 时 <code>n ≥ pop_SD² / w²</code>。对 0/1 数据，pop_SD = √(p·(1−p))，所以 <code>n ≥ p(1-p) / w²</code>。</p>
+  </div>
+
+  <!-- Q3.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.5</span><span class="q-title">想要 SD = 0.002（更精）→ <code>q3_5</code></span>
+    <p class="q-stmt">4 个选项：1=反复重抽直到 SD = 0.002；2=size 减半；3=size 翻 4 倍；4=不可能，超过总人口。</p>
+<pre><code>q3_5 = 4</code></pre>
+    <p class="why"><strong>💡 计算</strong>：SD ∝ 1/√n。SD 减半 → √n 翻倍 → n 翻 4 倍 = 4 × 14219 = 56876。<u>但</u> UCSD 总人数 43,533 &lt; 56,876 → 不可能。</p>
+    <p class="why"><strong>💡 排除其他选项</strong>：
+      <ul>
+        <li>1 错：反复重抽不会改变<u>单个</u>样本的 SD，只是看到不同样本的随机波动。</li>
+        <li>2 错：SD 减半要 n × 4，不是 n / 2。SD = 1/√n 的关系。</li>
+        <li>3 是<u>正确的</u> n 翻 4 倍，但<u>4 才是更"true"的</u>，因为<u>实际不可能</u>（超总人数）。题目选 "best answer and explanation"，所以选 4 而不是 3。</li>
+      </ul>
+    </p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec4">📚 Section 4 — Key Concepts（Q4.1–4.4）</h2>
+
+  <!-- Q4.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.1</span><span class="q-title">SU 公式：value = 36, mean = 20, SD = 3</span>
+    <p class="q-stmt">4 选项考 SU 公式 (value − mean) / SD。</p>
+<pre><code>q4_1 = 3
+# = (36 − 20) / 3</code></pre>
+    <p class="why"><strong>💡 必背</strong>：standard units = (value − mean) / SD。Z = (X − μ) / σ。<u>不</u>是 (mean − value)、<u>不</u>除以 √SD、<u>不</u>平方。</p>
+  </div>
+
+  <!-- Q4.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.2</span><span class="q-title">Chebyshev: 至少一半数据落在 mean ± k·SD 内，求最小 k</span>
+    <p class="q-stmt">4 个选项：1.35 / 1.40 / 1.45 / 1.50。</p>
+<pre><code>q4_2 = 3   # k = 1.45 是最小满足的</code></pre>
+    <p class="why"><strong>💡 Chebyshev 不等式</strong>：至少 <code>1 − 1/k²</code> 的数据在 ± k·SD 内。<br>
+      要 1 − 1/k² ≥ 0.5 → k² ≥ 2 → k ≥ √2 ≈ <strong>1.4142</strong>。最小选项 ≥ 1.4142 是 1.45（选项 3）。
+    </p>
+    <p class="why"><strong>💡 常用 Chebyshev 数值（必背）</strong>：
+      <ul>
+        <li>k=2 → 至少 75%</li>
+        <li>k=3 → 至少 88.8%</li>
+        <li>k=4 → 至少 93.75%</li>
+        <li>k=5 → 至少 96%</li>
+      </ul>
+    </p>
+  </div>
+
+  <!-- Q4.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.3</span><span class="q-title">5 个陈述选所有"<u>始终</u>为真"的</span>
+<pre><code>q4_3 = [1, 5]</code></pre>
+    <p class="why"><strong>💡 逐项分析</strong>：
+      <ul>
+        <li><strong>1. 大样本的 sample mean 直方图近似 normal</strong> → CLT 直接结论 ✓</li>
+        <li><strong>2. 大样本的 sample <u>median</u> 直方图近似 normal</strong> → CLT <u>只</u>对 mean/sum 适用，<u>不</u>对 median。✗（高频陷阱！）</li>
+        <li><strong>3. 知道 mean 和 SD 就能算 68% CI（mean ± 1·SD）</strong> → 68-95-99.7 法则只对 <u>normal</u> 分布；任意分布不能这么用。✗</li>
+        <li><strong>4. 任何分布 95% 数据在 mean ± 2·SD 内</strong> → 这是 normal 的性质（68-95-99.7），不是 Chebyshev。任意分布只能说 ≥ 75%。✗</li>
+        <li><strong>5. 任何分布 ≥ 95% 数据在 mean ± 5·SD 内</strong> → Chebyshev: 1 − 1/25 = 96% ≥ 95% ✓</li>
+      </ul>
+    </p>
+    <div class="warn"><strong>⚠️ Normal 性质 vs Chebyshev</strong>：
+      <ul>
+        <li><u>Normal 68-95-99.7</u>：精确比例（68 / 95 / 99.7），仅对 normal 分布。</li>
+        <li><u>Chebyshev</u>：下界（at least），对<u>任何</u>分布。</li>
+      </ul>
+      题目用 "for any distribution" 时只能用 Chebyshev；用 "approximately normal" 才能用 68-95-99.7。<u>对调就错</u>。
+    </div>
+  </div>
+
+  <!-- Q4.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.4</span><span class="q-title">SD 要减到 y/4，n 要乘几？</span>
+    <p class="q-stmt">4 选项：2x / 4x / 8x / 16x。</p>
+<pre><code>q4_4 = 4   # 16x</code></pre>
+    <p class="why"><strong>💡 推导</strong>：SD = pop_SD / √n。当 n = x 时 SD = y。当 SD = y/4 时，pop_SD/√n_new = y/4 = (pop_SD/√x) / 4 → √n_new = 4√x → n_new = 16x。</p>
+    <p class="why"><strong>💡 通用规律</strong>：<u>SD 缩小 k 倍 → n 要乘 k²</u>。SD 缩 2x → n 乘 4；缩 4x → 乘 16；缩 10x → 乘 100。这就是 Q3.5 的根：要把 0.004 → 0.002（缩 2x），n 乘 4。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="pitfalls">⚠️ 本作业典型陷阱</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：CLT 公式 SD 用谁的</strong><br>
+    <code>SD_sample_mean = pop_SD / √n</code>——分子是<strong>总体 SD</strong>，不是 sample SD。但实际操作中我们用 sample SD 估计 pop SD（plug-in）。考试如果给你 pop SD，直接用；如果只给 sample，用 sample 当 estimate。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：counts 的 SD 跟 proportions 趋势相反</strong><br>
+    <code>SD_counts = √(n · p · (1-p))</code>（与 √n 成<u>正比</u>）；<code>SD_props = √(p · (1-p)) / √n</code>（与 √n 成<u>反比</u>）。Q2.6 的两个真陈述都基于此。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：normal 公式 vs Chebyshev</strong><br>
+    Q4.3 选项 3、4 都把 normal 的精确法则（68-95-99.7）误用到"任何分布"上。要对任何分布说话只能 Chebyshev（下界，approximate / at least）。Q4.3 选项 5 才是真的（5 SD 内 ≥ 96%）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：CLT 只对 mean / sum 适用</strong><br>
+    Q4.3 选项 2 说"sample median 也近似 normal"——错。CLT <u>明确</u>只保证 sample mean / sum 的分布近似 normal。Median、min、max、IQR 等都不保证。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：样本量公式记反</strong><br>
+    Q3.4 要 SD ≤ w：<code>n ≥ pop_SD² / w²</code>。<u>不</u>是 <code>n ≥ pop_SD / w²</code>，<u>不</u>是 <code>n ≥ (pop_SD / w)²</code>（其实等价，但要注意分子分母位置）。<br>
+    Quiz 3 标准形式（按 CI 宽度）：<code>n ≥ (4 × SD / w)²</code>（w 是 CI <u>宽度</u>，95% CI 宽 = 4 × SD/√n）。这两个公式都常考。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：n 要向上取整 (<code>np.ceil</code>)</strong><br>
+    Q3.4 算出 14218.75 → <code>int(np.ceil(...)) = 14219</code>。<u>不</u>是 <code>int(14218.75) = 14218</code>（这是<u>向下</u>取整），<u>不</u>是 <code>round(14218.75) = 14219</code>（碰巧对，但 14218.4 round → 14218 就错了）。
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="formulas">📐 必背公式与速查</h2>
+
+  <table>
+    <tr><th>公式</th><th>表达</th><th>用在</th></tr>
+    <tr><td>Standard units</td><td><code>z = (x − mean) / SD</code></td><td>Q4.1</td></tr>
+    <tr><td>0/1 集合 SD</td><td><code>SD = √(p₀ · p₁)</code></td><td>Q3.1, Q3.4</td></tr>
+    <tr><td>CLT（mean）</td><td><code>SD_sample_mean = pop_SD / √n</code></td><td>Q1.2, Q3.1</td></tr>
+    <tr><td>CLT（sum/count）</td><td><code>SD_count = √n · pop_SD = √(n · p · (1-p))</code></td><td>Q2.6</td></tr>
+    <tr><td>Normal-based 95% CI</td><td><code>[mean − 2·SD, mean + 2·SD]</code></td><td>Q3.3</td></tr>
+    <tr><td>样本量（约束 SD ≤ w）</td><td><code>n ≥ pop_SD² / w²</code>，向上取整</td><td>Q3.4</td></tr>
+    <tr><td>样本量（CI 宽度约束）</td><td><code>n ≥ (4 · SD / width)²</code></td><td>Quiz 3 常考</td></tr>
+    <tr><td>SD 缩 k 倍</td><td>n 要 × k²</td><td>Q3.5, Q4.4</td></tr>
+    <tr><td>Chebyshev</td><td>≥ 1 − 1/k²（任何分布）</td><td>Q4.2, Q4.3</td></tr>
+    <tr><td>Normal 68-95-99.7</td><td>精确，<u>仅</u> normal</td><td>Q4.3 反面</td></tr>
+  </table>
+
+  <!-- ============================================================ -->
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① CLT 的两个声明分别是什么？（mean 分布的形状 + mean 分布的 SD 公式）</span></label>
+    <label><input type="checkbox"><span>② 0/1 数据的 SD 公式？为什么 p₀+p₁ = 1 时 SD 在 p = 0.5 时最大（= 0.5）？</span></label>
+    <label><input type="checkbox"><span>③ proportion 跟 count 的 SD 公式分别是什么？为什么 n 增加时一个升一个降？</span></label>
+    <label><input type="checkbox"><span>④ Bootstrap CI 跟 Normal-based CI 的代码区别？两者应该非常接近，为什么？</span></label>
+    <label><input type="checkbox"><span>⑤ Q3.4 的样本量公式怎么推导？为什么必须向上取整？</span></label>
+    <label><input type="checkbox"><span>⑥ "SD 缩 k 倍 → n 要 × k²"——这跟 CLT 公式的关系？</span></label>
+    <label><input type="checkbox"><span>⑦ Chebyshev 跟 Normal 68-95-99.7 各自适用条件？哪个更弱（适用范围更广）？</span></label>
+    <label><input type="checkbox"><span>⑧ Q4.3 选项 2 "sample median 也近似 normal" 为什么错？CLT 适用范围是？</span></label>
+    <label><input type="checkbox"><span>⑨ "plug-in" 思想：算 SD 时用 sample 比例代替 pop 比例为什么 OK？</span></label>
+    <label><input type="checkbox"><span>⑩ Q3.5 为什么选 4 而不是 3？两者都"在算法上"对，"在现实上"为什么 4 更对？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="03-lab6-hypothesis-fundamentals.html">⬅ 上一份：Lab 6</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="05-lab5-su-chebyshev-sample-size.html">下一份 ➡：Lab 5</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

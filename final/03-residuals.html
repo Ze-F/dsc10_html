@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 3 · Residuals &amp; Inference for Regression - DSC10 Final</title>
+<style>
+  :root {
+    --bg: #fafaf7; --text: #1f2328; --muted: #57606a;
+    --accent: #0969da; --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e; --code-text: #cdd6f4;
+    --warn-bg: #fff8c5; --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff; --tip-border: #54aeff;
+    --danger-bg: #ffebe9; --danger-border: #cf222e;
+    --ok-bg: #dafbe1; --ok-border: #1a7f37;
+    --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781;
+    --border: #d0d7de; --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+  .ascii-plot { font-family: "Menlo", "Monaco", monospace; white-space: pre; background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; font-size: 13px; line-height: 1.3; margin: 12px 0; overflow-x: auto; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📗 Final 总目录</a></span>
+  <span><a href="02-regression.html">← 上一节</a> <a href="04-mock-final.html">下一节: Mock Final →</a></span>
+</nav>
+
+<main>
+  <h1>Section 3 · Residuals &amp; Inference for Regression</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 25（Residuals and Inference）｜
+    <strong>Final 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1</span>（每套近年 Final 都有 1 道 residual plot 解读 + bootstrap regression 的题）｜
+    <strong>预计学习时间</strong>：1.5-2 小时
+  </p>
+
+  <div class="meta">
+    <strong>📌 这一节定位</strong>：Section 2 已经把 regression line 算出来了。本节回答"<strong>这条线靠不靠谱</strong>"的问题——用 <strong>residual plot</strong> 诊断 fit 质量，用 <strong>bootstrap</strong> 给预测加 uncertainty（prediction intervals），并引入 <em>datasaurus dozen</em> 警告"<strong>看起来相同的统计指标，分布可以完全不同</strong>"。
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a>
+        <ul>
+          <li><a href="#quality">Quality of fit：line 何时"有意义"</a></li>
+          <li><a href="#residuals">Residuals 的定义、性质与 helper 函数</a></li>
+          <li><a href="#residual-plot">Residual plot：构造与坐标轴</a></li>
+          <li><a href="#patterns">解读：4 种常见 pattern（含 heteroscedasticity）</a></li>
+          <li><a href="#anscombe">Anscombe's quartet</a></li>
+          <li><a href="#datasaurus">Datasaurus dozen 警告</a></li>
+          <li><a href="#prediction-intervals">Prediction intervals（bootstrap）</a></li>
+          <li><a href="#reverse">Reverse regression：predict x from y</a></li>
+          <li><a href="#best-line-vs-model">Best line ≠ best model</a></li>
+        </ul>
+      </li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>形式</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Residual plot 解读</strong>（patternless / curved / 不均匀 spread）</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>多选 / 配图（Sp24 Q12.3.4、Sp25 Q7.5.2、Wi25 Q8.6 都考）</td>
+      </tr>
+      <tr>
+        <td><strong>Residual = actual y − predicted y</strong>，方向不能搞反</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>计算（Sp25 Q4.7.2 经典）</td>
+      </tr>
+      <tr>
+        <td><strong>Residual plot 横轴 = x</strong>（不是 predicted y！）</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>T/F</td>
+      </tr>
+      <tr>
+        <td><strong>Prediction interval 宽度</strong>：在 mean_x 附近最窄，远离时变宽</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>多选（Sp24 Q12.2.3 经典）</td>
+      </tr>
+      <tr>
+        <td><strong>Bootstrap regression line</strong>：对每个 x 算 predicted y_i = m_i · x + b_i</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>代码 / 概念（Wi23 Q7.3.6）</td>
+      </tr>
+      <tr>
+        <td><strong>Reverse regression</strong>：predict x from y ≠ predict y from x</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>T/F（Sp25 Q7.4 多选）</td>
+      </tr>
+      <tr>
+        <td><strong>残差 sum 永远 = 0</strong>；regression line 必过 (mean_x, mean_y)</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>多选 T/F</td>
+      </tr>
+      <tr>
+        <td>"Best line ≠ best model"：line 是 best linear，但数据可能不该用 line</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>概念辨析</td>
+      </tr>
+      <tr>
+        <td><em>Datasaurus dozen</em>：相同 r、相同 mean/SD 的数据形状可以完全不同</td>
+        <td><span class="tier tier-3">⭐</span></td>
+        <td>概念警告</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3 id="quality">Quality of fit：line 何时"有意义"</h3>
+
+  <p>Section 2 已经证明 regression line 是<strong>所有直线中最小化 RMSE 的那条</strong>——它就是 <em>best line</em>，<strong>跟数据长什么样无关</strong>。</p>
+
+  <div class="tip">
+    <strong>三个等价名字（考题里都见过）</strong>：
+    <ul style="margin: 6px 0;">
+      <li>Line of <strong>best fit</strong></li>
+      <li><strong>Least squares</strong> line</li>
+      <li><strong>Regression</strong> line</li>
+    </ul>
+  </div>
+
+  <p>但"best line" ≠ "good fit"。Lec 25 一开场就给了一个反例：</p>
+
+  <div class="warn">
+    <strong>非线性数据的"最佳直线"图（PDF p.2）</strong>：散点呈明显抛物线 / 簇状非线性分布，regression line 算出来是 <code>y = 0.14x + 13.10</code>，斜率几乎为 0、完全没抓住数据的形状。<br>
+    <strong>结论</strong>：line 是 best <em>line</em>，但 <strong>only meaningful if the relationship between x and y is roughly linear</strong>。所以我们需要一个工具来诊断"数据到底该不该用 line 来 model"——这就是 <strong>residual plot</strong>。
+  </div>
+
+  <h3 id="residuals">Residuals 的定义、性质与 helper 函数</h3>
+
+  <div class="formula formula-big">
+    residual &nbsp;=&nbsp; actual y − predicted y by regression line
+  </div>
+
+  <p>每个 data point <code>(x_i, y_i)</code> 对应<strong>一个</strong> residual：</p>
+  <ul>
+    <li><strong>actual y</strong> = y_i（观测值）</li>
+    <li><strong>predicted y</strong> = m · x_i + b（regression line 给的预测）</li>
+    <li><strong>residual</strong> = y_i − (m · x_i + b)，正负都可能</li>
+  </ul>
+
+  <h4>Regression line 的 residuals 两条铁律</h4>
+  <ul>
+    <li><strong>residuals 之和 = 0</strong>（理论精确为 0，浮点上是 1e-15 量级）。因为 regression line 必过 (mean_x, mean_y)。</li>
+    <li><strong>residuals 的 mean = 0</strong>（sum / n = 0）。</li>
+  </ul>
+
+  <p class="tip">这两条只对<strong>regression line</strong>成立。任意其它直线的 residuals 之和可以非 0。</p>
+
+  <h4>Lec 25 官方 helper 函数（题目里直接出现）</h4>
+  <p>课程在 lec25 给了两个 helper，<strong>真题代码题里直接用这个签名</strong>，要会背：</p>
+  <pre><code>def predicted(df, x, y):
+    m = slope(df, x, y)
+    b = intercept(df, x, y)
+    return m * df.get(x) + b
+
+def residual(df, x, y):
+    return df.get(y) - predicted(df, x, y)</code></pre>
+
+  <p>用法：</p>
+  <pre><code>mom_son_predictions = mom_son.assign(
+    predicted = predicted(mom_son, 'mom', 'son'),
+    residuals = residual(mom_son, 'mom', 'son')
+)</code></pre>
+  <p class="tip">注意签名是 <code>(df, x, y)</code>——和 <code>slope</code> / <code>intercept</code> 一致。<strong>predicted</strong> 返回的是 Series（broadcast 后），<strong>residual</strong> 是「实际 y − Series 预测 y」也是 Series。</p>
+
+  <h4>易错：方向不能反</h4>
+  <div class="danger">
+    <strong>residual = actual − predicted</strong>，<strong>不是</strong> predicted − actual。<br>
+    考题常考：predicted = 5.4，actual = 2.1 → residual = 2.1 − 5.4 = <strong>−3.3</strong>（不是 +3.3）。<br>
+    <strong>Sp25 Final Q7.2 官方解析直接警告："Many students answered 3.3. Pay attention to the order of the calculation!"</strong>
+  </div>
+
+  <h3 id="residual-plot">Residual plot：构造与坐标轴</h3>
+
+  <p><strong>Residual plot</strong> = 给每个数据点画一个点 (x_i, residual_i) 的 scatter plot。</p>
+
+  <table>
+    <thead><tr><th>轴</th><th>变量</th></tr></thead>
+    <tbody>
+      <tr><td>横轴 (x)</td><td><strong>原数据的 x</strong>（即 predictor / actual x）</td></tr>
+      <tr><td>纵轴 (y)</td><td><strong>residual = actual y − predicted y</strong></td></tr>
+    </tbody>
+  </table>
+
+  <p class="warn">
+    <strong>⚠️ Sp24 Q12 P3.3 直接考</strong>：residual plot 横轴是 "actual production cost"（即 x），<strong>不</strong>是 predicted y。因为：
+    <ul>
+      <li>residual plot 的目的：检查 "residual 大小/方向是否随 x 变化"，所以横轴必须是 x。</li>
+      <li>如果横轴是 predicted y，本质上还是 x 的线性变换（predicted y = m·x + b），但<strong>课程约定</strong>用 actual x。</li>
+    </ul>
+  </p>
+
+  <h4>构造 residual plot 的代码</h4>
+  <pre><code>def residual_plot(df, x, y):
+    predicted_y = slope(df, x, y) * df.get(x) + intercept(df, x, y)
+    residuals = df.get(y) - predicted_y
+    plt.scatter(df.get(x), residuals)
+    plt.axhline(0, color='red', linestyle='--')   # 0 参考线</code></pre>
+
+  <h3 id="patterns">解读：4 种常见 pattern</h3>
+
+  <p>Residual plot 是 fit 质量的<strong>诊断工具</strong>。看 4 种常见 pattern：</p>
+
+  <h4>Pattern 1：Patternless cloud（好 fit）</h4>
+  <div class="ascii-plot">    residual
+        ▲
+      2 │   .  .    .   .
+      1 │ .    . . .  .   .
+      0 ├ ── . ── . ─ . ─ . ── ──
+     -1 │   . .  .  .   .  .
+     -2 │ .    .   .  . .
+        └────────────────────► x
+</div>
+  <ul>
+    <li>residuals 均匀分散在 0 上下、无明显趋势、spread 一致 → <strong>线性模型合适</strong></li>
+    <li>这是 ideal 的 residual plot。</li>
+  </ul>
+
+  <h4>Pattern 2：Curved pattern（应该用 nonlinear model）</h4>
+  <div class="ascii-plot">    residual
+        ▲
+      4 │ .                          .
+      2 │   .                      .
+      0 ├ ── . ── ── ── ── ── ─ . ── ──
+     -2 │       .            .
+     -4 │           .  .  .
+        └────────────────────────────► x
+</div>
+  <ul>
+    <li>residuals 显示<strong>明显的 U 形或倒 U 形</strong> → 数据真实关系是 nonlinear（如二次、指数）</li>
+    <li>结论："It would be better to fit a nonlinear curve."</li>
+    <li>这是 Sp24 Q12 P3.4 / Sp25 Q7 P5.2 的考点</li>
+  </ul>
+
+  <p class="warn">⚠️ <strong>陷阱</strong>：curved residual plot <strong>不</strong>意味着 |r| 很小。可能 |r| 仍然较大（线性 fit 抓到了趋势），但<em>有更好的 nonlinear fit</em>。</p>
+
+  <h4>Pattern 3：Funnel / 不均匀 spread（<span class="highlight">heteroscedasticity</span>）</h4>
+  <div class="ascii-plot">    residual
+        ▲
+      4 │                          .
+      2 │           .          . .  .
+      0 ├ . ── . ── . ── . ── . ── . ── ──
+     -2 │   .       .        .     .
+     -4 │                            .
+        └────────────────────────────► x
+</div>
+  <ul>
+    <li>左侧 spread 小、右侧 spread 大（或反过来）→ <strong>predictions 不同 x 值下精度不同</strong></li>
+    <li>结论："The accuracy of the regression line's predictions depends on x."</li>
+    <li>Sp25 Q1 P1.5 的考点</li>
+  </ul>
+
+  <div class="danger">
+    <strong>📖 必背术语</strong>：Lec 25 PDF 原文：<br>
+    "The formal term for 'uneven spread' is <strong>heteroscedasticity</strong>."<br>
+    考题选项里出现 "heteroscedasticity" 时 = 在描述 <strong>vertical spread 不均匀</strong>。和 "non-linear / curved" 是<strong>两件事</strong>，不能混。
+  </div>
+
+  <p class="warn">
+    ⚠️ Lec 25 PDF 还特意补了一句：<strong>uneven spread <em>doesn't</em> necessarily mean fitting a non-linear curve would be better</strong>——它只影响"<em>how we interpret the regression line's predictions</em>"（哪些 x 值的预测更靠谱）。
+  </p>
+
+  <h4>Pattern 4：Discrete x（slanted lines / bands）</h4>
+  <ul>
+    <li>如果 x 只有<strong>少数离散值</strong>（如 150, 175, 200, 225 cm），同一个 x 下的所有点 residuals 排列成<strong>垂直/斜线列</strong></li>
+    <li>每一斜线对应一个 x 值，斜率 = −m（因为 residual = y − (m·x + b) 在固定 y 时随 m·x 反向变化）</li>
+    <li>Wi25 Q8 P8.6 考过</li>
+  </ul>
+
+  <h3 id="anscombe">Anscombe's quartet</h3>
+
+  <p>Lec 25 PDF 在 Datasaurus 之前先讲 <strong>Anscombe's quartet</strong>——4 个 toy 数据集：</p>
+
+  <ul>
+    <li>4 个 dataset 的 <strong>mean of x、mean of y、SD of x、SD of y、correlation r</strong> <em>全部</em>几乎相同</li>
+    <li>因为这 5 个量决定 regression line 的 slope 和 intercept，所以 <strong>4 条 regression line 完全一样</strong></li>
+    <li>但 scatter plot 长得<strong>完全不同</strong>：dataset 1 是正常云、dataset 2 是明显的抛物线、dataset 3 是带 outlier 的完美直线、dataset 4 是 x 几乎全相同的一根柱子 + 1 个右上 outlier</li>
+  </ul>
+
+  <div class="warn">
+    <strong>核心信息</strong>：<strong>5 个 summary 统计量（mean × 2、SD × 2、r）相同 ≠ 数据相同</strong>。Anscombe 是这个事实最早最经典的反例（4 个），Datasaurus 是把它推到极端（13 个，其中一个还是恐龙形状🦖）。
+  </div>
+
+  <h3 id="datasaurus">Datasaurus dozen 警告</h3>
+
+  <p><strong>Datasaurus dozen</strong>：13 个数据集，<strong>r、mean_x、mean_y、SD_x、SD_y 全都几乎相同</strong>，但 scatter plot <strong>形状完全不同</strong>——有像恐龙的、星形的、十字形的、X 形的等。</p>
+
+  <div class="danger">
+    <strong>🚨 核心警告</strong>：<strong>只看 r、mean、SD 这些 summary 统计量来判断 fit 是否好是<em>不够的</em></strong>。必须画 scatter plot 和 residual plot 才能看清真实情况。
+  </div>
+
+  <p>这是 "<em>always visualize first</em>" 的<strong>极端反例</strong>——五个数字相同，但视觉信息完全不同。</p>
+
+  <h3 id="prediction-intervals">Prediction intervals（bootstrap）</h3>
+
+  <p>给定一个 x*，regression line 给出 single-point 预测 <code>predicted_y = m·x* + b</code>。但<strong>这个预测有 uncertainty</strong>——如果换一个 sample（同 population）会得到略不同的 (m, b)，predicted y 也会变。</p>
+
+  <h4>Bootstrap prediction interval 的算法</h4>
+  <pre><code>predicted_ys = np.array([])
+for i in np.arange(10000):
+    resample = original_data.sample(original_data.shape[0], replace=True)
+    m_i = slope(resample, 'x', 'y')
+    b_i = intercept(resample, 'x', 'y')
+    predicted_y_i = m_i * x_star + b_i
+    predicted_ys = np.append(predicted_ys, predicted_y_i)
+
+# 95% prediction interval
+ci = [np.percentile(predicted_ys, 2.5), np.percentile(predicted_ys, 97.5)]</code></pre>
+
+  <h4>关键性质：宽度随 x 变化</h4>
+  <div class="ok">
+    <strong>Prediction interval 在 x = mean_x 处最窄</strong>，<strong>远离 mean_x 时变宽</strong>。
+  </div>
+
+  <p>直觉：bootstrap 出的各条 regression line <strong>都必过 (mean_x, mean_y) 附近</strong>（每条 line 都过它自己的 sample mean，这些 sample means 集中在 population mean 附近）→ 在 pivot 点附近 line 之间差别小，远离时差别被"放大"（斜率不同 → 远端的 y 拉开很远）。</p>
+
+  <h4>Lec 25 的 <code>draw_many_lines</code> 几何图（必看）</h4>
+  <p>PDF 最后一段 <code>draw_many_lines(m_boot, b_boot)</code> 把所有 bootstrap 出的 line 叠画在一起，得到的图像有一个非常清晰的 <strong>X 形 / 沙漏腰</strong>：</p>
+
+  <div class="ascii-plot">    y
+        ▲                          ╱╱╱
+     75 │     ╲╲                 ╱╱╱
+     70 │       ╲╲╲           ╱╱╱           ← 远离 mean_x，line 散开（区间宽）
+     65 │          ╲╲╲     ╱╱╱
+        │            ╲╲╲ ╱╱╱
+        │  pivot ▶  ◇━━━◇━━━◇       ← 所有 line 都"挤"过 (mean_x, mean_y)，区间最窄
+        │           ╱╱╱ ╲╲╲
+        │        ╱╱╱      ╲╲╲
+        └─────────────────────► x
+              mean_x
+</div>
+
+  <div class="ok">
+    <strong>PDF 原文观察（两条要背）</strong>：
+    <ol style="margin: 6px 0;">
+      <li>"All bootstrapped lines pass through <strong>(mean mother's height in resample, mean son's height in resample)</strong>" —— 因为 regression line 的定义就保证它<strong>必经过样本均值点</strong>，所以每条 bootstrap line 都过<em>自己 resample</em> 的均值点（这些点都集中在原样本均值附近，所以视觉上像共同 pivot）。</li>
+      <li>"Predictions seem to vary more for <strong>very tall and very short</strong> mothers than they do for mothers with an average height." —— 几何上就是 X 形腰部最窄。</li>
+    </ol>
+  </div>
+
+  <p class="tip">考点措辞：<strong>"the closer a mother's height is to the mean mother's height, the narrower the prediction interval"</strong>——PDF 原话，最容易出现在多选题里作为唯一正确选项。</p>
+
+  <p class="warn">
+    <strong>⚠️ Sp24 Q12 P2.3 直接考</strong>：data 的 mean price = 140 dollars。100 dollar 和 120 dollar 的 prediction interval 谁宽？<br>
+    答：<strong>100 dollar</strong>（离 mean=140 更远 → 区间更宽）。
+  </p>
+
+  <h4>陷阱：不能把 (slope CI 端点) 与 (intercept CI 端点) 独立组合</h4>
+  <p>已在 Section 2 提过（Wi23 Q7 P3.6）：</p>
+  <ul>
+    <li>"95% slopes 在 [a, b]、95% intercepts 在 [c, d]" → 预测 x* = 500 的 CI <strong>不</strong>是 [500a + c, 500b + d]</li>
+    <li>因为 slope 和 intercept 在每次 bootstrap 中<strong>相关</strong>（同一组 resample 决定一对 (m, b)）</li>
+    <li>正确做法：对每次 bootstrap 算 predicted_y_i，再对这些 predicted_y_i 取 percentile（见上面代码）</li>
+  </ul>
+
+  <h3 id="reverse">Reverse regression：predict x from y</h3>
+
+  <p>r 是对称的，但 <strong>regression line 不对称</strong>：</p>
+
+  <ul>
+    <li>Predict <strong>y from x</strong>：m_yx = r · SD_y / SD_x</li>
+    <li>Predict <strong>x from y</strong>：m_xy = r · SD_x / SD_y</li>
+    <li>两个 slope 一般<strong>不</strong>互为倒数：m_xy ≠ 1 / m_yx（除非 |r| = 1）</li>
+  </ul>
+
+  <h4>具体关系</h4>
+  <div class="formula">
+    m_yx · m_xy &nbsp;=&nbsp; r²
+  </div>
+  <p>所以只有当 r² = 1（即 |r| = 1）时，<code>m_xy = 1 / m_yx</code>。其它情况下，predicting x from y 和"把 y from x 反过来"是<strong>两条不同的线</strong>。</p>
+
+  <h4>课程考点：比较 a 和 c</h4>
+  <p>Sp25 Q7 P7.4：predict y from x 用 y = ax + b；predict x from y 用 x = cy + d。在<strong>正相关</strong>但<em>非完美</em>的情境下：</p>
+  <ul>
+    <li>a = r · SD_y / SD_x</li>
+    <li>c = r · SD_x / SD_y</li>
+    <li>a · c = r² &lt; 1</li>
+    <li>所以 a 和 c <strong>各自</strong>都比 1/对方<strong>小</strong>（在某些 SD 配置下）。题目里 a &lt; c 还是 c &lt; a 取决于 SD 比例。</li>
+  </ul>
+
+  <h3 id="best-line-vs-model">Best line ≠ best model</h3>
+
+  <div class="ok">
+    <strong>Regression line 是<em>所有直线中</em>最好的（least squares 意义下）</strong>。<br>
+    但<strong>不</strong>意味着 line 是<em>所有可能模型中</em>最好的——曲线、分段函数、二次模型、log-linear 模型等可能拟合得更好。
+  </div>
+
+  <p>residual plot 是判断"该不该用 line"的关键工具：</p>
+  <ul>
+    <li>Patternless residual → line 合适</li>
+    <li>Curved residual → nonlinear model 更好</li>
+  </ul>
+
+  <p class="warn">⚠️ 典型陷阱措辞：
+    <ul>
+      <li>"The regression line is the best <strong>line</strong>" ✓ True</li>
+      <li>"The regression line is the best <strong>model</strong>" ✗ False（数据可能 nonlinear）</li>
+      <li>"Some other line has lower RMSE" ✗ False（regression line 就是 RMSE 最小的 line）</li>
+      <li>"Some other <strong>curve</strong> has lower RMSE" ✓ True（曲线不是 line，不在 least squares 的优化空间里）</li>
+    </ul>
+  </p>
+
+  <hr>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <h3>陷阱 1：residual 方向写反</h3>
+  <p>正确：<code>residual = actual y − predicted y</code>。<br>
+  错（高频）：predicted − actual（顺序反 → 符号反）。<br>
+  口诀："观测在前、预测在后"。</p>
+
+  <h3>陷阱 2：residual plot 横轴是 x，不是 predicted y</h3>
+  <p>横轴是 actual x（即 predictor）。纵轴是 residual。<br>
+  虽然 predicted y 和 x 是线性关系（看 plot 形状一样），但<strong>课程约定</strong>用 x。</p>
+
+  <h3>陷阱 3：curved residual ≠ |r| 小</h3>
+  <p>curved residual plot 意味着 "data 是 nonlinear，应该用 curve"，<strong>不</strong>意味着 |r| 弱。<br>
+  数据可以是 strong nonlinear pattern（如 y = x²），用 line 拟合后 residual 是 U 形，但 |r| 仍可能不小（取决于范围）。</p>
+
+  <h3>陷阱 4：prediction interval 在 mean_x 附近最窄</h3>
+  <p>典型措辞：<br>
+  "100 dollar product 和 120 dollar product 的 prediction interval 谁宽？data mean = 140."<br>
+  答：100 dollar（离 mean 远）→ 区间宽。<br>
+  <strong>不是</strong>价格小所以区间小，而是离<strong>mean</strong>远所以区间大。</p>
+
+  <h3>陷阱 5：bootstrap regression line 与 prediction CI</h3>
+  <p>"95% bootstrap slopes 在 [a, b]、95% intercepts 在 [c, d]" → predicted_y(500) 的 CI <strong>不</strong>是 [500a + c, 500b + d]。<br>
+  Slope 和 intercept 的 bootstrap 分布<strong>不独立</strong>。<br>
+  正确：对每次 bootstrap 算 predicted_y_i = m_i · x + b_i，再对这些 y_i 取 percentile。</p>
+
+  <h3>陷阱 6：RMSE 不是 average error 的简单解释</h3>
+  <p>RMSE = √(mean of squared errors)。<br>
+  <strong>不</strong>等于 "predictions are on average X off from actual"（那是 MAE, mean absolute error）。<br>
+  <strong>不</strong>等于 X% off。<br>
+  <strong>不</strong>等于 X% of predictions are within ±X。<br>
+  RMSE 是 squared error 的 RMS，<strong>没有</strong>非常直观的"average X"解释。Wi25 Q8.5 直接考"<em>选哪个描述对 RMSE = 36 cm 是准确的</em>" → 答 None of the above。</p>
+
+  <h3>陷阱 7：Predict y from x 与 predict x from y 是<strong>两条</strong>不同的线</h3>
+  <p>除非 |r| = 1，否则<strong>不</strong>能"把 y = ax + b 反过来变成 x = (1/a)y − b/a 当 predict x from y"。<br>
+  predict x from y 的 slope 是 c = r · SD_x / SD_y，不是 1/a。<br>
+  关系：a · c = r²。</p>
+
+  <h3>陷阱 8：residuals 之和 = 0 只对 regression line 成立</h3>
+  <p>对任意<em>其它</em>直线，residuals 之和不为 0。<br>
+  这是 regression line 的<strong>定义性质</strong>之一（least squares 的一阶条件）。</p>
+
+  <h3>陷阱 9：residual plot 显示"曲线 pattern" → 选 "fit nonlinear curve"，不要选 "correlation is weak"</h3>
+  <p>常见迷惑选项："residual 有 pattern → r 弱"。<br>
+  正确解读：residual 的 pattern 反映的是<strong>当前 line 没抓到的趋势</strong>，跟 r 大小没有直接对应关系。</p>
+
+  <hr>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <p class="meta">题目来源：<code>practice.dsc10.com/lectures/lec25/</code> + 近期 Final。Lec 25 是 final-only 内容，没有 quiz 真题。</p>
+
+  <h3>真题 1：Sp25 Final Q7 P4.4 ⭐⭐⭐（residual 计算 · 方向陷阱）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Final · Problem 4.4（apartment rent → sqft 预测）</div>
+    <p>Sophie's apartment：rent = $5000（mean rent = $3000，SD rent = $400），mean sqft = 2000，SD sqft = 500，r = 0.9。我们预测 Sophie 公寓 sqft = 2450（已算）。Sophie 公寓<strong>实际</strong> sqft = 2300。求 residual。</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：−150</strong></p>
+      <p>residual = actual y − predicted y = 2300 − 2450 = <strong>−150</strong></p>
+      <p class="warn">⚠️ 写成 +150（=2450 − 2300）是 <strong>高频错</strong>。"observed − predicted"的顺序不能反。</p>
+    </details>
+  </div>
+
+  <h3>真题 2：Sp25 Final Q7 P7.2 ⭐⭐⭐（残差计算 · WNBA 例）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Final · Problem 7.2（Tina Charles · 点 → 助攻预测）</div>
+    <p>Tina Charles 2021 年场均 27 分。Regression 预测她场均助攻 5.4。她实际场均助攻 2.1。求 residual。</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：−3.3</strong></p>
+      <p>2.1 − 5.4 = <strong>−3.3</strong></p>
+      <p class="warn">官方原解析特意标注："Many students answered 3.3. Pay attention to the order of the calculation!"</p>
+    </details>
+  </div>
+
+  <h3>真题 3：Sp24 Final Q12 P2.3 ⭐⭐⭐（prediction interval 宽度）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Final · Problem 12.2.3（IKEA 家具 · price → assembly cost 预测）</div>
+    <p>data 中 mean price = 140 dollars。我们对 <strong>100 dollar</strong> 产品和 <strong>120 dollar</strong> 产品各构造 95% prediction interval。哪个 interval <strong>更宽</strong>？</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：100 dollar product 的 interval 更宽</strong></p>
+      <p>Prediction interval 在 mean_x 处最窄，远离时变宽。100 dollar 离 mean = 140 距离 40；120 dollar 离 mean 距离 20。所以 100 dollar 的 interval 更宽。</p>
+      <p class="tip"><strong>关键认知</strong>：跟"价格本身大小"无关，只跟"<strong>距 mean_x 的距离</strong>"有关。</p>
+    </details>
+  </div>
+
+  <h3>真题 4：Sp24 Final Q12 P3.3 ⭐⭐（residual plot 横轴）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Final · Problem 12.3.3（residual plot 坐标轴）</div>
+    <p>给定一个 residual plot for predicting sale price from production cost。横轴表示的是什么？</p>
+    <ol type="A">
+      <li>actual production cost</li>
+      <li>actual sale price</li>
+      <li>predicted production cost</li>
+      <li>predicted sale price</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：A. actual production cost</strong></p>
+      <p>Residual plot 约定：横轴是 <strong>x</strong>（即 predictor、independent variable）。这里 production cost 是 x → "actual production cost"。</p>
+      <p>预测变量是 sale price（y），residual 是 sale price 的残差，但<strong>横轴用 x</strong>。</p>
+    </details>
+  </div>
+
+  <h3>真题 5：Sp24 Final Q12 P3.4 ⭐⭐⭐（residual plot 解读 · 多选）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Final · Problem 12.3.4（curved residual 的结论）</div>
+    <p>给一个有<strong>明显曲线 pattern</strong>的 residual plot。下面哪些结论可以画？多选。</p>
+    <ol type="A">
+      <li>The correlation between production cost and sale price is weak.</li>
+      <li>It would be better to fit a nonlinear curve.</li>
+      <li>Our predictions will be more accurate for some inputs than others.</li>
+      <li>We don't have enough data.</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：B 只有 (官方：It would be better to fit a nonlinear curve)</strong></p>
+      <ul>
+        <li>(A) ❌ "correlation 弱"——可能 r 仍很强（线性 fit 抓了主要趋势）。curved residual 不直接说 r 弱。</li>
+        <li>(B) ✅ curved residual 是 nonlinear 关系的标志。</li>
+        <li>(C) ❌ "predictions accuracy depends on input"——这是 funnel pattern（不均匀 spread）的结论，不是 curved 的结论。</li>
+        <li>(D) ❌ residual plot 不告诉你 sample size 够不够。</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>真题 6：Sp25 Final Q7 P5.2 ⭐⭐⭐（curved residual 多选）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Final · Problem 7.5.2（curved residual 的可推论）</div>
+    <p>看到 curved pattern 的 residual plot，下面哪些<strong>可以</strong>推断？多选。</p>
+    <ol type="A">
+      <li>The correlation coefficient between these variables is weak (r &lt; 0.5).</li>
+      <li>A line is not the best choice to model the relationship between these variables.</li>
+      <li>There is a difference in mean between two subgroups.</li>
+      <li>There are outliers in the dataset.</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：B 只有</strong></p>
+      <ul>
+        <li>(A) ❌ curved residual 不暗示 r 弱。</li>
+        <li>(B) ✅ 唯一可靠结论。</li>
+        <li>(C) ❌ 残差曲线 ≠ 群体差异。</li>
+        <li>(D) ❌ outliers 通常显示为单点离群，不是整体 curved pattern。</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>真题 7：Sp25 Final Q1 P1.5 ⭐⭐（uneven spread residual）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Final · Problem 1.5（penguin · spread 不均匀的 residual）</div>
+    <p>residual plot 显示 vertical spread <strong>不均匀</strong>（左小右大或反之）。哪个结论<strong>可以</strong>从此 plot 推出？</p>
+    <ol type="A">
+      <li>For this dataset, there is another line with a lower RMSE.</li>
+      <li>The RMSE of the regression line is large.</li>
+      <li>The accuracy of the regression line's predictions depends on bill length.</li>
+      <li>The relationship is nonlinear.</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：C（The accuracy ... depends on bill length）</strong></p>
+      <p>不均匀 vertical spread → 不同 x 值下 residuals 的离散程度不同 → predictions 在某些 x 值下精确、其它不精确。</p>
+      <ul>
+        <li>(A) ❌ regression line 就是 RMSE 最小的 line。</li>
+        <li>(B) ❌ 看不出 RMSE 绝对值。</li>
+        <li>(D) ❌ uneven spread ≠ curved，不直接说 nonlinear。</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>真题 8：Wi25 Final Q8 P8.5 ⭐⭐（RMSE 的"average error" 措辞陷阱）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Final · Problem 8.8.5（RMSE = 36 cm 的解读）</div>
+    <p>Professor Flitwick 的 regression line RMSE = 36 cm。下面哪个准确描述这个 RMSE 意味着什么？</p>
+    <ol type="A">
+      <li>Predictions are, on average, 36 cm off from actual values.</li>
+      <li>Predictions are, on average, 6 cm off from actual values.</li>
+      <li>About 95% of predictions are within ±36 cm of actual.</li>
+      <li>The slope is off by 36 cm per unit x.</li>
+      <li>None of the above.</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：E（None of the above）</strong></p>
+      <ul>
+        <li>(A) ❌ RMSE 是 squared error 的 RMS，<strong>不</strong>等于 average absolute error（MAE）。RMSE ≥ MAE，一般严格大。</li>
+        <li>(B) ❌ 数字也不对。</li>
+        <li>(C) ❌ RMSE 不是 confidence interval bound。</li>
+        <li>(D) ❌ RMSE 与 slope 无关。</li>
+      </ul>
+      <p class="warn"><strong>RMSE 的精确意义</strong>："residuals 的 RMS"——一个综合指标，<strong>没有</strong>简单的"average X off" 解释。</p>
+    </details>
+  </div>
+
+  <h3>真题 9：Sp25 Final Q7 P7.3 ⭐⭐⭐（regression line 必经过哪个点）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Final · Problem 7.7.3（regression line 上的点）</div>
+    <p>predict assists from points: x = points per game, y = assists per game。<strong>mean x = 7, mean y = 1.5</strong>。下面哪些点<strong>必定</strong>在 regression line 上？多选。</p>
+    <ol type="A">
+      <li>(0, 0)，when both in standard units</li>
+      <li>(0, 0)，when both in original units</li>
+      <li>(7, 1.5)，when both in standard units</li>
+      <li>(7, 1.5)，when both in original units</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：A 和 D</strong></p>
+      <ul>
+        <li>(A) ✅ SU 下 regression line 必过 (0, 0)（slope = r，intercept = 0）</li>
+        <li>(B) ❌ original units 下不一定过原点</li>
+        <li>(C) ❌ SU 下 (7, 1.5) 意义不明（7 和 1.5 都不是 SU 值）</li>
+        <li>(D) ✅ original units 下 regression line 必过 (mean_x, mean_y) = (7, 1.5)</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>真题 10：Sp25 Final Q7 P7.4 ⭐⭐⭐（reverse regression 比较 slope）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Final · Problem 7.7.4（predict y from x vs x from y）</div>
+    <p>Predict assists (y) from points (x)：y = ax + b。现在反过来 predict points (x) from assists (y)：x = cy + d。给定 SD<sub>points</sub> &gt; SD<sub>assists</sub>，positive 但非完美 r。比较 a 和 c。</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：a &lt; c</strong></p>
+      <ul>
+        <li>a = r · SD<sub>y</sub> / SD<sub>x</sub> = r · SD<sub>assists</sub> / SD<sub>points</sub>，分子小分母大 → a 较小</li>
+        <li>c = r · SD<sub>x</sub> / SD<sub>y</sub> = r · SD<sub>points</sub> / SD<sub>assists</sub>，分子大分母小 → c 较大</li>
+        <li>所以 a &lt; c</li>
+      </ul>
+      <p class="tip"><strong>验证</strong>：a · c = r² &lt; 1（因为 |r| &lt; 1）。a 和 c 互相不为倒数。</p>
+    </details>
+  </div>
+
+  <h3>真题 11：Wi25 Final Q8 P8.6 ⭐⭐（discrete x → 斜线 residual plot）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Final · Problem 8.8.6（broomstick · discrete x 的 residual plot）</div>
+    <p>broomstick 长度只有 4 个值 (150, 175, 200, 225 cm)。residual plot 长什么样？</p>
+    <ul>
+      <li>Option A：patternless cloud</li>
+      <li>Option B：4 条<strong>斜线</strong>分别在 x = 150/175/200/225 处</li>
+      <li>Option C：curved pattern</li>
+    </ul>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：Option B</strong></p>
+      <p>因为 x 只取 4 个离散值，每个 x 对应许多 y 值。<br>
+      在 x = c（固定值）下：residual = y − (m·c + b) = y − const，所以 residuals 按 y 线性排列 → <strong>4 条垂直/斜线</strong>。</p>
+    </details>
+  </div>
+
+  <h3>真题 12：Sp25 Final Q7 P5.3 ⭐⭐（单位换算对 residual plot/RMSE 的影响）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Final · Problem 7.5.3（除 y 以 1000 → 哪些量变）</div>
+    <p>Haymitch 把所有价格除以 1000（dollars → thousands of dollars），重新算 regression line。下面哪些<strong>会按 1/1000 缩放</strong>？多选。</p>
+    <ol type="A">
+      <li>mean of y</li>
+      <li>SD of y</li>
+      <li>slope</li>
+      <li>intercept</li>
+      <li>correlation coefficient r</li>
+      <li>RMSE</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：A、B、C、D、F（不含 E）</strong></p>
+      <ul>
+        <li>(A)(B) ✅ mean 和 SD 与 y 同步缩放</li>
+        <li>(C) ✅ m = r · SD_y / SD_x，SD_y 除 1000 → m 除 1000</li>
+        <li>(D) ✅ b = mean_y − m · mean_x，两者都除 1000 → b 除 1000</li>
+        <li>(E) ❌ r 对线性变换不变</li>
+        <li>(F) ✅ residuals 与 y 同步缩放 → 平方误差 / 1000²，RMSE 开方后 / 1000</li>
+      </ul>
+      <p class="tip"><strong>口诀</strong>：单位换算只影响 y 时，所有"y 的派生量"按相同因子缩放；r 不动。</p>
+    </details>
+  </div>
+
+  <hr>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <p>看完本节后，对着 Claude 把下面每条都讲一遍（要能讲<strong>为什么</strong>）：</p>
+
+  <div class="checklist">
+    <label><input type="checkbox"><span> residual 的定义：<strong>actual y − predicted y</strong>。为什么写反（predicted − actual）是错的？</span></label>
+    <label><input type="checkbox"><span> 为什么 regression line 的 residuals 之和 = 0？跟"必过 (mean_x, mean_y)" 是同一个性质吗？</span></label>
+    <label><input type="checkbox"><span> Residual plot 横轴是什么？纵轴是什么？为什么不用 predicted y 作横轴？</span></label>
+    <label><input type="checkbox"><span> 4 种 residual plot pattern：patternless、curved、funnel/不均匀 spread、discrete x。每种意味着什么？</span></label>
+    <label><input type="checkbox"><span> Curved residual plot → 应该用 nonlinear model。这<strong>不</strong>意味着 |r| 弱，为什么？</span></label>
+    <label><input type="checkbox"><span> Datasaurus dozen 是什么？传递的核心警告是什么？</span></label>
+    <label><input type="checkbox"><span> Bootstrap prediction interval 的算法（4 步）。写出伪代码。</span></label>
+    <label><input type="checkbox"><span> Prediction interval 在哪里最窄？为什么远离 mean_x 时变宽？</span></label>
+    <label><input type="checkbox"><span> "95% slopes 在 [a,b]、95% intercepts 在 [c,d]，所以 predict x=500 的 CI 是 [500a+c, 500b+d]" 为什么<strong>错</strong>？正确做法是什么？</span></label>
+    <label><input type="checkbox"><span> predict y from x 的 slope a vs predict x from y 的 slope c。两者关系（a·c = r²）和直觉。</span></label>
+    <label><input type="checkbox"><span> "Best line" 和 "best model" 的区别。Wi26 Q11(a) 那道选项陷阱再讲一遍。</span></label>
+    <label><input type="checkbox"><span> RMSE = 36 cm 意味着什么？为什么"predictions are on average 36 cm off" 是<strong>错</strong>的？</span></label>
+    <label><input type="checkbox"><span> Sophie 公寓 actual 2300，predicted 2450，residual = ?（答 −150 而非 150）</span></label>
+    <label><input type="checkbox"><span> "100 美元和 120 美元产品哪个 prediction interval 更宽？mean = 140" 答案 + 直觉。</span></label>
+    <label><input type="checkbox"><span> Discrete x 时 residual plot 长什么样？为什么？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="index.html">📗 Final 总目录</a></span>
+  <span><a href="02-regression.html">← 上一节</a> <a href="04-mock-final.html">下一节: Mock Final →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

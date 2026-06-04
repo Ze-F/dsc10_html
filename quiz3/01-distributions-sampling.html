@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 1 · Distributions & Sampling - DSC10 Quiz3</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --danger-bg: #ffebe9;
+    --danger-border: #cf222e;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .nav-bottom {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+  .nav-top a, .nav-bottom a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 16px;
+    margin-top: 20px;
+    color: var(--muted);
+  }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+  }
+  .tier {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta {
+    background: #f6f8fa;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .danger {
+    background: var(--danger-bg);
+    border-left: 4px solid var(--danger-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--tip-bg);
+    border-left: 4px solid var(--tip-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  details {
+    background: var(--q-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+  }
+  details[open] {
+    background: #fff;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+  }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) {
+    margin-top: 12px;
+  }
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .q-source {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .checklist {
+    background: #f0f9ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .checklist label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+  .checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    padding: 10px 16px;
+    margin: 12px 0;
+    font-family: "Menlo", "Monaco", monospace;
+    font-size: 15px;
+  }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 Quiz3 总目录</a></span>
+  <span><a href="02-bootstrap-ci.html">下一节: Bootstrap & CI →</a></span>
+</nav>
+
+<main>
+  <h1>Section 1 · Distributions & Sampling</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 13（Distributions and Sampling）｜
+    <strong>Quiz3 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1</span>｜
+    <strong>预计学习时间</strong>：1.5-2 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+  <p>本节是 Quiz3 的<strong>词汇地基</strong>。最近几次 quiz（Sp24/Sp25/W24/W25/W26）几乎都直接考"哪个是 SRS"、"parameter vs statistic"、"empirical vs probability distribution"。错一个就送分。</p>
+
+  <table>
+    <thead>
+      <tr><th>考点</th><th>Tier</th><th>形式</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>SRS 定义识别</strong>（区分 with/without replacement、stratified、multinomial）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>Sp24, W26 都考"哪段代码是 SRS"</td></tr>
+      <tr><td><strong>Parameter vs Statistic</strong>（参数固定，统计量随样本变）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>Sp24, W24, W25 直接T/F或填空</td></tr>
+      <tr><td><strong>Probability vs Empirical distribution</strong>（理论 vs 观测）</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>W24, W25, Sp25 圈词/填空</td></tr>
+      <tr><td><code>df.sample(n, replace=)</code> 语法 + 默认值</td><td><span class="tier tier-1">⭐⭐⭐</span></td><td>F24, F25, Sp24, W25, W26 几乎每次填空</td></tr>
+      <tr><td><strong>Law of large numbers</strong>（更大样本 → 更好估计）</td><td><span class="tier tier-2">⭐⭐</span></td><td>Sp24 T/F 项</td></tr>
+      <tr><td><strong>Sampling distribution of a statistic</strong>（统计量的分布）</td><td><span class="tier tier-2">⭐⭐</span></td><td>Sp25 T/F、W26 Q3.4</td></tr>
+      <tr><td>样本量对 sampling distribution 的影响（更窄、center 不变）</td><td><span class="tier tier-2">⭐⭐</span></td><td>Sp25 Q2.2（一词答）</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. Probability distribution vs Empirical distribution</h3>
+  <p>两种"分布"，<strong>区别在于来源是理论还是观测</strong>。</p>
+
+  <table>
+    <thead><tr><th></th><th>Probability distribution</th><th>Empirical distribution</th></tr></thead>
+    <tbody>
+      <tr><th>来源</th><td><strong>理论 (theoretical)</strong></td><td><strong>观测 (observations)</strong></td></tr>
+      <tr><th>描述</th><td>所有可能取值 + 每个值的<strong>理论概率</strong></td><td>所有观察到的值 + 每个值的<strong>出现频率/比例</strong></td></tr>
+      <tr><th>例</th><td>掷骰子，每面 1/6</td><td>掷25次骰子，得到 array([4,1,6,...,3,4,4])，再统计每面频率</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Law of large numbers（大数定律）</strong>：如果一个 chance experiment 在<strong>相同条件下独立重复多次</strong>，那么某事件发生的<strong>比例</strong>会越来越接近其<strong>理论概率</strong>。</p>
+  <div class="tip"><strong>📌 大白话</strong>：掷骰子次数越多，得到 5 的频率越接近 1/6。这就是我们能用 simulation 近似 probability distribution 的依据。</div>
+
+  <h3>2. Population vs Sample</h3>
+  <ul>
+    <li><strong>Population（总体）</strong>：我们想了解的<strong>全部</strong>人/物/事件。</li>
+    <li><strong>Sample（样本）</strong>：population 的<strong>子集</strong>。通常我们没法调查全体，只能调查子集。</li>
+    <li><strong>目标</strong>：用 <em>sample distribution</em> 估计 <em>population distribution</em>。</li>
+  </ul>
+
+  <h3>3. Simple Random Sample (SRS)</h3>
+  <div class="danger">
+    <strong>DSC10 里 SRS 的严格定义</strong>（必背！）：<br>
+    "A simple random sample is a sample drawn <strong>uniformly</strong> at random <strong>without replacement</strong>."
+    <ul>
+      <li><strong>Uniformly</strong>：每个个体被选中的概率都相同。</li>
+      <li><strong>Without replacement</strong>：同一个个体不会被选两次。</li>
+    </ul>
+  </div>
+
+  <h4>不好的采样方式</h4>
+  <ul>
+    <li><strong>Convenience sample</strong>：方便谁就采谁（如 PC 排队的人）。容易有 <strong>bias（偏倚）</strong>。</li>
+  </ul>
+
+  <h3>4. 采样代码：两套语法，<span class="highlight">默认值正好相反</span>！</h3>
+
+  <h4>从 list / array 采样：<code>np.random.choice</code></h4>
+<pre><code>colleges = ['Revelle', 'Muir', 'Marshall', 'Warren',
+            'ERC', 'Sixth', 'Seventh', 'Eighth']
+
+# SRS of 3 colleges（必须显式写 replace=False）
+np.random.choice(colleges, 3, replace=False)
+# array(['Seventh', 'Eighth', 'Muir'])</code></pre>
+
+  <h4>从 DataFrame 采样：<code>df.sample</code></h4>
+<pre><code># 5 flights, without replacement（default 就是 False）
+united_full.sample(5)
+
+# 5 flights, with replacement
+united_full.sample(5, replace=True)</code></pre>
+
+  <div class="danger">
+    <strong>🚨 极易错点</strong>：两个 API 的 <code>replace</code> 默认值正好相反！
+    <ul>
+      <li><code>np.random.choice(options, n)</code> → 默认 <strong><code>replace=True</code></strong>（有放回）</li>
+      <li><code>df.sample(n)</code> → 默认 <strong><code>replace=False</code></strong>（无放回）</li>
+    </ul>
+    考试 SRS 题里：<code>np.random.choice(songs.get("song_name"), 20)</code> 因为默认 with replacement，<strong>不是 SRS</strong>。
+  </div>
+
+  <h3>5. Parameter vs Statistic</h3>
+
+  <table>
+    <thead><tr><th></th><th>Parameter（参数）</th><th>Statistic（统计量）</th></tr></thead>
+    <tbody>
+      <tr><th>关联</th><td><strong>p</strong>opulation</td><td><strong>s</strong>ample</td></tr>
+      <tr><th>是否随机</th><td><strong>固定</strong>（fixed, not random）</td><td><strong>随机</strong>（depends on the random sample）</td></tr>
+      <tr><th>例</th><td>population mean</td><td>sample mean</td></tr>
+      <tr><th>实际操作</th><td>通常未知 / 想求</td><td>从样本算出来，用来 estimate parameter</td></tr>
+    </tbody>
+  </table>
+  <div class="tip"><strong>记忆口诀</strong>：<strong>p</strong>arameter / <strong>p</strong>opulation 都以 p 开头；<strong>s</strong>tatistic / <strong>s</strong>ample 都以 s 开头。</div>
+
+  <p>关键：<strong>"Statistical inference" = 用 sample 数据对 population 下结论</strong>。</p>
+
+  <h3>6. Sampling Distribution of a Statistic（统计量的分布）</h3>
+
+  <p>因为 statistic 依赖随机样本，所以 statistic 本身也是<strong>随机的</strong>，有自己的分布。</p>
+
+  <ul>
+    <li><strong>Probability distribution of a statistic</strong>（= "sampling distribution"）：理论上所有可能样本下的统计量取值及其概率。</li>
+    <li><strong>Empirical distribution of a statistic</strong>：通过<strong>模拟</strong>大量样本、对每个样本算出统计量、画直方图得到的分布。当模拟次数足够多，它逼近 sampling distribution。</li>
+  </ul>
+
+  <h4>模拟 sampling distribution 的标准模板（必背）</h4>
+<pre><code>sample_size = 1000
+repetitions = 2000
+sample_means = np.array([])
+
+for n in np.arange(repetitions):
+    m = united.sample(sample_size).get('Delay').mean()
+    sample_means = np.append(sample_means, m)
+
+# 把 sample_means 画 histogram → 这就是 empirical distribution
+# of the sample mean</code></pre>
+
+  <h3>7. 样本量对 sampling distribution 的影响</h3>
+  <ul>
+    <li><strong>Center（中心）</strong>：不变，始终在 population mean 附近。</li>
+    <li><strong>Spread（宽度）</strong>：样本越大 → 分布越<strong>窄</strong>（更精确）。</li>
+  </ul>
+  <p>这是 Quiz3 高频 T/F 选项：「Larger sample → better estimate」永远是 <strong>True</strong>。「Distribution of statistic 与 sample size 无关」永远是 <strong>False</strong>。</p>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="danger">
+    <strong>陷阱 1 · <code>replace</code> 默认值反着来</strong><br>
+    <code>np.random.choice</code> 默认 <code>replace=True</code>，<code>df.sample</code> 默认 <code>replace=False</code>。任何"判断这段代码是否是 SRS"的题都先看默认值。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 2 · <code>replace=1</code> 是 truthy</strong><br>
+    <code>songs.sample(20, replace=1)</code> 等价于 <code>replace=True</code> → with replacement → <strong>不是</strong> SRS。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 3 · 从 population 采样 ≠ bootstrapping</strong><br>
+    Bootstrapping 严格定义是<strong>从 sample 中 with replacement 再采样</strong>。如果数据本身就是 population（如 Fall 2024 Q1.2 的 1000 reptiles），那不管你 <code>replace=True</code> 与否，都<strong>不</strong>叫 bootstrap。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 4 · Stratified sampling 不是 SRS</strong><br>
+    "先随机选 20 个 genre，再每个 genre 选一首歌" —— 这种<strong>分层抽样</strong>下每个 song 被选中的概率与所在 genre 大小有关，<strong>不</strong>是 uniform，所以<strong>不</strong>是 SRS。
+  </div>
+
+  <div class="danger">
+    <strong>陷阱 5 · <code>np.random.multinomial</code> 是 with replacement</strong><br>
+    <code>np.random.multinomial(20, np.ones(n)/n)</code> 等价于"独立、均匀地、有放回地"抽 20 次 → <strong>不</strong>是 SRS。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6 · 「Parameter 随样本而变」是 False</strong><br>
+    Parameter 是 population 的<strong>固定</strong>数值；变的是 statistic。Sp24 Q1 直接考。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7 · 「boot_means 是 distribution of parameters」是 False</strong><br>
+    模拟出的 histogram 上的每个值都是一个 sample 的<strong>统计量</strong>（不是 parameter）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 8 · 「Empirical distribution 是 theoretical」是 False</strong><br>
+    Empirical 来自 observations / simulations；theoretical 那个叫 probability distribution。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 9 · 「sample 比 population 多采样几个会有放回」</strong><br>
+    <code>df.sample(n, replace=True)</code> 可以让 n &gt; population size；但 <code>df.sample(n)</code>（默认 replace=False）如果 n &gt; len(df) 会报错。
+  </div>
+
+  <div class="tip">
+    <strong>💡 高分技巧</strong>：见到任何"分布"字眼，先在脑里贴四个标签：
+    <ol>
+      <li><strong>什么的分布？</strong>（population / sample / statistic）</li>
+      <li><strong>理论还是观测？</strong>（probability / empirical）</li>
+      <li><strong>谁是 parameter，谁是 statistic？</strong></li>
+      <li><strong>采样有放回吗？</strong>（是否 SRS）</li>
+    </ol>
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+  <p>点击每题"显示答案"展开。建议先盖住答案做一遍。</p>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Quiz 3 · Problem 1（T/F 多选）</div>
+    <p>Which of the following statements are true in general? Select all that apply.</p>
+    <ul>
+      <li>(A) Parameters are fixed, but statistics can change depending on the sample.</li>
+      <li>(B) Parameters and statistics can both fluctuate depending on the sample.</li>
+      <li>(C) For simple random samples, statistics give better estimates of parameters when the sample size is larger.</li>
+      <li>(D) The distribution of a statistic is the same regardless of the sample size.</li>
+      <li>(E) None of the above.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(A) 和 (C)</strong></p>
+      <ul>
+        <li>(A) ✅ Parameter 是 population 固定量；statistic 因样本而变。</li>
+        <li>(B) ❌ Parameter 不随样本变。</li>
+        <li>(C) ✅ 大数定律 + 抽样直觉：样本大 → 估计准。</li>
+        <li>(D) ❌ Sampling distribution 会随 n 变窄。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Quiz 3 · Problem 3（SRS 识别 · 高频）</div>
+    <p>Which of the following can be used to generate a <strong>simple random sample</strong> of <code>"rating"</code>s from 10 restaurants in <code>restaurants</code>? Select all that apply.</p>
+<pre><code># Option 1
+sample = restaurants.take(np.arange(10)).get("rating")
+
+# Option 2
+sample = restaurants.sample(10, replace=False).get("rating")
+
+# Option 3
+sample = restaurants.sample(10, replace=True).get("rating")
+
+# Option 4
+positions = np.random.choice(np.arange(0, restaurants.shape[0]),
+                             10, replace=False)
+sample = restaurants.take(positions).get("rating")
+
+# Option 5
+positions = np.random.choice(np.arange(0, restaurants.shape[0]),
+                             10, replace=True)
+sample = restaurants.take(positions).get("rating")</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：Option 2 和 Option 4</strong></p>
+      <ul>
+        <li>Option 1 ❌ <code>take(np.arange(10))</code> 取前 10 行，<strong>不随机</strong>。</li>
+        <li>Option 2 ✅ <code>sample(10, replace=False)</code> 标准 SRS。</li>
+        <li>Option 3 ❌ <code>replace=True</code> 是有放回，不是 DSC10 定义的 SRS。</li>
+        <li>Option 4 ✅ 用 <code>np.random.choice</code> + <code>replace=False</code> 选 position 再 <code>take</code>，等价 SRS。</li>
+        <li>Option 5 ❌ <code>replace=True</code>。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2026 Quiz 3 · Problem 2（SRS 识别 · 新趋势严格定义）</div>
+    <p>Select all sampling methods below where the resulting sample is a simple random sample (SRS) of 20 songs from the <code>songs</code> DataFrame.</p>
+    <ul>
+      <li>(A) <code>songs.sample(20, replace=1)</code></li>
+      <li>(B) <code>np.random.multinomial(20, np.ones(songs.shape[0]) / songs.shape[0])</code> to decide how many times to take each row.</li>
+      <li>(C) <code>np.random.choice(songs.get("song_name"), 20)</code></li>
+      <li>(D) Randomly pick 20 genres without replacement, then within each picked genre, randomly pick a song.</li>
+      <li>(E) Randomly pick 20 artists without replacement, then within each picked artist, randomly pick a song.</li>
+      <li>(F) None of the above.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(F) None of the above</strong></p>
+      <ul>
+        <li>(A) ❌ <code>replace=1</code> 是 truthy = True → with replacement，不是 SRS。</li>
+        <li>(B) ❌ <code>np.random.multinomial</code> 等价于<strong>有放回</strong>均匀抽样。</li>
+        <li>(C) ❌ <code>np.random.choice</code> 默认 <code>replace=True</code>；而且只取了一列 song_name，没在 row 层面采样。</li>
+        <li>(D)(E) ❌ <strong>Stratified sampling</strong>（分层抽样）：每首歌被选中的概率与所在 genre/artist 大小有关，不 uniform。</li>
+      </ul>
+      <p class="highlight">这是 W26 最新趋势：考 SRS 严格定义。务必记住 SRS = uniform + without replacement。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Quiz 3 · Problem 2.1（情景 T/F）</div>
+    <p><strong>Setup</strong>：UCSD 想估计学生愿为 Sun God Festival 票付多少钱。他们采集了 <strong>500 个 simple random samples，每个 100 个学生</strong>，问相同问题。然后画了一个直方图，展示每个样本的<strong>均值</strong>的分布。</p>
+    <p>Which of the following statements are true? Select all that apply.</p>
+    <ul>
+      <li>(A) The histogram will be approximately centered around the mean amount that all UCSD students would be willing to pay.</li>
+      <li>(B) The variability in the histogram is due to the fact that we resample with replacement.</li>
+      <li>(C) This distribution is an example of an empirical distribution.</li>
+      <li>(D) This distribution includes many randomly generated parameters.</li>
+      <li>(E) None of the above.</li>
+    </ul>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：(A) 和 (C)</strong></p>
+      <ul>
+        <li>(A) ✅ Sampling distribution of sample mean 的中心 ≈ population mean。</li>
+        <li>(B) ❌ 这不是 bootstrap！是<strong>从 population 反复取 SRS</strong>，根本没用 replacement。</li>
+        <li>(C) ✅ 通过观察/模拟得到的分布 → empirical。</li>
+        <li>(D) ❌ 每个样本的 mean 是 <strong>statistic</strong>，不是 parameter。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Quiz 3 · Problem 2.2（一词答）</div>
+    <p>Describe in <strong>one word</strong> how the histogram would be different if it were instead based on 500 simple random samples of <strong>1000</strong> students each (instead of 100).</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：Narrower（或 tighter / thinner）</strong></p>
+      <p>样本量 n 增大 → sampling distribution 的 spread 减小 → 直方图更窄。center 不变。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2024 Quiz 4 · Problem 3.2（圈词）</div>
+    <p>承前题：<code>boot_means</code> 由 10000 次 bootstrap resample 得到。</p>
+    <p>In each blank, circle the word that correctly fills in the sentence.</p>
+    <p style="font-size: 18px;">A histogram of <code>boot_means</code> shows a(n) <strong>probability / empirical</strong> distribution of a <strong>statistic / parameter</strong>.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：empirical / statistic</strong></p>
+      <ul>
+        <li><strong>empirical</strong>：来自实际跑模拟得到的（不是理论）。</li>
+        <li><strong>statistic</strong>：每次 resample 算的 mean 是 statistic（parameter 是固定数）。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 3 · Problem 1（5 词填空 · 极高频）</div>
+    <p>A <strong>(a)</strong> provides insight into how much a <strong>(b)</strong> might vary across samples and is key for estimating the corresponding <strong>(c)</strong>. This type of distribution is an example of a <strong>(d)</strong> because it is based on trials of an experiment, as opposed to a <strong>(e)</strong>, which is based on theory.</p>
+    <p>五个词：parameter, statistic, probability distribution, empirical distribution, bootstrap distribution</p>
+    <details>
+      <summary>显示答案</summary>
+      <ul>
+        <li><strong>(a) bootstrap distribution</strong> — 反映 statistic 在不同 sample 下的变化。</li>
+        <li><strong>(b) statistic</strong> — 会随样本变的量。</li>
+        <li><strong>(c) parameter</strong> — 我们想估计的固定 population 数值。</li>
+        <li><strong>(d) empirical distribution</strong> — based on trials of an experiment。</li>
+        <li><strong>(e) probability distribution</strong> — based on theory。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 3 · Problem 1.1（语法填空）</div>
+    <p><code>space_reptiles</code> 是 1000 行的 population（所有 Statistica 上的爬行动物），列有 <code>length</code>、<code>age</code>、<code>number_of_eyes</code>。</p>
+    <p>Fill in the blanks. The function takes a sample of reptiles from <code>space_reptiles</code>, <strong>with replacement</strong>, of the specified size, and return the average value in the given column for the sample.</p>
+<pre><code>def sample_of_reptiles(sample_size, column):
+    return space_reptiles.sample(__(x)__).__(y)__</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>(x)</strong> <code>sample_size, replace=True</code></p>
+      <p><strong>(y)</strong> <code>get(column).mean()</code></p>
+      <p>完整：<code>space_reptiles.sample(sample_size, replace=True).get(column).mean()</code></p>
+      <p>注意 <code>column</code> 是<strong>变量</strong>（字符串值由参数传入），所以 <code>get(column)</code> 不加引号。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 3 · Problem 1.2（T/F · 概念辨析）</div>
+    <p><strong>True or False</strong>: The function call <code>sample_of_reptiles(1000, "length")</code> is an example of <strong>bootstrapping</strong>.</p>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：False</strong></p>
+      <p>Bootstrapping 严格定义是<strong>从 sample 中再 with replacement 采样</strong>来估计 statistic 的变异性。这里 <code>space_reptiles</code> 是<strong>整个 population</strong>，不是 sample。即便用 <code>replace=True</code> 而且 size 等于 population size，这也只是普通的 population sampling，<strong>不</strong>是 bootstrap。</p>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍，能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>解释 <strong>probability distribution</strong> 和 <strong>empirical distribution</strong> 的区别，并举一个具体例子。</span></label>
+    <label><input type="checkbox"><span>陈述 <strong>law of large numbers</strong>，并说明它为什么允许我们用 simulation 近似 probability distribution。</span></label>
+    <label><input type="checkbox"><span>说出 <strong>SRS</strong> 在 DSC10 里的精确定义（两个关键词）。</span></label>
+    <label><input type="checkbox"><span>用代码演示如何从 list 做 SRS（<code>np.random.choice</code>），并说出它的默认 <code>replace</code> 值。</span></label>
+    <label><input type="checkbox"><span>用代码演示如何从 DataFrame 做 SRS（<code>df.sample</code>），并说出它的默认 <code>replace</code> 值。</span></label>
+    <label><input type="checkbox"><span>解释 <strong>parameter</strong> 和 <strong>statistic</strong> 的区别，举例说明谁随机谁固定。</span></label>
+    <label><input type="checkbox"><span>能用 "p/p, s/s" 口诀解释 parameter ↔ population、statistic ↔ sample。</span></label>
+    <label><input type="checkbox"><span>解释 <strong>sampling distribution of a statistic</strong>（统计量的分布）是什么、为什么 statistic 本身是随机的。</span></label>
+    <label><input type="checkbox"><span>写出 simulate sampling distribution of sample mean 的标准 for-loop 模板。</span></label>
+    <label><input type="checkbox"><span>解释样本量增大 sampling distribution 的 <strong>center</strong> 与 <strong>spread</strong> 会怎么变。</span></label>
+    <label><input type="checkbox"><span>判断: 「Stratified sampling 是 SRS 吗？」并说明原因。</span></label>
+    <label><input type="checkbox"><span>判断: 「<code>np.random.multinomial</code> 抽出来的是 SRS 吗？」并说明原因。</span></label>
+    <label><input type="checkbox"><span>判断: 「<code>df.sample(n, replace=True)</code> 从 population 中抽 → 是 bootstrap 吗？」并说明原因。</span></label>
+    <label><input type="checkbox"><span>判断: 「<code>replace=1</code> 等价于 <code>replace=True</code> 还是 <code>replace=False</code>？」</span></label>
+    <label><input type="checkbox"><span>看到一个直方图描述时，回答四个问题：什么的分布？理论还是观测？谁是 parameter / statistic？是否有放回？</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="index.html">📚 返回 Quiz3 目录</a></span>
+  <span><a href="02-bootstrap-ci.html">下一节: Bootstrap & CI →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

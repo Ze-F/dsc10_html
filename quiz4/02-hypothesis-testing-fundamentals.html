@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 2 · Hypothesis Testing Fundamentals - DSC10 Quiz4</title>
+<style>
+  :root { --bg: #fafaf7; --text: #1f2328; --muted: #57606a; --accent: #0969da; --accent-bg: #ddf4ff; --code-bg: #1e1e2e; --code-text: #cdd6f4; --warn-bg: #fff8c5; --warn-border: #d4a72c; --tip-bg: #ddf4ff; --tip-border: #54aeff; --danger-bg: #ffebe9; --danger-border: #cf222e; --ok-bg: #dafbe1; --ok-border: #1a7f37; --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781; --border: #d0d7de; --q-bg: #f6f8fa; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📕 Quiz4 总目录</a></span>
+  <span><a href="01-sample-size-models-revisit.html">← 上一节</a> <a href="03-pvalues-decisions.html">下一节: p-values &amp; Decisions →</a></span>
+</nav>
+
+<main>
+  <h1>Section 2 · Hypothesis Testing Fundamentals</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 19（Hypothesis Testing） ｜
+    <strong>Quiz 4 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1</span>（每份 quiz 都涉及 null/alt 配对 + test stat 选择） ｜
+    <strong>预计学习时间</strong>：1.5-2 小时
+  </p>
+
+  <div class="meta">
+    <strong>🎯 本节定位</strong>：Lec 19 是 Quiz 4 的中枢。Lec 20-22 的所有题都基于这一节的概念：null hypothesis、alternative hypothesis、test statistic、simulate under null。如果这一节不熟，后面所有节都会塌方。<br>
+    本节的核心高频考点是 <strong>test statistic 的选择（abs vs 不带 abs）</strong> —— Wi26、Fa24、Wi25 三次 Q4 都直接考过。
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 真题 &amp; 练习</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>一句话</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Hypothesis test 四步流程</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>写 null / alt → 选 test stat → simulate under null → 看 observed 落在哪 → 决策</td>
+      </tr>
+      <tr>
+        <td>Null hypothesis 必须是 well-defined probability model</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>必须能 simulate；通常是 "no effect" / "equal to" / "随机抽的"</td>
+      </tr>
+      <tr>
+        <td>Alternative hypothesis 是 null 的"对立面"</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>可以是 "different"（双边）、"&gt;"、"&lt;"（单边）</td>
+      </tr>
+      <tr>
+        <td><strong>选 test statistic：方向决定要不要 abs</strong></td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>alt = "A &gt; B" 或 "A &lt; B" → <em>不带 abs</em>；alt = "different" → <em>带 abs</em>。<strong>每年都考</strong></td>
+      </tr>
+      <tr>
+        <td>"large / small values lean towards" 思维</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>好的 test stat：高值偏一种 hypothesis，低值偏另一种</td>
+      </tr>
+      <tr>
+        <td>Observed vs simulated 区分</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>observed = 真实数据算出来的；simulated = 在 null 假设下生成的</td>
+      </tr>
+      <tr>
+        <td>Simulate under null 代码骨架</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td><code>for i in np.arange(N): stat = ...; results = np.append(results, stat)</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. Hypothesis Test 是什么</h3>
+
+  <p>从 Lec 18 的"Swain jury 故事"形式化而来：</p>
+
+  <div class="formula formula-big">
+    A hypothesis test chooses between two views of how data were generated, based on data in a sample.
+  </div>
+
+  <p>注意两件事：</p>
+  <ol>
+    <li>它在两个 hypothesis 之间<strong>选一个</strong>，<em>不保证</em>选中的就是真理</li>
+    <li>它的结论只<strong>基于 sample</strong>，所以再小心也只能给可能性</li>
+  </ol>
+
+  <h3>2. Null Hypothesis vs Alternative Hypothesis</h3>
+
+  <table>
+    <thead><tr><th></th><th>Null (H<sub>0</sub>)</th><th>Alternative (H<sub>1</sub>)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>定义</strong></td>
+        <td>一个 <em>well-defined probability model</em> about how data was generated（可以 simulate）</td>
+        <td>另一种关于 data 怎么来的 view，通常和 null 互斥</td>
+      </tr>
+      <tr>
+        <td><strong>语气</strong></td>
+        <td>"no effect" / "no difference" / "随机抽的" / "param = some value"</td>
+        <td>"there is a difference" / "biased" / "treated 更大" / "param ≠ value"</td>
+      </tr>
+      <tr>
+        <td><strong>能否 simulate</strong></td>
+        <td><strong>必须能</strong> simulate（这就是它叫 null hypothesis 的原因）</td>
+        <td>不需要能 simulate</td>
+      </tr>
+      <tr>
+        <td><strong>结论</strong></td>
+        <td><strong>reject</strong> 或 <strong>fail to reject</strong>（永远不"accept"）</td>
+        <td>无直接结论，只能说"data supports alt"或"not"</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="danger">
+    <strong>🔥 高频考点</strong>：题目让你"选哪个 null / alt 配对正确"。常见错误：
+    <ul>
+      <li>把 "there is a difference" 当 null（错！这不是 well-defined probability model，没法 simulate）</li>
+      <li>Null 和 alt 互换</li>
+      <li>Alt 包含 causation 描述（"causes taller flowers"）—— 通常 alt 应避免 causation 措辞</li>
+    </ul>
+    <strong>口诀</strong>：null 是 "no difference / same distribution / equal to X"；alt 是 null 的反面。
+  </div>
+
+  <h4>例子：硬币是否公平</h4>
+  <ul>
+    <li><strong>Null</strong>：The coin is fair (P(heads) = 0.5)。← <em>well-defined</em>，可以用 <code>np.random.multinomial(400, [0.5, 0.5])</code> 模拟</li>
+    <li><strong>Alt（双边）</strong>：The coin is not fair</li>
+    <li><strong>Alt（单边）</strong>：The coin is biased towards tails (P(heads) &lt; 0.5)</li>
+  </ul>
+
+  <h4>例子：Swain v. Alabama</h4>
+  <ul>
+    <li><strong>Null</strong>：Jury panel was selected at random from a population that is 26% Black</li>
+    <li><strong>Alt</strong>：Jury panel was not selected at random</li>
+  </ul>
+
+  <h4>例子：Fertilizer &amp; flower height（Wi25 Q4 P2）</h4>
+  <ul>
+    <li><strong>Null</strong>：There is no difference in the average height of treated and untreated flowers</li>
+    <li><strong>Alt</strong>：There is a difference in the average height of treated and untreated flowers</li>
+  </ul>
+  <p>注意 Wi25 Q4 P2 的<strong>错误选项</strong>：</p>
+  <ul>
+    <li>❌ "Null: There is a difference; Alt: no difference"（互换）</li>
+    <li>❌ "Null: Fertilizer use has no impact; Alt: Fertilizer use <strong>causes</strong> taller flowers"（causation 措辞 + 单边偏题意）</li>
+  </ul>
+
+  <h3>3. Test Statistic：核心工具</h3>
+
+  <h4>3.1 定义</h4>
+
+  <div class="formula formula-big">
+    A test statistic is a single number, computed from a sample, used to decide which hypothesis the data supports.
+  </div>
+
+  <p>区分两个相关概念：</p>
+  <ul>
+    <li><strong>Observed statistic</strong>：test statistic 算在<em>真实 observed data</em> 上的值（只有一个）</li>
+    <li><strong>Simulated test statistic</strong>：under null 假设的 simulated sample 上算出的（成千上万个，组成 empirical distribution）</li>
+  </ul>
+
+  <h4>3.2 选 test statistic 的两大原则</h4>
+
+  <div class="tip">
+    <ol>
+      <li><strong>能区分两个 hypothesis</strong>：算出来的值要能区分 null 真和 alt 真两种情况</li>
+      <li><strong>方向一致</strong>：理想情况下，<em>large 值</em>偏一种 hypothesis，<em>small 值</em>偏另一种 —— 不要让"high & low 都偏 alt，中间偏 null"</li>
+    </ol>
+  </div>
+
+  <h4>3.3 ⭐ 决定要不要 abs：取决于 alternative 方向</h4>
+
+  <p>这是<strong>整个 Quiz 4 最高频的陷阱</strong>，连续多年考。</p>
+
+  <table>
+    <thead><tr><th>Alternative 形式</th><th>测的方向</th><th>Test statistic</th><th>极端值含义</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>"different / not equal"</strong></td>
+        <td>双边</td>
+        <td><strong>带 abs</strong>：|A − B| 或 |X − 期望|</td>
+        <td>大 = 偏 alt（不管 A&gt;B 还是 A&lt;B 都不对）</td>
+      </tr>
+      <tr>
+        <td><strong>"A &gt; B"（A 更大）</strong></td>
+        <td>单边（右尾）</td>
+        <td><strong>不带 abs</strong>：A − B</td>
+        <td>大 = 偏 alt；小 = 偏 null</td>
+      </tr>
+      <tr>
+        <td><strong>"A &lt; B"（A 更小）</strong></td>
+        <td>单边（左尾）</td>
+        <td><strong>不带 abs</strong>：A − B，<em>or</em> B − A</td>
+        <td>A−B 小 = 偏 alt；或 B−A 大 = 偏 alt</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="danger">
+    <strong>口诀</strong>：<br>
+    "different" → <strong>abs(差)</strong>，看大值<br>
+    "&gt; 或 &lt;" → <strong>不带 abs</strong>，看一端
+  </div>
+
+  <h4>3.4 经验：用 absolute value 把"两边都极端"变成"一边极端"</h4>
+
+  <p>Lec 19 的硬币例子：</p>
+  <ul>
+    <li>Null: coin is fair。Alt（双边）: coin is not fair。</li>
+    <li>如果用 <code>number of heads</code> 作 test stat：太大（接近 400）和太小（接近 0）<em>都</em> 偏 alt，中间偏 null —— 这是<strong>双向极端</strong>，不好处理</li>
+    <li>解决：用 <code>|number of heads − 200|</code>。这样 <em>大值</em>统一偏 alt，<em>小值</em>统一偏 null</li>
+  </ul>
+
+  <p>这个技巧叫 "absolute value trick"。考试代码里经常出现：</p>
+
+  <pre><code>def num_heads_from_200(arr):
+    return abs(arr[0] - 200)
+
+# observed
+num_heads_from_200([188, 212])  # |188 - 200| = 12</code></pre>
+
+  <h4>3.5 ⭐ 单边 alt 用了 abs 会发生什么？</h4>
+
+  <div class="warn">
+    考试常考 "could we use |A − B| as a test stat for alt: A &gt; B?" —— 答案：<strong>不能</strong>，因为 |A − B| 大也可能是 A 比 B 小很多，无法区分方向。
+  </div>
+
+  <h3>4. Simulate Under the Null：标准代码骨架</h3>
+
+  <p>无论什么场景，simulate under null 的代码总是这个结构：</p>
+
+  <pre><code>results = np.array([])
+for i in np.arange(N):       # N 通常 = 10000
+    # ① 在 null 假设下生成一个 sample
+    new_sample = ...         # multinomial / choice / permutation 之一
+
+    # ② 在这个 sample 上算 test statistic
+    stat = ...
+
+    # ③ 存起来
+    results = np.append(results, stat)
+
+# 现在 results 是 empirical distribution of the test statistic under null</code></pre>
+
+  <h4>4.1 例：硬币是否公平</h4>
+
+  <pre><code># Null: P(heads) = 0.5
+# Test stat: |number of heads − 200|
+
+results = np.array([])
+for i in np.arange(10000):
+    one_sample_heads = np.random.multinomial(400, [0.5, 0.5])[0]
+    stat = abs(one_sample_heads - 200)
+    results = np.append(results, stat)
+
+# observed
+observed = abs(188 - 200)  # = 12</code></pre>
+
+  <h4>4.2 例：jury 是否随机（Swain）</h4>
+
+  <pre><code># Null: panel drawn at random from 26% Black population
+# Test stat: number of Black men in panel
+
+counts = np.array([])
+for i in np.arange(10000):
+    new_count = np.random.multinomial(100, [0.26, 0.74])[0]
+    counts = np.append(counts, new_count)
+
+# observed
+observed = 8</code></pre>
+
+  <h4>4.3 例：用 <code>np.random.choice</code> 替代 multinomial（Wi25 Q4 P3.1）</h4>
+
+  <p>Wi25 给的代码用 <code>np.random.choice</code>，是 multinomial 的<em>等价写法</em>之一：</p>
+
+  <pre><code># Wi25 Q4 P3.1 - fertilizer flower fields
+# Null: each field independently 80% fertilized
+
+def one_stat():
+    sample_size = flowers.shape[0]
+    random_choice = np.random.choice([True, False],
+                                      sample_size, p=[0.8, 0.2])
+    return abs(0.8 - np.count_nonzero(random_choice) / sample_size)
+
+# Wi25 Q4 P3.2 - 等价的 multinomial 写法
+def one_stat_differently():
+    multi = np.random.multinomial(flowers.shape[0], [0.8, 0.2])
+    return abs(0.8 - multi[0] / flowers.shape[0])</code></pre>
+
+  <p class="tip">📌 <strong>关键观察</strong>：<code>np.random.choice([True, False], n, p=[0.8, 0.2])</code> 抽 n 个 boolean；<code>np.random.multinomial(n, [0.8, 0.2])</code> 直接给两个 counts。两种写法都正确，看题目代码框架。</p>
+
+  <h3>5. Draw a Conclusion：把 observed 和 empirical distribution 比</h3>
+
+  <ul>
+    <li>如果 observed 落在 simulated distribution 的<strong>常见区域</strong> → null 看起来合理 → <strong>fail to reject null</strong></li>
+    <li>如果 observed 落在<strong>罕见区域</strong>（尾部）→ null 看起来不合理 → <strong>reject null</strong></li>
+  </ul>
+
+  <p>"罕见"具体多少算罕见？要靠 <strong>p-value</strong> 量化 —— 那是下一节的内容。本节先建立"看 observed 在 empirical distribution 哪个位置"的直观。</p>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <h3>陷阱 1：Null / alt 互换</h3>
+  <p>Null 必须是"无效应 / 等于某值 / 随机的"那一边（可 simulate 的那一边）。"There is a difference" <strong>不能</strong>当 null。</p>
+
+  <h3>陷阱 2：Alt 写了 causation</h3>
+  <p>"Fertilizer use <em>causes</em> taller flowers" 这种 causation 措辞在 hypothesis test 里通常错。我们只能说"有 difference"，不能说"causes"。</p>
+
+  <h3>陷阱 3：⭐ Test stat 方向搞错</h3>
+  <div class="danger">
+    <strong>必背决策树</strong>：
+    <ul>
+      <li>alt 说 "different" → test stat <strong>必须</strong>带 abs；<em>不带 abs 不行</em>，因为正负两端都偏 alt</li>
+      <li>alt 说 "A 比 B 大" → test stat <strong>必须</strong>是 A − B 或 -(B − A)；<em>带 abs 不行</em>，因为大值可能来自 A 小很多</li>
+      <li>alt 说 "A 比 B 小" → 用 A − B 看左尾，或 B − A 看右尾；<strong>不带 abs</strong></li>
+    </ul>
+  </div>
+
+  <h3>陷阱 4：把 observed statistic 当 simulated</h3>
+  <p>Observed 只有一个，是从真实数据算出来的。Simulated 是从 null 模型生成 N 次得到的 array。这两个不要混。</p>
+
+  <h3>陷阱 5：Null hypothesis 必须可以 simulate</h3>
+  <p>"Coins are fair" 可以模拟（P=0.5）；"Coins are unfair" <strong>不行</strong>（具体多 unfair？0.51？0.03？无法模拟）。所以 "unfair" 只能当 alt。</p>
+
+  <h3>陷阱 6：高低 both 偏 alt 的 test stat</h3>
+  <p>对双边 alt，<code>number of heads</code> 就有这个问题：太多 和 太少都偏 alt。所以必须加 abs。考试经常给一堆候选 test stat，让你选哪些"valid" —— 注意单边题用 abs 不 valid，双边题不用 abs 也不 valid。</p>
+
+  <h3>陷阱 7：忘了 <code>[0]</code> 索引</h3>
+  <p><code>np.random.multinomial(100, [0.26, 0.74])</code> 返回 array，<strong>必须加 <code>[0]</code></strong> 才能得到第一类的 count。这是高频代码扣分点。</p>
+
+  <h3>陷阱 8：append 没赋值</h3>
+  <p><code>np.append(arr, x)</code> <strong>不修改</strong> arr，必须写 <code>arr = np.append(arr, x)</code>。</p>
+
+  <h2 id="problems">📝 真题 &amp; 练习</h2>
+
+  <h3>真题 1：Fa24 Q4 P2 ⭐⭐⭐（test stat 方向）</h3>
+
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 4, Problem 2 (Lec 19)</div>
+    <p>Null: 评分 &gt; 9 的 Comedy 比例 等于 评分 &gt; 9 的 Action 比例。</p>
+    <p>Alt: 评分 &gt; 9 的 Comedy 比例 <strong>&gt;</strong> 评分 &gt; 9 的 Action 比例。</p>
+    <p>设 C<sub>9</sub> = Comedy 比例，A<sub>9</sub> = Action 比例。下列哪些是 valid test statistic？多选。</p>
+    <ol type="A">
+      <li>C<sub>9</sub> − 0.5</li>
+      <li>A<sub>9</sub> − 0.5</li>
+      <li>A<sub>9</sub> · C<sub>9</sub></li>
+      <li>A<sub>9</sub> + C<sub>9</sub></li>
+      <li>C<sub>9</sub> − A<sub>9</sub></li>
+      <li>A<sub>9</sub> − C<sub>9</sub></li>
+      <li>|A<sub>9</sub> − C<sub>9</sub>|</li>
+      <li>|C<sub>9</sub> − A<sub>9</sub>|</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：E（C<sub>9</sub> − A<sub>9</sub>）和 F（A<sub>9</sub> − C<sub>9</sub>）</strong></p>
+      <ul>
+        <li>Alt 是 <strong>C<sub>9</sub> &gt; A<sub>9</sub></strong>（单边）→ test stat 不该带 abs</li>
+        <li><strong>E. C<sub>9</sub> − A<sub>9</sub></strong>：valid。大值（C 比 A 大很多）→ 偏 alt；小值（甚至负）→ 偏 null。<strong>看右尾</strong></li>
+        <li><strong>F. A<sub>9</sub> − C<sub>9</sub></strong>：valid。<strong>方向反过来</strong>了 —— 小值（甚至负）偏 alt，<strong>看左尾</strong>。同样能区分</li>
+        <li>A、B：和单独某个比例的偏移有关，不能直接区分两组</li>
+        <li>C、D：A·C 或 A+C 与 alt 不相关</li>
+        <li>G、H：abs 形式 —— alt 是单边，abs 之后无法区分 A&gt;C 还是 A&lt;C，<strong>不 valid</strong></li>
+      </ul>
+      <p class="warn">⚠️ 关键陷阱：用 abs 对应"different"双边 alt；这里是单边 alt，不能用 abs。</p>
+    </details>
+  </div>
+
+  <h3>真题 2：Wi25 Q4 P2.1 ⭐⭐（选 null/alt 配对）</h3>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 4, Problem 2.1 (Lec 19)</div>
+    <p>研究员想知道 fertilizer 是否影响花的高度（treated vs untreated）。选正确的 null/alt 配对：</p>
+    <ol type="A">
+      <li>Null: There is a difference in average height. Alt: no difference.</li>
+      <li>Null: no difference. Alt: there is a difference.</li>
+      <li>Null: no difference. Alt: Treated flowers grow taller, on average.</li>
+      <li>Null: Fertilizer has no impact. Alt: Fertilizer <em>causes</em> taller flowers.</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：B</strong></p>
+      <ul>
+        <li><strong>A 错</strong>：null 和 alt 互换。Null 必须是 "no difference"（可 simulate）</li>
+        <li><strong>B 对</strong>：standard 形式，alt 双边</li>
+        <li><strong>C 不是最佳</strong>：题目说"determine whether there is a relationship"（含义是双边）；选 C 把 alt 缩成单边，<em>偏离题意</em></li>
+        <li><strong>D 错</strong>：用了 "causes"，不能从 hypothesis test 推 causation</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>真题 3：Wi25 Q4 P3.1-P3.3 ⭐⭐⭐（代码填空）</h3>
+
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 4, Problem 3.1-3.3 (Lec 21, sim under null)</div>
+    <p>Null: each flower field has 80% chance of being fertilized, independently. Test stat: |0.8 − proportion fertilized|. 完成代码：</p>
+    <pre><code>def one_stat():
+    sample_size = ___(a)___
+    random_choice = (np.random.choice([True, False],
+                     sample_size, p=[0.8, 0.2]))
+    return ___(b)___
+
+def one_stat_differently():
+    multi = np.random.multinomial(___(c)___)
+    return ___(d)___
+
+many_stats = ___(e)___
+for i in np.arange(10000):
+    many_stats = ___(f)___</code></pre>
+    <details>
+      <summary>显示答案</summary>
+      <ul>
+        <li>(a) <code>flowers.shape[0]</code>（sample 跟现实一样大）</li>
+        <li>(b) <code>abs(0.8 - np.count_nonzero(random_choice) / sample_size)</code></li>
+        <li>(c) <code>flowers.shape[0], [0.8, 0.2]</code></li>
+        <li>(d) <code>abs(0.8 - multi[0] / flowers.shape[0])</code></li>
+        <li>(e) <code>np.array([])</code></li>
+        <li>(f) <code>np.append(many_stats, one_stat())</code>（或 one_stat_differently()）</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>练习 4：识别 test statistic 的方向（综合）</h3>
+
+  <div class="q-block">
+    <div class="q-source">综合练习</div>
+    <p>对下面每个 (null, alt) 配对，写出合适的 test statistic 形式 + 看哪一尾。</p>
+    <ol>
+      <li>Null: 硬币公平。Alt: 硬币不公平。</li>
+      <li>Null: 硬币公平。Alt: 硬币偏 tails。</li>
+      <li>Null: 红 vs 绿 candy 比例相同。Alt: 红 candy 更多。</li>
+      <li>Null: Patriots 和 Colts 的 pressure drop 一样。Alt: Patriots 的 pressure drop 更大。</li>
+      <li>Null: Jeffrey 和 Kate 给的平均分相同。Alt: Jeffrey 给的平均分更低。</li>
+    </ol>
+
+    <details>
+      <summary>显示答案</summary>
+      <ol>
+        <li>双边 → <code>|number_of_heads − 200|</code>，<strong>右尾</strong>（大值偏 alt）</li>
+        <li>单边（偏 tails 即 heads 少）→ <code>number_of_heads</code>，<strong>左尾</strong>（小值偏 alt）<br>或 <code>number_of_tails</code>，右尾</li>
+        <li>单边（红 &gt; 绿）→ <code>n_red − n_green</code>，<strong>右尾</strong></li>
+        <li>单边 → <code>mean_drop_Patriots − mean_drop_Colts</code>，<strong>右尾</strong></li>
+        <li>单边（Jeffrey 更低）→ <code>mean_Jeffrey − mean_Kate</code>，<strong>左尾</strong>；或 <code>mean_Kate − mean_Jeffrey</code>，右尾</li>
+      </ol>
+      <p class="tip">📌 注意 (5) 是 Wi26 Q4 P2.2 的考点 —— 必须知道方向，否则会选错差的写法。</p>
+    </details>
+  </div>
+
+  <h3>练习 5：写 null 还是 alt？</h3>
+
+  <div class="q-block">
+    <div class="q-source">综合练习</div>
+    <p>下面每个 statement，判断它适合做 null 还是 alt（或都不适合）：</p>
+    <ol type="A">
+      <li>"There is no difference between A and B"</li>
+      <li>"A's mean is higher than B's mean"</li>
+      <li>"The data is drawn at random from a population that is 26% Black"</li>
+      <li>"There is some unfairness"</li>
+      <li>"Treatment causes recovery"</li>
+      <li>"X follows distribution [0.3, 0.4, 0.3]"</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <ul>
+        <li>A: <strong>null</strong>（可 simulate "same distribution"）</li>
+        <li>B: <strong>alt</strong>（无法直接 simulate "higher"，不知道高多少）</li>
+        <li>C: <strong>null</strong>（well-defined model）</li>
+        <li>D: <strong>都不适合</strong>。当 null 不行（不能 simulate）；当 alt 太模糊。改成"the coin is unfair"才能当 alt</li>
+        <li>E: <strong>都不适合</strong>，"causes" 不该出现在 hypothesis 里</li>
+        <li>F: <strong>null</strong>（well-defined）</li>
+      </ul>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>讲清楚 null hypothesis 和 alternative hypothesis 的差别（哪个必须可 simulate）</span></label>
+    <label><input type="checkbox"><span>说出 null 的"标准措辞"模板：no difference / equal to X / random sample from ...</span></label>
+    <label><input type="checkbox"><span>解释为什么 alt 不能写 "causes"</span></label>
+    <label><input type="checkbox"><span>定义 test statistic 并区分 observed vs simulated</span></label>
+    <label><input type="checkbox"><span>讲清楚选 test stat 的两大原则：能区分 + 方向一致（不要 high & low 都偏 alt）</span></label>
+    <label><input type="checkbox"><span>背下决策树：alt 是 "different" → 带 abs；alt 是 "&gt;" 或 "&lt;" → 不带 abs</span></label>
+    <label><input type="checkbox"><span>解释 absolute value trick：把双向极端变成单向极端</span></label>
+    <label><input type="checkbox"><span>口头写出 simulate under null 的代码骨架（for loop + append）</span></label>
+    <label><input type="checkbox"><span>用 multinomial 和 choice 两种写法分别实现硬币 400 次抛掷模拟</span></label>
+    <label><input type="checkbox"><span>不看答案做 Fa24 Q4 P2 —— 单边 alt，能秒选 C−A 和 A−C</span></label>
+    <label><input type="checkbox"><span>不看答案做 Wi25 Q4 P2.1 —— 能 1 秒挑出 B 选项</span></label>
+    <label><input type="checkbox"><span>讲清楚为什么 abs(diff) 不能用于单边 alt</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="01-sample-size-models-revisit.html">← 上一节</a></span>
+  <span><a href="index.html">📕 返回目录</a></span>
+  <span><a href="03-pvalues-decisions.html">下一节: p-values &amp; Decisions →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

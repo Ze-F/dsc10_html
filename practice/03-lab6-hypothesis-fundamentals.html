@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 03 · Lab 6 — Hypothesis Testing Fundamentals · DSC10</title>
+<style>
+  :root { --bg:#fafaf7; --text:#1f2328; --muted:#57606a; --accent:#0969da; --code-bg:#1e1e2e; --code-text:#cdd6f4; --warn-bg:#fff8c5; --warn-border:#d4a72c; --tip-bg:#ddf4ff; --tip-border:#54aeff; --ok-bg:#dafbe1; --ok-border:#1a7f37; --tier-1:#cf222e; --tier-2:#bf8700; --tier-3:#6e7781; --border:#d0d7de; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.7; font-size:16px; }
+  .nav-top, .nav-bottom { background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:14px; flex-wrap:wrap; gap:8px; }
+  .nav-bottom { border-bottom:none; border-top:1px solid var(--border); margin-top:60px; }
+  .nav-top a, .nav-bottom a { color:var(--accent); text-decoration:none; margin-right:16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration:underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color:var(--muted); cursor:not-allowed; text-decoration:none; }
+  main { max-width:880px; margin:0 auto; padding:32px 24px 60px; }
+  h1 { font-size:28px; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:22px; margin-top:48px; border-left:4px solid var(--accent); padding-left:12px; }
+  h3 { font-size:18px; margin-top:28px; }
+  p, ul, ol { margin:12px 0; }
+  ul, ol { padding-left:28px; }
+  li { margin:4px 0; }
+  code { font-family:"Menlo","Monaco","Consolas",monospace; background:#eef0f2; padding:2px 6px; border-radius:4px; font-size:14px; color:#cf222e; }
+  pre { background:var(--code-bg); color:var(--code-text); padding:16px; border-radius:8px; overflow-x:auto; font-size:14px; line-height:1.5; margin:16px 0; }
+  pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:14px; }
+  .tier { display:inline-block; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:600; margin-right:8px; }
+  .tier-1 { background:#ffebe9; color:var(--tier-1); border:1px solid #ffcecb; }
+  .tier-2 { background:#fff8c5; color:var(--tier-2); border:1px solid #d4a72c; }
+  .meta { background:#f6f8fa; border-left:4px solid var(--accent); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .warn { background:var(--warn-bg); border-left:4px solid var(--warn-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .tip { background:var(--tip-bg); border-left:4px solid var(--tip-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .ok { background:var(--ok-bg); border-left:4px solid var(--ok-border); padding:10px 14px; margin:12px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .q-block { background:#fff; border:1px solid var(--border); border-radius:8px; padding:18px 20px; margin:22px 0; }
+  .q-id { display:inline-block; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:4px; margin-right:10px; letter-spacing:0.5px; }
+  .q-title { font-size:16px; font-weight:600; }
+  .q-stmt { color:var(--muted); font-size:14px; margin:10px 0; border-left:3px solid #d0d7de; padding-left:10px; font-style:italic; }
+  .think, .why { margin:12px 0; font-size:14.5px; }
+  .think strong { color:#6f42c1; }
+  .why strong { color:#1f883d; }
+  .checklist { background:#f0f9ff; border:1px solid #54aeff; border-radius:8px; padding:16px 20px; }
+  .checklist label { display:block; margin:8px 0; cursor:pointer; user-select:none; }
+  .checklist input[type="checkbox"] { margin-right:8px; transform:scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration:line-through; color:var(--muted); }
+  .toc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:24px 0; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { margin:4px 0; }
+  .toc a { color:var(--accent); text-decoration:none; }
+  .crosslink { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:20px 0; font-size:14px; }
+  .crosslink h4 { margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600; }
+  .crosslink ul { margin:4px 0; padding-left:20px; }
+  .crosslink a { color:var(--accent); text-decoration:none; }
+  table { border-collapse:collapse; width:100%; margin:16px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 12px; text-align:left; }
+  th { background:#f6f8fa; font-weight:600; }
+  hr { border:none; border-top:1px solid var(--border); margin:40px 0; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="02-hw6-hypothesis-permutation.html">⬅ 上一份：HW 6</a> | <a href="04-hw5-clt-normal.html">下一份 ➡：HW 5</a></span>
+</nav>
+
+<main>
+  <h1>Practice 03 · Lab 6 — Hypothesis Testing 基础</h1>
+  <p class="meta">
+    <strong>原始截止</strong>：Thursday, May 21st 2026, 11:59 PM ｜
+    <strong>涵盖讲义</strong>：CIT 11（Lec 18, 19, 20）｜
+    <strong>对应模块</strong>：Quiz 4 ｜
+    <strong>主题</strong>：Hypothesis testing 入门——双侧 vs 单侧、test statistic 的选择、p-value 的定义与计算 ｜
+    <strong>预计时长</strong>：1.5–2 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#overview">📋 作业概览 + 知识点回链</a></li>
+      <li><a href="#sec1">📚 Section 1 — Therapeutic Touch / Emily Rosa（Q1.1–1.9）双侧检验</a></li>
+      <li><a href="#sec2">📚 Section 2 — YouTube Advertisements（Q2.1–2.4）单侧检验</a></li>
+      <li><a href="#pitfalls">⚠️ 本作业典型陷阱</a></li>
+      <li><a href="#compare">🆚 双侧 vs 单侧对比表</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="overview">📋 作业概览</h2>
+
+  <p>Lab 6 把 hypothesis testing 的<u>基本流程</u>走完整一遍，用两个对比鲜明的例子：</p>
+  <ul>
+    <li><strong>Section 1：Therapeutic Touch（双侧）</strong>—— Emily Rosa 9 岁时设计的实验，280 次试验中 TT 从业者猜对 123 次。问：他们是不是<em>真的</em>能感知"人体能量场"（HEF）？因为题目是"any effect, in either direction"，所以是<strong>双侧</strong>，要用<u>绝对差</u>。</li>
+    <li><strong>Section 2：YouTube Ads（单侧）</strong>—— YouTube 声称 92% 广告可跳过；King Triton 看了 100 条发现 18 条不可跳过。问：YouTube 说的 92% 是不是<em>偏高</em>？这是<strong>单侧</strong>，<u>不</u>取绝对值。</li>
+  </ul>
+
+  <p>本 lab 与 HW 6 的关系：<strong>Lab 6 是基本功</strong>，HW 6 是同一套机制再换 4 个场景练熟。如果先做 HW 6 再回来做 Lab 6，会觉得 Lab 6 很简单。</p>
+
+  <p><strong>Tier 速览</strong>：</p>
+  <ul>
+    <li><span class="tier tier-1">⭐⭐⭐</span> 选 test statistic：双侧用 |·|，单侧不用。考试每年必考。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> p-value 定义（Q1.8）：选项 2 才对——"= observed <em>or even further in the direction of the alternative</em>"。</li>
+    <li><span class="tier tier-2">⭐⭐</span> <code>np.random.multinomial</code> 返回 array 索引——<code>[0]</code> 是第一类，<code>[1]</code> 是第二类。</li>
+    <li><span class="tier tier-2">⭐⭐</span> Q1.6 的隐性陷阱：<code>one_simulated_test_stat</code> 必须基于<u>同一次</u>抽样的 <code>simulation_proportion</code>。</li>
+  </ul>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链 — 想深入某个概念：</h4>
+    <ul>
+      <li>Null/alt 写法、双侧 vs 单侧、test statistic 选择 → <a href="../quiz4/02-hypothesis-testing-fundamentals.html#concepts">quiz4/02-hypothesis-testing-fundamentals</a></li>
+      <li>p-value 严格定义、三种结论用语 → <a href="../quiz4/03-pvalues-decisions.html#concepts">quiz4/03-pvalues-decisions</a></li>
+      <li>HW 6 把这套机制扩展到 4 种场景 → <a href="02-hw6-hypothesis-permutation.html">Practice 02 / HW 6</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec1">📚 Section 1 — Therapeutic Touch（Emily Rosa, 1996）</h2>
+
+  <p><strong>背景</strong>：TT 从业者声称能感知人体能量场（HEF）。Emily 设计了双盲实验：280 次试验，从业者隔板伸手过来，Emily 抛硬币决定把自己的手放在他们的左手还是右手附近，从业者猜哪只。结果 280 次<strong>猜对 123 次</strong>（≈ 43.9%，比 50% 低）。</p>
+
+  <div class="tip">
+    <strong>📐 假设（双侧！）</strong><br>
+    H<sub>0</sub>: 从业者随机猜，每次猜对的真实概率 = 0.5<br>
+    H<sub>A</sub>: <em>真实概率不等于 0.5</em>（任意方向都算 evidence——这里其实低于 0.5，但题目要求测"any effect, in either direction"）<br><br>
+    <strong>统计量</strong>：|观察比例 − 0.5|（带绝对值，因为双侧）<br>
+    <strong>Simulate under H<sub>0</sub></strong>：从 [0.5, 0.5] 抽 280 次，算"猜对"比例与 0.5 的绝对差<br>
+    <strong>p 值</strong>：右尾（&ge;），因为统计量已经取了 |·|（始终 ≥ 0），越大越极端
+  </div>
+
+  <!-- Q1.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.1</span><span class="q-title">写 null &amp; alternative</span>
+    <p class="q-stmt">"Write both of your answers" — Markdown 答案不被 autograder 检查。</p>
+    <p><strong>H<sub>0</sub></strong>：The TT practitioner is guessing randomly; the proportion of correct guesses is 0.5.</p>
+    <p><strong>H<sub>A</sub></strong>：The proportion of correct guesses is <em>different from</em> 0.5（双侧）。</p>
+    <p class="why"><strong>💡 为什么<u>双侧</u></strong>：题干明示 "We want to test whether or not some treatment has an effect, <strong>in either direction</strong>. This is <em>not</em> the same as testing whether the treatment actually works as intended."—— Emily 不是想证 TT 有效，而是测 TT 跟乱猜<u>有没有</u>差别。任何方向（明显高于 50% 或明显低于 50%）都是 evidence against H<sub>0</sub>。</p>
+  </div>
+
+  <!-- Q1.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.2</span><span class="q-title"><code>expected_correct</code></span>
+<pre><code>expected_correct = 0.5</code></pre>
+    <p class="why"><strong>💡 为什么 0.5</strong>：H<sub>0</sub> 等同于"投硬币"——每次猜对概率 = 0.5。autograder 的 message "Don't just copy this answer!" 是看你有没有想清楚 H<sub>0</sub> 的含义，不是真的禁止填 0.5。</p>
+  </div>
+
+  <!-- Q1.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.3</span><span class="q-title"><code>best_stat</code>（双侧→选 |·|）</span>
+    <p class="q-stmt">三个选项：1=expected − actual（带方向）；2=|expected − actual|（绝对差）；3=expected + actual（和，没意义）。</p>
+<pre><code>best_stat = 2</code></pre>
+    <p class="why"><strong>💡 为什么不是 1（带方向）</strong>：1 是 expected − actual。如果 actual = 0.7（远高于 0.5），差 = −0.2 是负的；如果 actual = 0.3（远低于 0.5），差 = +0.2 是正的。<u>"两种极端"得到相反符号</u>。双侧检验要求"任何方向偏离都算极端"，所以必须取 |·|。</p>
+    <p class="why"><strong>💡 为什么不是 3（和）</strong>：expected + actual 在 [0, 2] 区间，跟"偏离 H<sub>0</sub>"没有任何单调关系，毫无判别力。课件里 lec 19 那个 coin flipping 例子就是反例集。</p>
+    <p class="why"><strong>💡 对比 HW 6 Q1.6</strong>：那里是<u>单侧</u> H<sub>A</sub>（"p &gt; 1/144"），所以<u>不</u>能用 |·|（绝对差丢失方向，单侧不可用）；这里是<u>双侧</u>，必须用 |·|。<strong>这是同一套机制对镜像问题的两种答案。</strong></p>
+  </div>
+
+  <!-- Q1.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.4</span><span class="q-title"><code>calculate_test_stat(expected, actual)</code></span>
+<pre><code>def calculate_test_stat(expected_prop, actual_prop):
+    return np.abs(expected_prop - actual_prop)</code></pre>
+    <div class="ok"><strong>✅ 测试</strong>：
+      <ul>
+        <li><code>calculate_test_stat(0.6, 0.5) + calculate_test_stat(0.1, 0.4) = 0.1 + 0.3 = 0.4</code> ✓</li>
+        <li><code>calculate_test_stat(0.99, 0.43) = 0.56</code> ✓</li>
+        <li><code>calculate_test_stat(0.43, 0.99) = 0.56</code> ✓ —— 顺序换了结果一样，证明确实是<u>绝对</u>差。</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Q1.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.5</span><span class="q-title"><code>observed_test_stat</code></span>
+<pre><code>observed_test_stat = calculate_test_stat(0.5, 123 / 280)
+# = |0.5 − 0.4393| = 0.0607 ≈ 17/280</code></pre>
+    <p class="why"><strong>💡 17 怎么出来的</strong>：H<sub>0</sub> 下"应猜对 140 次"（=280×0.5）；实际猜对 123 次；差 17 次 → 比例差 17/280 ≈ 0.0607。autograder 反推 <code>np.isclose(observed_test_stat, 17/280)</code>。</p>
+  </div>
+
+  <!-- Q1.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.6</span><span class="q-title">单次模拟 + <code>one_simulated_test_stat</code></span>
+<pre><code>model_proportions = np.array([0.5, 0.5])
+simulation_proportion   = np.random.multinomial(280, model_proportions)[0] / 280
+one_simulated_test_stat = np.abs(0.5 - simulation_proportion)</code></pre>
+    <p class="why"><strong>💡 为什么 <code>[0] / 280</code></strong>：<code>multinomial(280, [0.5, 0.5])</code> 返回 array 如 <code>[142, 138]</code>，第 0 位是"猜对"次数。除以 280 得到该次模拟的"猜对比例"。</p>
+    <div class="warn"><strong>⚠️ 高频隐性陷阱（autograder 卡死大军）</strong>：如果你写成
+<pre style="margin:8px 0"><code>simulation_proportion   = np.random.multinomial(280, model_proportions)[0] / 280
+one_simulated_test_stat = calculate_test_stat(0.5, np.random.multinomial(280, model_proportions)[0] / 280)
+# ❌ 调用了 multinomial 两次！两个变量基于<u>不同</u>的随机结果</code></pre>
+      autograder 测试 5 (<code>np.isclose(one_simulated_test_stat, np.abs(0.5 - simulation_proportion))</code>) 就会失败，提示 "Test case failed"。<br><br>
+      <strong>修复</strong>：把 <code>simulation_proportion</code> 保存下来，<code>one_simulated_test_stat</code> 用<u>它</u>计算，不要再次调用 multinomial：<code>np.abs(0.5 - simulation_proportion)</code>。
+    </div>
+  </div>
+
+  <!-- Q1.7 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.7</span><span class="q-title">10,000 次模拟 → <code>simulated_test_stats</code></span>
+<pre><code>num_repetitions = 10000
+simulated_test_stats = np.array([])
+for i in np.arange(num_repetitions):
+    sim_prop = np.random.multinomial(280, model_proportions)[0] / 280
+    simulated_test_stats = np.append(simulated_test_stats, np.abs(0.5 - sim_prop))</code></pre>
+    <p class="why"><strong>💡 注意 <code>np.all(simulated_test_stats &lt;= 0.2)</code> 应该 True</strong>：H<sub>0</sub> 下 SD ≈ √(0.5·0.5/280) ≈ 0.0299，4 个 SD ≈ 0.12，几乎不会 &gt; 0.2。如果你 |·| 写漏了，可能出现负值——autograder 测试 2 就过不了。</p>
+  </div>
+
+  <!-- Q1.8 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.8</span><span class="q-title"><code>p_def</code>（p-value 定义）</span>
+    <p class="q-stmt">4 个选项：1=p 是 "exactly = observed" 的概率；2="= observed <strong>或更偏向 alt 方向</strong>"；3=under <em>alt</em>...；4=number（不是概率）。</p>
+<pre><code>p_def = 2</code></pre>
+    <p class="why"><strong>💡 严格定义</strong>：p-value = P( test statistic ≥ observed | H<sub>0</sub> )，"≥" 那部分 = "or even further in the direction of the alternative"。</p>
+    <p class="why"><strong>💡 排除其他选项</strong>：
+      <ul>
+        <li>1 错在 "<em>equal to</em>"——连续分布的精确等于概率 = 0，没意义；离散也只是单点。</li>
+        <li>3 错在 "under the <em>alternative</em>"——p 值永远是在 H<sub>0</sub> 下算的。</li>
+        <li>4 错在 "<em>number</em>"——p 是 fraction / probability，不是计数。</li>
+      </ul>
+    </p>
+  </div>
+
+  <!-- Q1.9 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.9</span><span class="q-title"><code>emily_p_val</code></span>
+<pre><code>emily_p_val = np.count_nonzero(simulated_test_stats &gt;= observed_test_stat) / 10000</code></pre>
+    <p class="why"><strong>💡 为什么右尾 <code>&gt;=</code></strong>：统计量已经是 |·|（始终非负），越大越偏离 H<sub>0</sub>。p 值 = 模拟分布中比 observed 还远的比例 = 右尾。</p>
+    <p class="why"><strong>💡 经典数据</strong>：observed ≈ 0.0607（约 17/280）。在 H<sub>0</sub> 下，|sample_prop − 0.5| ≥ 0.0607 大约对应 z ≥ 2.03，双侧 p ≈ 0.042。<strong>所以 p ≈ 0.04 &lt; 0.05 但 &gt; 0.01</strong>——题干随后给的 cutoff 是 0.01（医学保守标准），按这个 cutoff 还<u>不能</u>拒绝；但按 0.05 就能拒绝。Lab 6 这里题目<u>没让你写结论</u>，所以不卡这点。</p>
+    <p class="why"><strong>💡 真实历史</strong>：Emily Rosa 这个实验后来发在 JAMA 上，TT 从业者圈子炸了。原始论文里他们用的就是双侧检验，p &lt; 0.05 → "TT 跟随机猜没显著区别"。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec2">📚 Section 2 — YouTube Advertisements（King Triton）</h2>
+
+  <p><strong>背景</strong>：YouTube 公开说 92% 广告可跳过。King Triton 看了 100 条，发现 <strong>18 条不可跳过</strong>（只有 82% 可跳过），怀疑 YouTube 的 92% 偏高。</p>
+
+  <div class="tip">
+    <strong>📐 假设（单侧！）</strong><br>
+    H<sub>0</sub>: 92% 可跳过、8% 不可跳过（YouTube 的声明正确）<br>
+    H<sub>A</sub>: 真实可跳过比例 <em>&lt; 92%</em>（等价：不可跳过比例 &gt; 8%）<br><br>
+    <strong>统计量</strong>：100 条广告中 unskippable 的<u>数量</u>（不取 |·|）<br>
+    <strong>Simulate under H<sub>0</sub></strong>：从 [0.92, 0.08] 抽 100 个，记录 unskippable 数<br>
+    <strong>p 值</strong>：右尾——unskippable <u>越多</u>越支持 H<sub>A</sub>（"YouTube 偏高了" ↔ "实际更多不可跳过"）
+  </div>
+
+  <!-- Q2.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.1</span><span class="q-title">写 null &amp; alternative</span>
+    <p><strong>H<sub>0</sub></strong>: YouTube's claim is accurate — 92% skippable, 8% unskippable.</p>
+    <p><strong>H<sub>A</sub></strong>: 真实可跳过比例 <em>小于</em> 92%（即 unskippable 比例 &gt; 8%）。</p>
+    <p class="why"><strong>💡 为什么单侧</strong>：King Triton 怀疑 92% <strong>偏高</strong>——只在乎"实际比 92% 低"一个方向。"实际比 92% 高"对他没意义（他不是来质疑 YouTube 谦虚了的）。</p>
+  </div>
+
+  <!-- Q2.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.2</span><span class="q-title"><code>null_probabilities</code></span>
+<pre><code>null_probabilities = np.array([0.92, 0.08])
+# [0]=skippable, [1]=unskippable</code></pre>
+    <p class="why"><strong>💡 顺序很关键</strong>：题目明示 "first element = skippable, second = unskippable"。如果反了，下面 <code>[1]</code> 取出来的就是 skippable 数，结论会完全错。</p>
+  </div>
+
+  <!-- Q2.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.3</span><span class="q-title">10,000 次模拟 → <code>unskippable_counts</code></span>
+<pre><code>unskippable_counts = np.array([])
+for i in np.arange(10000):
+    unskippable_counts = np.append(unskippable_counts,
+                                   np.random.multinomial(100, null_probabilities)[1])</code></pre>
+    <p class="why"><strong>💡 <code>[1]</code> 是 unskippable 数</strong>：因为 null_probabilities 第 1 位是 unskippable。题目要求记录"unskippable 的<u>数量</u>"——不要除以 100，要的就是 count（0–100 的整数）。</p>
+    <div class="ok"><strong>✅ 测试</strong>：<code>7.5 &lt; np.mean(unskippable_counts) &lt; 8.5</code>。H<sub>0</sub> 下期望 = 100 × 0.08 = 8，正好在区间里。</div>
+  </div>
+
+  <!-- Q2.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.4</span><span class="q-title"><code>unskippable_p_val</code></span>
+<pre><code>unskippable_p_val = np.count_nonzero(unskippable_counts &gt;= 18) / 10000</code></pre>
+    <p class="why"><strong>💡 为什么右尾</strong>：观察到 unskippable = 18。H<sub>A</sub>: 真实不可跳过比例 &gt; 8% → unskippable count <strong>越大</strong>越支持 H<sub>A</sub>。p 值 = 模拟中 ≥ 18 的比例。</p>
+    <p class="why"><strong>💡 这个 p 值有多小</strong>：H<sub>0</sub> 下期望 8，SD ≈ √(100·0.08·0.92) ≈ 2.71，observed 18 对应 z = (18−8)/2.71 ≈ 3.7 → 单侧 p ≈ 0.00011。题干 autograder 测试就要求 <code>0 ≤ unskippable_p_val ≤ 0.01</code>——一个数量级别的过界。</p>
+    <div class="ok"><strong>💡 结论（题目没让写但你应该知道）</strong>：p ≈ 0.0001 ≪ 0.01 → <strong>reject</strong> YouTube 的 92% 声明。证据非常强。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="pitfalls">⚠️ 本作业典型陷阱（横切多题）</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：双侧 vs 单侧——统计量取不取 |·| 是分界线</strong><br>
+    Q1.3（双侧）选 |·|；HW 6 Q1.6（单侧）排除 |·|。同一道题型，alt 方向不同，答案就<u>完全相反</u>。看清题干 "in either direction"（双侧）/ "more often than expected"（单侧）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：<code>np.random.multinomial</code> 的索引意义</strong><br>
+    <code>multinomial(n, [p₀, p₁])[k]</code> 是<u>第 k 类的计数</u>。Q1.6 取 <code>[0]</code>（"猜对" = 第一类）；Q2.3 取 <code>[1]</code>（"unskippable" = 第二类）。索引<u>对应你的 probability array 顺序</u>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：Q1.6 的 "<u>同一次</u>抽样" 陷阱</strong><br>
+    <code>simulation_proportion</code> 和 <code>one_simulated_test_stat</code> 必须基于<u>同一次</u> multinomial 调用。如果你两个变量分别调用 multinomial，autograder test 5 会失败。修复：先存 <code>sim_prop</code>，再用它算 abs 差。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：p-value 定义（Q1.8）</strong><br>
+    选项 2 才对——"= observed <strong>or even further in the direction of the alt</strong>"。<u>不</u>是 "exactly = observed"（连续分布概率永远 0）。<u>不</u>是 "under the alternative"。<u>不</u>是 "number"。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：counts vs proportions</strong><br>
+    Q2.3 题目说 "Number of unskippable ads"——不要除以 100。Q1.6 题目说 "proportion"——必须除以 280。要看题目要什么。两边的 axvline 也跟着改：Q2 用 <code>x=18</code>（count），Q1 用 <code>x=observed_test_stat</code>（proportion 的绝对差）。
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="compare">🆚 双侧 vs 单侧对比表</h2>
+
+  <table>
+    <tr><th>维度</th><th>双侧（Lab 6 Sec 1 · Therapeutic Touch）</th><th>单侧（Lab 6 Sec 2 · YouTube）</th></tr>
+    <tr><td>H<sub>A</sub> 措辞</td><td>"different from" / "either direction"</td><td>"less than" / "more than" / "偏高" / "偏低"</td></tr>
+    <tr><td>统计量</td><td><strong>带 |·|</strong>（绝对差）</td><td><strong>不带 |·|</strong>（保留方向）</td></tr>
+    <tr><td>p 值方向</td><td>始终右尾（&ge;），因为 |·| ≥ 0</td><td>视 H<sub>A</sub> 方向：alt &gt; H<sub>0</sub> 用 &ge;；alt &lt; H<sub>0</sub> 用 &le;</td></tr>
+    <tr><td>example 描述</td><td>"任何偏离 H<sub>0</sub> 都算证据"</td><td>"只在乎单一方向"</td></tr>
+    <tr><td>题目关键词</td><td>"any effect" / "in either direction" / "is the treatment different from chance"</td><td>"偏高/偏低" / "more/less" / "更多/更少" / "高估/低估"</td></tr>
+  </table>
+
+  <!-- ============================================================ -->
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① 怎么从 H<sub>A</sub> 的措辞判断双侧还是单侧？哪些关键词分别对应？</span></label>
+    <label><input type="checkbox"><span>② Q1.3：为什么 best_stat = 2（|·|）？如果是单侧，为什么 |·| 反而错？</span></label>
+    <label><input type="checkbox"><span>③ <code>np.random.multinomial(n, [p0, p1])</code> 返回什么？<code>[0]</code> 和 <code>[1]</code> 分别表示什么？</span></label>
+    <label><input type="checkbox"><span>④ Q1.6 为什么 <code>one_simulated_test_stat</code> 必须用 <code>simulation_proportion</code> 计算，不能再调一次 multinomial？autograder 怎么检测出来的？</span></label>
+    <label><input type="checkbox"><span>⑤ Q1.8 的 4 个选项，2 是对的，1、3、4 分别错在哪？（核心是"or even further"和"under H<sub>0</sub>"）</span></label>
+    <label><input type="checkbox"><span>⑥ Q1.9 为什么用 <code>&gt;=</code>（右尾）而不是 <code>&lt;=</code>？这跟统计量本身的非负性有什么关系？</span></label>
+    <label><input type="checkbox"><span>⑦ Q2.3 为什么记 <strong>counts</strong>（不除 100）而 Q1.7 记 <strong>proportion</strong>（除 280）？两者后续怎么对应 axvline？</span></label>
+    <label><input type="checkbox"><span>⑧ YouTube 的 p 值非常小（≈ 10⁻⁴）。从直觉上为什么这个数据这么有说服力？z 值算出来多大？</span></label>
+    <label><input type="checkbox"><span>⑨ Emily Rosa 的 p ≈ 0.04 在 0.05 水平 reject、在 0.01 水平 fail to reject。为什么医学领域常用 0.01？</span></label>
+    <label><input type="checkbox"><span>⑩ Lab 6 跟 HW 6 的关系：Lab 6 学基础，HW 6 在 Smiski（单侧）、TVD（categorical）、permutation、CI 法 4 个方向扩展，能讲出 4 种区别吗？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="02-hw6-hypothesis-permutation.html">⬅ 上一份：HW 6</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="04-hw5-clt-normal.html">下一份 ➡：HW 5</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

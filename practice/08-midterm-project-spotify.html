@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 08 · Midterm Project — Spotify Weekly Charts · DSC10</title>
+<style>
+  :root { --bg:#fafaf7; --text:#1f2328; --muted:#57606a; --accent:#0969da; --code-bg:#1e1e2e; --code-text:#cdd6f4; --warn-bg:#fff8c5; --warn-border:#d4a72c; --tip-bg:#ddf4ff; --tip-border:#54aeff; --ok-bg:#dafbe1; --ok-border:#1a7f37; --tier-1:#cf222e; --tier-2:#bf8700; --tier-3:#6e7781; --border:#d0d7de; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.7; font-size:16px; }
+  .nav-top, .nav-bottom { background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:14px; flex-wrap:wrap; gap:8px; }
+  .nav-bottom { border-bottom:none; border-top:1px solid var(--border); margin-top:60px; }
+  .nav-top a, .nav-bottom a { color:var(--accent); text-decoration:none; margin-right:16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration:underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color:var(--muted); cursor:not-allowed; text-decoration:none; }
+  main { max-width:880px; margin:0 auto; padding:32px 24px 60px; }
+  h1 { font-size:28px; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:22px; margin-top:48px; border-left:4px solid var(--accent); padding-left:12px; }
+  h3 { font-size:18px; margin-top:28px; }
+  p, ul, ol { margin:12px 0; }
+  ul, ol { padding-left:28px; }
+  li { margin:4px 0; }
+  code { font-family:"Menlo","Monaco","Consolas",monospace; background:#eef0f2; padding:2px 6px; border-radius:4px; font-size:14px; color:#cf222e; }
+  pre { background:var(--code-bg); color:var(--code-text); padding:16px; border-radius:8px; overflow-x:auto; font-size:14px; line-height:1.5; margin:16px 0; }
+  pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:14px; }
+  .tier { display:inline-block; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:600; margin-right:8px; }
+  .tier-1 { background:#ffebe9; color:var(--tier-1); border:1px solid #ffcecb; }
+  .tier-2 { background:#fff8c5; color:var(--tier-2); border:1px solid #d4a72c; }
+  .meta { background:#f6f8fa; border-left:4px solid var(--accent); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .warn { background:var(--warn-bg); border-left:4px solid var(--warn-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .tip { background:var(--tip-bg); border-left:4px solid var(--tip-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .ok { background:var(--ok-bg); border-left:4px solid var(--ok-border); padding:10px 14px; margin:12px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .q-block { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:18px 0; }
+  .q-id { display:inline-block; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:4px; margin-right:10px; letter-spacing:0.5px; }
+  .q-title { font-size:15px; font-weight:600; }
+  .why { margin:8px 0; font-size:14px; }
+  .why strong { color:#1f883d; }
+  .checklist { background:#f0f9ff; border:1px solid #54aeff; border-radius:8px; padding:16px 20px; }
+  .checklist label { display:block; margin:8px 0; cursor:pointer; user-select:none; }
+  .checklist input[type="checkbox"] { margin-right:8px; transform:scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration:line-through; color:var(--muted); }
+  .toc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:24px 0; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { margin:4px 0; }
+  .toc a { color:var(--accent); text-decoration:none; }
+  .crosslink { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:20px 0; font-size:14px; }
+  .crosslink h4 { margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600; }
+  .crosslink ul { margin:4px 0; padding-left:20px; }
+  .crosslink a { color:var(--accent); text-decoration:none; }
+  table { border-collapse:collapse; width:100%; margin:16px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 12px; text-align:left; }
+  th { background:#f6f8fa; font-weight:600; }
+  hr { border:none; border-top:1px solid var(--border); margin:40px 0; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="07-hw4-sampling-bootstrap.html">⬅ 上一份：HW 4</a> | <a href="09-hw3-names-cereal-loans-probability.html">下一份 ➡：HW 3</a></span>
+</nav>
+
+<main>
+  <h1>Practice 08 · Midterm Project — Spotify Weekly Charts</h1>
+  <p class="meta">
+    <strong>原始截止</strong>：May 4 2026（Spotify 数据分析综合项目）｜
+    <strong>对应模块</strong>：Midterm 综合 ｜
+    <strong>主题</strong>：DataFrame 操作全家桶——index/groupby/merge/apply/绘图——在<u>真实</u>大数据集上的应用 ｜
+    <strong>预计时长</strong>：6–8 小时（46 题）
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#overview">📋 项目概览 + 知识点回链</a></li>
+      <li><a href="#sec1">📚 Section 1 — What's a Song?（Q1.1–1.10）</a></li>
+      <li><a href="#sec2">📚 Section 2 — The Sound of Music（Q2.1–2.5）</a></li>
+      <li><a href="#sec3">📚 Section 3 — Slow and Steady（Q3.1–3.9）tempo &amp; key</a></li>
+      <li><a href="#sec4">📚 Section 4 — Crazy in Love（Q4.1–4.8）字符串特征分析</a></li>
+      <li><a href="#sec5">📚 Section 5 — The Test of Time（Q5.1–5.7）日期处理</a></li>
+      <li><a href="#sec6">📚 Section 6 — Party in the USA（Q6.1–6.10）megahits 判定</a></li>
+      <li><a href="#sec7">📚 Section 7 — Encore（Q7.1–7.3）综合对比</a></li>
+      <li><a href="#patterns">🔁 高频出现的 7 个 babypandas 模式</a></li>
+      <li><a href="#pitfalls">⚠️ 典型陷阱</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="overview">📋 项目概览</h2>
+
+  <p><strong>数据</strong>：Spotify Weekly Charts，每行 = 某周某地区某 track 的排名 + 14 个音频特征 + 元信息。规模数十万行。</p>
+
+  <p><strong>逻辑链</strong>：</p>
+  <ol>
+    <li><strong>Sec 1–2</strong>：把"原始 charts"压缩成"唯一歌曲"（按 track + artist groupby + median）。处理重复 uri、多 artist 的歌等等。</li>
+    <li><strong>Sec 3</strong>：tempo 分类 + 各类音频特征均值——综合 groupby([a,b])、merge、自定义排序。</li>
+    <li><strong>Sec 4</strong>：字符串过滤 + 把"含某词 vs 不含"对比抽象成 <code>word_analysis(word)</code> 函数。</li>
+    <li><strong>Sec 5</strong>：处理 release_date 的三种格式（YYYY / YYYY-MM / YYYY-MM-DD），算 weeks_between。</li>
+    <li><strong>Sec 6</strong>：megahits 判定——top 1/2 + 长留榜时间 + 长 top 10 连击。考<strong>累加器模式</strong>找最长 streak。</li>
+    <li><strong>Sec 7</strong>：把 megahits 的音频特征 vs 全部歌的均值对比，画水平条形图。</li>
+  </ol>
+
+  <p><strong>Tier 速览</strong>（高频考点 + babypandas 限制）：</p>
+  <ul>
+    <li><span class="tier tier-1">⭐⭐⭐</span> babypandas <strong>没有 <code>.rename()</code></strong> ——用 <code>.assign(新=旧).drop(columns=[旧])</code>。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> babypandas <strong>没有 <code>.reindex()</code></strong> ——用辅助 <code>_order</code> 列 + sort + drop。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> babypandas <strong><code>.drop()</code> 只能 columns=</strong>，不能按 index 删行——用布尔过滤代替。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> <strong><code>groupby().median()/mean()/min()</code> 不能处理非数值列</strong>——必须先 <code>get([...])</code>。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> <strong>多列 groupby</strong>：<code>groupby(['a', 'b'])</code> 在 Sec 1.4、1.7、1.10 反复出现。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> 累加器找最长 streak（Q6.8）—— for + current/longest 双变量。</li>
+    <li><span class="tier tier-2">⭐⭐</span> <code>.str.contains('word', regex=False)</code>（Q4.6 强调 regex=False）。</li>
+    <li><span class="tier tier-2">⭐⭐</span> <code>merge</code> 不传 <code>on</code> 自动按所有共有列 join（Q3.5）。</li>
+  </ul>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链：</h4>
+    <ul>
+      <li>DataFrame indexing / .get / .loc / .iloc → <a href="../midterm/01-dataframes-indexing.html">midterm/01-dataframes-indexing</a></li>
+      <li>查询、groupby、布尔过滤 → <a href="../midterm/02-querying-groupby.html">midterm/02-querying-groupby</a></li>
+      <li>函数 + .apply、链式 → <a href="../midterm/04-functions-apply.html">midterm/04-functions-apply</a></li>
+      <li>多列 groupby、merge → <a href="../midterm/05-multi-groupby-merge.html">midterm/05-multi-groupby-merge</a></li>
+      <li>条件语句、for 循环、累加器 → <a href="../midterm/06-conditionals-loops.html">midterm/06-conditionals-loops</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec1">📚 Section 1 — What's a Song?</h2>
+
+  <p><strong>意图</strong>：从大数据 charts（每行 = 一次上榜事件）压缩到"唯一歌曲"。一个 track_name 可能多次出现（多周、多 artist 版本、多 uri）。</p>
+
+  <div class="q-block"><span class="q-id">Q 1.1</span><span class="q-title"><code>unique_uris</code></span>
+<pre><code>unique_uris = int(np.unique(charts.get('uri')).shape[0])</code></pre>
+    <p class="why"><strong>💡 用 <code>int(...)</code> 包</strong>：<code>np.unique(...).shape[0]</code> 返回 numpy int 而不是 Python int，autograder 测 <code>isinstance(..., numbers.Integral)</code> 会过不了纯 numpy 的 <code>int64</code>。<u>注意</u>：之后所有 "count → integer" 都要 <code>int(...)</code> 包。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.2</span><span class="q-title">某 track 的所有不同 uri</span>
+<pre><code>astronaut_ocean_uris = np.unique(charts[charts.get('track_name') == 'Astronaut In The Ocean'].get('uri'))</code></pre>
+    <p class="why"><strong>💡 链式套路</strong>：filter → get(列) → np.unique。这是最常见模式。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.3</span><span class="q-title">循环播放</span>
+<pre><code>for uri in astronaut_ocean_uris:
+    play_spotify(uri)</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.4</span><span class="q-title">每个 track 的不同 uri 数（学 "rename"）</span>
+<pre><code>distinct_pairs = charts.groupby(['track_name', 'uri']).count().reset_index().get(['track_name', 'uri'])
+counted = distinct_pairs.groupby('track_name').count()
+uris_per_track = (counted
+    .assign(uri_count=counted.get('uri'))   # "重命名" 第一步：新列
+    .drop(columns=['uri'])                    # "重命名" 第二步：删旧列
+    .sort_values(by='uri_count', ascending=False))</code></pre>
+    <div class="warn"><strong>⚠️ babypandas 没有 <code>.rename()</code></strong>。这是高频 workaround：<code>.assign(新=旧).drop(columns=[旧])</code>。整个项目反复用。</div>
+    <p class="why"><strong>💡 为什么先 <code>groupby([track, uri]).count()</code></strong>：原 charts 每个 (track, uri) 组合可能出现<u>多次</u>（不同周）。先 groupby 双列再 count，然后 reset_index → 得到 distinct (track, uri) pairs。再对它按 track groupby count → 每个 track 有几个不同的 uri。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.5</span><span class="q-title">平均</span>
+<pre><code>avg_uri_count = uris_per_track.get('uri_count').mean()</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.6</span><span class="q-title">'Toxic' 的所有 artist_names</span>
+<pre><code>toxic_artists = np.unique(charts[charts.get('track_name') == 'Toxic'].get('artist_names'))</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.7</span><span class="q-title"><code>repeat_titles</code>：被多 artist 翻唱的 track</span>
+<pre><code>distinct_pairs = charts.groupby(['track_name', 'artist_names']).count().reset_index().get(['track_name', 'artist_names'])
+counted = distinct_pairs.groupby('track_name').count()
+artist_counts = (counted
+    .assign(num_artists=counted.get('artist_names'))
+    .drop(columns=['artist_names'])
+    .reset_index())
+repeat_titles = artist_counts[artist_counts.get('num_artists') &gt; 1]</code></pre>
+    <p class="why"><strong>💡 同样的 rename 模式</strong>。模式：distinct pairs → groupby + count → rename → 筛选。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.8</span><span class="q-title">用 '; ' 拼接 artist_names</span>
+<pre><code>def get_all_artists(t):
+    artists = np.unique(charts[charts.get('track_name') == t].get('artist_names'))
+    return '; '.join(artists)
+
+repeat_titles = repeat_titles.assign(
+    all_artists=repeat_titles.get('track_name').apply(get_all_artists)
+)</code></pre>
+    <p class="why"><strong>💡 <code>'; '.join(arr)</code></strong>：Python 的 str.join，把 array of strings 拼成单一 string，用 '; ' 隔开。这是字符串聚合常用 trick。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.9</span><span class="q-title">不同 (track, artist) 组合数</span>
+<pre><code>num_songs = int(charts.groupby(['track_name', 'artist_names']).count().shape[0])</code></pre>
+    <p class="why"><strong>💡 多列 groupby 的核心用法</strong>：去重 (track, artist) 组合数。.shape[0] 直接告诉你不同组合数量。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.10</span><span class="q-title"><code>songs_on_charts</code>：每首歌一行 + 11 个 median 特征</span>
+<pre><code>feature_cols = ['danceability', 'energy', 'key', 'mode', 'loudness', 'speechiness',
+                'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration']
+songs_on_charts = (charts.get(['track_name', 'artist_names'] + feature_cols)
+    .groupby(['track_name', 'artist_names']).median().reset_index())</code></pre>
+    <div class="warn"><strong>⚠️ 必须先 <code>.get([需要的列])</code> 再 groupby</strong>：charts 含 string 列（release_date、uri 等），<code>.median()</code> 处理字符串会报错。这跟 HW 4 Q4.1 同一陷阱（pandas 2.x 不忽略非数值列）。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec2">📚 Section 2 — The Sound of Music</h2>
+
+  <div class="q-block"><span class="q-id">Q 2.1</span><span class="q-title">ms → min（重命名 duration → duration_min）</span>
+<pre><code>songs = songs.assign(duration_min=songs.get('duration') / 60000).drop(columns=['duration'])</code></pre>
+    <p class="why"><strong>💡</strong> 60000 = 1000 × 60。ms 除 60000 = min。再次用 assign + drop 实现 "rename + transform"。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.2</span><span class="q-title">最长歌（用 float()）</span>
+<pre><code>sorted_by_dur = songs.sort_values(by='duration_min', ascending=False)
+longest_song_name    = sorted_by_dur.get('track_name').iloc[0]
+longest_song_artist  = sorted_by_dur.get('artist_names').iloc[0]
+longest_song_minutes = float(sorted_by_dur.get('duration_min').iloc[0])</code></pre>
+    <p class="why"><strong>💡 <code>float()</code> 包</strong>：autograder 检 <code>isinstance(longest_song_minutes, float)</code>，numpy float64 可能不过。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.3</span><span class="q-title">不重复 key</span>
+<pre><code>unique_keys = np.unique(songs.get('key'))</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.4</span><span class="q-title">文字解释：为什么 key 不全是整数？</span>
+    <p class="why"><strong>💡 答案</strong>：因为 Q1.10 用 <code>median</code> 聚合一首歌的多行 charts。如果一首歌有偶数行且各行的 integer key 不同（如 1 和 2），median = 1.5。所以 songs 的 key 列<u>不全</u>是整数。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.5</span><span class="q-title">key 分布直方图</span>
+<pre><code>songs.plot(kind='hist', y='key', bins=np.arange(-0.25, 12.25, 0.5),
+           title='Distribution of Key in Songs')</code></pre>
+    <p class="why"><strong>💡 bin 边界 -0.25 到 12.25 步长 0.5</strong>：把每个 0.5-wide bin 中心对在整数或半整数上。这样 key=0 落在 [-0.25, 0.25)、key=0.5 落在 [0.25, 0.75)、…刚好每个独立可见。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec3">📚 Section 3 — Slow and Steady</h2>
+
+  <div class="q-block"><span class="q-id">Q 3.1</span><span class="q-title"><code>tempo_to_name(t)</code>：bpm → 意大利术语</span>
+<pre><code>def tempo_to_name(t):
+    if   t &lt; 60:  return 'Lento'
+    elif t &lt; 90:  return 'Adagio'
+    elif t &lt; 110: return 'Andante'
+    elif t &lt; 120: return 'Moderato'
+    elif t &lt; 160: return 'Allegro'
+    elif t &lt; 180: return 'Vivace'
+    else:          return 'Presto'
+
+songs = songs.assign(tempo_name=songs.get('tempo').apply(tempo_to_name))</code></pre>
+    <p class="why"><strong>💡 if/elif 链 + .apply</strong>：每个 elif 检查"小于某阈值"。注意阈值顺序——<u>从小到大</u>。如果反过来（先 t&lt;180 再 t&lt;160）会逻辑错。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.2</span><span class="q-title">最常/最少见 (tempo, key) 组合</span>
+<pre><code>combo_counts = songs.groupby(['tempo_name', 'key']).count().reset_index().sort_values(by='track_name', ascending=False)
+most_common_combo  = [combo_counts.get('tempo_name').iloc[0],  float(combo_counts.get('key').iloc[0])]
+least_common_combo = [combo_counts.get('tempo_name').iloc[-1], float(combo_counts.get('key').iloc[-1])]</code></pre>
+    <p class="why"><strong>💡 多列 groupby + count + iloc[0/-1]</strong>。注意：<code>combo_counts.get('track_name')</code> 在 groupby 后是每组行数（任意非 groupby 列的 count 都一样）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.3</span><span class="q-title"><code>common_songs</code>：用 &amp; 双条件过滤</span>
+<pre><code>common_songs = songs[(songs.get('tempo_name') == most_common_combo[0]) &amp;
+                     (songs.get('key')        == most_common_combo[1])]</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.4</span><span class="q-title"><code>to_merge</code>：字典序最小的 uri</span>
+<pre><code>to_merge = (charts.get(['track_name', 'artist_names', 'uri'])
+    .groupby(['track_name', 'artist_names']).min().reset_index())</code></pre>
+    <p class="why"><strong>💡 字符串 <code>.min()</code> = 字典序最小</strong>。也用 .get([..]) 提前过滤掉混合类型列（同 Q1.10）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.5</span><span class="q-title"><code>merge</code> 不传 <code>on</code></span>
+<pre><code>common_songs_uri = common_songs.merge(to_merge)</code></pre>
+    <div class="warn"><strong>⚠️ babypandas merge 限制</strong>：<code>on=</code> 只能传<u>单</u>列字符串。<u>但</u>不传 <code>on</code> 时 babypandas 自动用<u>所有共有列</u> merge——这里 common_songs 和 to_merge 共有 'track_name' 和 'artist_names'，自动用这两列联合 join。</div>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.6</span><span class="q-title">字典序后第 0, 50, 100 首</span>
+<pre><code>sorted_uris  = common_songs_uri.sort_values(by='uri').get('uri').reset_index(drop=True)
+certain_uris = np.array(sorted_uris.iloc[np.arange(0, len(sorted_uris), 50)])
+
+for uri in certain_uris:
+    play_spotify(uri)</code></pre>
+    <p class="why"><strong>💡 <code>np.arange(0, len, 50)</code></strong>：[0, 50, 100, …]。每 50 取一个。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.7</span><span class="q-title"><code>song_means</code>：按 tempo 升序排（"reindex" 替代）</span>
+<pre><code>order_map = {'Lento': 0, 'Adagio': 1, 'Andante': 2, 'Moderato': 3,
+             'Allegro': 4, 'Vivace': 5, 'Presto': 6}
+
+means = (songs.get(['tempo_name', 'danceability', 'energy', 'acousticness', 'valence'])
+    .groupby('tempo_name').mean().reset_index())
+
+song_means = (means
+    .assign(_order=means.get('tempo_name').apply(lambda x: order_map[x]))
+    .sort_values(by='_order')
+    .drop(columns=['_order'])
+    .set_index('tempo_name'))</code></pre>
+    <div class="warn"><strong>⚠️ babypandas 没有 <code>.reindex()</code></strong>。Workaround：加辅助 <code>_order</code> 列把名字映到数字 → 按它排序 → 删辅助列 → set_index 把名字放回索引。</div>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.8</span><span class="q-title"><code>song_means_modified</code>：按 index 删行</span>
+<pre><code>fewest_tempo = songs.groupby('tempo_name').count().get('track_name').sort_values().index[0]
+reset = song_means.reset_index()
+song_means_modified = reset[reset.get('tempo_name') != fewest_tempo].set_index('tempo_name')</code></pre>
+    <div class="warn"><strong>⚠️ babypandas <code>.drop()</code> 只接 columns=</strong>。要按 index 删行——只能 reset_index → 布尔过滤 → set_index 还原。</div>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.9</span><span class="q-title">折线图</span>
+<pre><code>song_means_modified.plot(kind='line', y=['danceability', 'energy', 'acousticness', 'valence'],
+    title='Audio Features by Tempo Name')</code></pre>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec4">📚 Section 4 — Crazy in Love</h2>
+
+  <div class="q-block"><span class="q-id">Q 4.1</span><span class="q-title">含 'love' 的字符串列 'True'/'False'（不是 bool！）</span>
+<pre><code>love_and_not = songs.assign(has_love=songs.get('track_name')
+    .str.lower()
+    .str.contains('love', regex=False)
+    .apply(lambda b: 'True' if b else 'False'))</code></pre>
+    <div class="warn"><strong>⚠️ 必须是字符串 'True' / 'False'</strong>，不是 bool。后面 Q4.2、4.3 用 <code>== 'True'</code> 过滤。如果存的是 bool，那应该用 <code>== True</code>。两者不同。</div>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.2</span><span class="q-title">含/不含 love 的 loudness 均值</span>
+<pre><code>average_love_song_loudness     = float(love_and_not[love_and_not.get('has_love') == 'True' ].get('loudness').mean())
+average_non_love_song_loudness = float(love_and_not[love_and_not.get('has_love') == 'False'].get('loudness').mean())</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.3</span><span class="q-title"><code>love_means</code>：以 has_love 为索引</span>
+<pre><code>love_means = love_and_not.get(['danceability', 'energy', 'speechiness', 'acousticness',
+    'instrumentalness', 'liveness', 'valence', 'has_love']).groupby('has_love').mean()</code></pre>
+    <p class="why"><strong>💡 PDF starter 代码有 bug</strong>：原 <code>(love_and_not.get([...])</code> 左括号没闭合，会报 "( was never closed"。直接重写。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.4</span><span class="q-title">加 AbsDiff 列</span>
+<pre><code>transposed_love = transposed_love.assign(AbsDiff=(transposed_love.get('False') - transposed_love.get('True')).abs())</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.5</span><span class="q-title">水平条形图（AbsDiff 大的在上）</span>
+<pre><code>transposed_love.sort_values(by='AbsDiff').plot(kind='barh', y=['False', 'True'],
+    title="What's So Special About Love?")</code></pre>
+    <p class="why"><strong>💡 sort 升序 + barh</strong>：barh 从下往上画。升序 + barh 让最大的在<u>最上面</u>。降序会反过来。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.6</span><span class="q-title"><code>word_analysis(word, draw_plot=False)</code>：抽象成函数</span>
+<pre><code>def word_analysis(word, draw_plot=False):
+    feats = ['danceability', 'energy', 'speechiness', 'acousticness',
+             'instrumentalness', 'liveness', 'valence']
+    has_word = songs.get('track_name').str.lower().str.contains(word.lower(), regex=False)\
+        .apply(lambda b: 'True' if b else 'False')
+    means = songs.assign(has_word=has_word).get(feats + ['has_word']).groupby('has_word').mean().T
+    means = means.assign(AbsDiff=(means.get('False') - means.get('True')).abs())
+    if draw_plot:
+        title = "What's So Special About " + word[0].upper() + word[1:].lower() + "?"
+        means.sort_values(by='AbsDiff').plot(kind='barh', y=['False', 'True'], title=title)
+    return means</code></pre>
+    <p class="why"><strong>💡 <code>regex=False</code> 必须</strong>：题目强调。否则 <code>.</code>、<code>*</code> 等会被当 regex 解析。</p>
+    <p class="why"><strong>💡 标题首字母大写</strong>：<code>word[0].upper() + word[1:].lower()</code>。考字符串切片 + 拼接。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.7</span><span class="q-title"><code>polarity(word)</code></span>
+<pre><code>def polarity(word):
+    return float(word_analysis(word, draw_plot=False).get('AbsDiff').sum())</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.8</span><span class="q-title">按 polarity 降序排</span>
+<pre><code>polarities = np.array([polarity(w) for w in polarity_words])
+polarity_words_ranked = polarity_words[np.argsort(-polarities)]</code></pre>
+    <p class="why"><strong>💡 <code>np.argsort(-arr)</code></strong>：argsort 给升序的<u>索引</u>；取负 → 降序索引。然后用这些索引取原 array。是 numpy 降序的标准技巧。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec5">📚 Section 5 — The Test of Time</h2>
+
+  <div class="q-block"><span class="q-id">Q 5.1</span><span class="q-title">YYYY 与 YYYY-MM 各占比例</span>
+<pre><code>year_only       = float((charts.get('release_date').str.len() == 4).mean())
+year_month_only = float((charts.get('release_date').str.len() == 7).mean())</code></pre>
+    <p class="why"><strong>💡 <code>.str.len()</code></strong>：每个字符串的字符数。YYYY = 4，YYYY-MM = 7，YYYY-MM-DD = 10。<code>.mean()</code> bool Series = 比例。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.2</span><span class="q-title">补齐到 YYYY-MM-DD</span>
+<pre><code>def fix_date(s):
+    if   len(s) == 4: return s + '-01-01'
+    elif len(s) == 7: return s + '-01'
+    else:              return s
+
+charts = charts.assign(release_date=charts.get('release_date').apply(fix_date))</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.3</span><span class="q-title">最早 release_date</span>
+<pre><code>oldest_song         = charts.sort_values(by='release_date').get('track_name').iloc[0]
+oldest_song_artists = charts.sort_values(by='release_date').get('artist_names').iloc[0]</code></pre>
+    <p class="why"><strong>💡 字符串日期 YYYY-MM-DD 的字典序 = 时间序</strong>。所以 sort_values 直接按字符串排即可。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.4</span><span class="q-title"><code>weeks_between</code>：跨年逻辑</span>
+<pre><code>def weeks_between(date1, date2):
+    year1, month1, day1 = date1[0], date1[1], date1[2]
+    year2, month2, day2 = date2[0], date2[1], date2[2]
+    total_days = 0
+    if year1 == year2:
+        total_days = days_between(month1, day1, month2, day2)
+    else:
+        total_days = (year2 - year1 - 1) * 365
+        total_days = total_days + days_between(month1, day1, 12, 31)
+        total_days = total_days + days_between(1, 1, month2, day2)
+        total_days = total_days + 1
+    return int(total_days / 7)</code></pre>
+    <p class="why"><strong>💡 跨年分三段</strong>：① 当年从 (m1, d1) 到 12/31；② 中间整年（year2−year1−1 年）；③ 第 year2 年从 1/1 到 (m2, d2)；最后 +1（衔接的那天）。除以 7 取整 = 整周数。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.5</span><span class="q-title">oldest song 从发行到最后上榜的周数</span>
+<pre><code>oldest_rows = charts[(charts.get('track_name') == oldest_song) &
+                     (charts.get('artist_names') == oldest_song_artists)]
+release_str = oldest_rows.get('release_date').iloc[0]
+recent_str  = oldest_rows.sort_values(by='week', ascending=False).get('week').iloc[0]
+weeks_since_release = weeks_between(convert_date_to_list(release_str), convert_date_to_list(recent_str))</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.6</span><span class="q-title">每周 US #1（去重技巧）</span>
+<pre><code>charts_with_ages = charts.assign(weeks_old=weeks_old)
+us_top1 = charts_with_ages[(charts_with_ages.get('country') == 'United States') &
+                            (charts_with_ages.get('rank') == 1)]
+top_us = us_top1.get(['week', 'track_name', 'artist_names', 'release_date', 'weeks_old'])\
+    .groupby('week').max()</code></pre>
+    <p class="why"><strong>💡 用 <code>groupby('week').max()</code> 去重</strong>：同周 #1 可能因多艺人拆成多行。groupby('week') 后 max 把同 week 行聚合成 1 行（这些列在重复行中值都相同，max 就是自己），同时 week 自动成 index 并按字典序（=时间序）排好。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.7</span><span class="q-title">折线图</span>
+<pre><code>top_us.plot(kind='line', y='weeks_old', figsize=(10, 5),
+    title='Age (weeks) of #1 Song in the US Over Time')</code></pre>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec6">📚 Section 6 — Party in the USA</h2>
+
+  <div class="q-block"><span class="q-id">Q 6.1</span><span class="q-title"><code>us_charts</code>：US 数据去重</span>
+<pre><code>us_charts = (charts[charts.get('country') == 'United States']
+    .get(['track_name', 'artist_names', 'rank', 'week'])
+    .groupby(['track_name', 'artist_names', 'rank', 'week']).count().reset_index()
+    .sort_values(by=['week', 'rank']))</code></pre>
+    <p class="why"><strong>💡 多列 sort_values</strong>：传 list 表示先按 week 排，平局按 rank 排。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 6.2</span><span class="q-title">不同周数</span>
+<pre><code>num_weeks = int(us_charts.groupby('week').count().shape[0])</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 6.3</span><span class="q-title">加 week_num（每数字重复 200）</span>
+<pre><code>us_charts = us_charts.assign(week_num=np.repeat(np.arange(1, num_weeks + 1), 200))</code></pre>
+    <p class="why"><strong>💡 <code>np.repeat([1,2,3], 200)</code> = [1×200, 2×200, 3×200]</strong>。每周必有 200 行（前 200 名），所以 week_num 按这个模式重复。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 6.4</span><span class="q-title">曾排进 top 2 的 track</span>
+<pre><code>been_top_two = np.unique(us_charts[us_charts.get('rank') &lt;= 2].get('track_name'))</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 6.5</span><span class="q-title"><code>possibly_mega</code>：us_charts 中筛出 ∈ been_top_two 的行</span>
+<pre><code>flagged = us_charts.assign(in_btt=us_charts.get('track_name').apply(lambda t: t in been_top_two))
+possibly_mega = flagged[flagged.get('in_btt')].drop(columns=['in_btt'])</code></pre>
+    <p class="why"><strong>💡 <code>x in array</code> 在 apply 里</strong>：检查 element-wise。返回 bool Series，可用作过滤。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 6.6</span><span class="q-title">加 weeks_on_charts</span>
+<pre><code>def calculate_weeks(track_name):
+    return possibly_mega[possibly_mega.get('track_name') == track_name].shape[0]
+
+possibly_mega = possibly_mega.assign(
+    weeks_on_charts=possibly_mega.get('track_name').apply(calculate_weeks)
+)</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 6.7</span><span class="q-title"><code>calculate_rank_array(track)</code>：长度 num_weeks 的 rank 数组</span>
+<pre><code>def calculate_rank_array(track_name):
+    song_rows = possibly_mega[possibly_mega.get('track_name') == track_name]
+    weeks_in = np.array(song_rows.get('week_num'))
+    ranks_in = np.array(song_rows.get('rank'))
+    rank_array = np.array([])
+    for w in np.arange(1, num_weeks + 1):
+        if w in weeks_in:
+            rank_array = np.append(rank_array, ranks_in[weeks_in == w][0])
+        else:
+            rank_array = np.append(rank_array, 201)
+    return rank_array</code></pre>
+    <p class="why"><strong>💡 201 是 sentinel</strong>："不在榜"用一个不可能值（&gt; 200）代替。后续判断 "rank ≤ 10" 时它永远 False。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 6.8</span><span class="q-title"><code>longest_streak(track, n=10)</code>：累加器找最长连击</span>
+<pre><code>def longest_streak(track_name, n=10):
+    rank_array = calculate_rank_array(track_name)
+    longest = 0
+    current = 0
+    for num in rank_array:
+        if num &lt;= n:
+            current = current + 1
+            longest = max(longest, current)
+        else:
+            current = 0
+    return max(longest, current)</code></pre>
+    <p class="why"><strong>💡 累加器双变量模板</strong>：
+      <ul>
+        <li><code>current</code>：当前连击长度</li>
+        <li><code>longest</code>：迄今最长</li>
+        <li>满足条件 → current++ 并更新 longest；不满足 → current 归零</li>
+      </ul>
+      期末非常高频。注意 return 用 <code>max(longest, current)</code> 是冗余的（longest 已经 always &gt;= current），但更安全。
+    </p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 6.9</span><span class="q-title">加 longest_streak_top_ten 列（用 dict 缓存）</span>
+<pre><code>unique_tracks = np.unique(possibly_mega.get('track_name'))
+streak_map = {t: longest_streak(t, 10) for t in unique_tracks}
+possibly_mega = possibly_mega.assign(
+    longest_streak_top_ten=possibly_mega.get('track_name').apply(lambda t: streak_map[t])
+)</code></pre>
+    <p class="why"><strong>💡 性能优化</strong>：如果直接 <code>.apply(longest_streak)</code>，会对每行（多行同 track）重复计算同样的 streak。先建 dict 缓存 → 每个 track 只算一次。这是真实场景的<u>必备优化</u>。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 6.10</span><span class="q-title"><code>us_megahits</code>：三条件 + 以 track 为 index + 3 列</span>
+<pre><code>us_megahits = (possibly_mega[
+    (possibly_mega.get('weeks_on_charts') &gt;= 20) &
+    (possibly_mega.get('longest_streak_top_ten') &gt;= 5)
+]
+.groupby('track_name').max()
+.get(['artist_names', 'weeks_on_charts', 'longest_streak_top_ten']))</code></pre>
+    <p class="why"><strong>💡 megahits 三条件</strong>：曾 top 2（已在 possibly_mega 里）+ 总在榜 ≥ 20 周 + top 10 连击 ≥ 5 周。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec7">📚 Section 7 — Encore</h2>
+
+  <div class="q-block"><span class="q-id">Q 7.1</span><span class="q-title"><code>megahits</code>：merge 加 12 个音频特征</span>
+<pre><code>audio_cols = ['danceability', 'energy', 'key', 'mode', 'loudness', 'speechiness',
+              'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_min']
+megahits = (us_megahits.reset_index()
+    .merge(songs.get(['track_name'] + audio_cols), on='track_name')
+    .set_index('track_name'))</code></pre>
+    <p class="why"><strong>💡 reset_index → merge → set_index</strong>：merge 需要列名匹配，但 index 不算"列"。所以先 reset_index 把 track_name 拿出，merge 后再设回 index。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 7.2</span><span class="q-title"><code>megahit_comparison</code>：不用 .T</span>
+<pre><code>audio_features = np.array(['danceability', 'energy', 'speechiness', 'acousticness',
+    'instrumentalness', 'liveness', 'valence', 'loudness', 'tempo', 'duration_min'])
+every_means   = np.array([songs.get(f).mean()    for f in audio_features])
+megahit_means = np.array([megahits.get(f).mean() for f in audio_features])
+
+megahit_comparison = (bpd.DataFrame()
+    .assign(audio_feature=audio_features,
+            every_song_mean=every_means,
+            megahit_mean=megahit_means)
+    .set_index('audio_feature'))</code></pre>
+    <p class="why"><strong>💡 题目禁用 <code>.T</code></strong>：所以从头用 list comprehension 算两个均值数组，再 assign 构造 DataFrame。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 7.3</span><span class="q-title">前 7 个特征水平条形图</span>
+<pre><code>first_seven = megahit_comparison.iloc[:7]
+first_seven = first_seven.assign(AbsDiff=(first_seven.get('every_song_mean') - first_seven.get('megahit_mean')).abs())
+first_seven.sort_values(by='AbsDiff').plot(kind='barh', y=['every_song_mean', 'megahit_mean'],
+    title="What's So Special About Megahits?")</code></pre>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="patterns">🔁 高频出现的 7 个 babypandas 模式</h2>
+
+  <table>
+    <tr><th>模式</th><th>babypandas 写法</th><th>出现位置</th></tr>
+    <tr><td>rename 列</td><td><code>.assign(新=旧).drop(columns=[旧])</code></td><td>Q1.4, 1.7, 2.1, …</td></tr>
+    <tr><td>"按 index 删行"</td><td>reset_index → 布尔过滤 → set_index</td><td>Q3.8</td></tr>
+    <tr><td>"reindex" 自定义顺序</td><td>加 _order 辅助列 → sort → drop</td><td>Q3.7</td></tr>
+    <tr><td>对混合类型列 groupby</td><td>先 <code>.get([需要的列])</code> 再 groupby</td><td>Q1.10, 3.4, 4.3</td></tr>
+    <tr><td>多列 groupby</td><td><code>.groupby(['a', 'b'])</code></td><td>Q1.4, 1.7, 1.9, 1.10, 3.2, 3.4, 6.1</td></tr>
+    <tr><td>"count distinct (a, b) 组合数"</td><td><code>groupby([a,b]).count().shape[0]</code></td><td>Q1.9, 6.2</td></tr>
+    <tr><td>merge 不传 on</td><td>自动按所有共有列 join</td><td>Q3.5</td></tr>
+  </table>
+
+  <!-- ============================================================ -->
+  <h2 id="pitfalls">⚠️ 典型陷阱</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：autograder 类型检查 (int / float)</strong><br>
+    所有 "shape[0]"、"count"、"average" 都要 <code>int(...)</code> 或 <code>float(...)</code> 包，否则 numpy int64/float64 通不过 <code>isinstance(..., numbers.Integral)</code>。Q1.1, 1.9, 2.2, 6.2, 6.4 等都涉及。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：has_love 是字符串 'True'/'False' 不是 bool</strong><br>
+    Q4.1。后续 Q4.2、4.3 用 <code>== 'True'</code> 过滤。如果存的是 bool，需要 <code>== True</code>，两者不同。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：<code>.str.contains</code> 必须 <code>regex=False</code></strong><br>
+    Q4.1, 4.6 强调。否则 <code>.</code>、<code>*</code> 等正则元字符会被误解。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：merge 不传 on 自动联合多列</strong><br>
+    Q3.5。共有 'track_name' 和 'artist_names'，automerge 用<u>两列联合</u>。如果你以为只用 track_name，行数会膨胀。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：累加器 streak 模板（Q6.8）</strong><br>
+    current / longest 双变量。满足条件 → current++，更新 longest；不满足 → current = 0。条件循环结束后 longest 就是答案。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：性能——把 .apply 的重复计算缓存到 dict</strong><br>
+    Q6.9。对每行同 track 直接 <code>.apply(longest_streak)</code> 会重复计算。先建 dict 一次性算完，apply 改成查 dict。期末 / 真实场景必备技巧。
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① babypandas 没有 <code>.rename()</code> —— 标准 workaround？什么时候出现？</span></label>
+    <label><input type="checkbox"><span>② babypandas 没有 <code>.reindex()</code> —— 怎么用辅助 _order 列做自定义顺序？</span></label>
+    <label><input type="checkbox"><span>③ <code>groupby().median()</code> 在混合类型列上为什么报错？怎么修？</span></label>
+    <label><input type="checkbox"><span>④ 多列 groupby 用什么语法？怎么数 distinct (a, b) 组合数？</span></label>
+    <label><input type="checkbox"><span>⑤ Q4.1：has_love 为什么是字符串 'True' / 'False' 而不是 bool？后续怎么过滤？</span></label>
+    <label><input type="checkbox"><span>⑥ Q5.4：<code>weeks_between</code> 跨年怎么分三段计算？最后为什么 +1？</span></label>
+    <label><input type="checkbox"><span>⑦ Q6.8 streak 累加器：current 和 longest 各起什么作用？什么时候 current = 0？</span></label>
+    <label><input type="checkbox"><span>⑧ Q6.9：为什么先建 streak_map dict 再 apply 而不是直接 apply(longest_streak)？性能差多少？</span></label>
+    <label><input type="checkbox"><span>⑨ 字符串 YYYY-MM-DD 的字典序为什么 = 时间序？这有什么用？</span></label>
+    <label><input type="checkbox"><span>⑩ <code>np.repeat</code> 跟 <code>np.tile</code> 的区别？Q6.3 用 repeat 是为什么？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="07-hw4-sampling-bootstrap.html">⬅ 上一份：HW 4</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="09-hw3-names-cereal-loans-probability.html">下一份 ➡：HW 3</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

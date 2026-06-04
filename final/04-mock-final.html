@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 4 · Mock Final - DSC10 Final</title>
+<style>
+  :root {
+    --bg: #fafaf7; --text: #1f2328; --muted: #57606a;
+    --accent: #0969da; --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e; --code-text: #cdd6f4;
+    --warn-bg: #fff8c5; --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff; --tip-border: #54aeff;
+    --danger-bg: #ffebe9; --danger-border: #cf222e;
+    --ok-bg: #dafbe1; --ok-border: #1a7f37;
+    --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781;
+    --border: #d0d7de; --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .qid { background: #ddf4ff; color: #0969da; padding: 2px 8px; border-radius: 4px; margin-right: 6px; font-weight: 600; }
+  .q-points { color: var(--muted); font-size: 12px; float: right; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+  .trap { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--tier-1); border-radius: 6px; padding: 12px 16px; margin: 10px 0; }
+  .trap-num { color: var(--tier-1); font-weight: 700; margin-right: 6px; }
+  .trap-tag { display: inline-block; background: #eef0f2; padding: 1px 8px; border-radius: 10px; font-size: 12px; color: var(--muted); margin-left: 6px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📗 Final 总目录</a></span>
+  <span><a href="03-residuals.html">← 上一节</a></span>
+</nav>
+
+<main>
+  <h1>Section 4 · Mock Final &amp; Trap Speed-Drill</h1>
+  <p class="meta">
+    <strong>覆盖范围</strong>：Lec 1-25 综合｜
+    <strong>预计耗时</strong>：完整刷一遍约 4-5 小时（Mock A 限时 90 分钟做 → 核对 → Wi26 Final 限时 3 小时刷 → 30 题陷阱速刷）
+  </p>
+
+  <div class="meta">
+    <strong>🎯 使用方法（推荐顺序）</strong>：
+    <ol>
+      <li><strong>Mock A（拼接版）</strong>：限时 <strong>90 分钟</strong>做完。模拟真 Final 的"多个 lecture 整合"难度。做完查答案、错题归类回各 section。</li>
+      <li><strong>Wi26 Final 真题</strong>：在 <code>practice_site/wi26-final/index.html</code>。限时 <strong>3 小时</strong>，完整一卷下来对自己做最准的诊断。</li>
+      <li><strong>30 题陷阱速刷</strong>：考前 <strong>1 小时</strong>过一遍，每题 1-2 分钟。错的回对应 section 重看。</li>
+      <li><strong>考前 final check</strong>：考试早晨 30 分钟内过一遍。</li>
+    </ol>
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#mock-a">📝 Mock Final A（拼接版，90 分钟）</a></li>
+      <li><a href="#real-finals">📋 历年 Final 真题</a></li>
+      <li><a href="#traps">🔥 30 题陷阱速刷</a></li>
+      <li><a href="#final-check">✅ 考前 final check（30 条秒杀）</a></li>
+      <li><a href="#cheat-sheet">📋 笔记参考（1 page 双面建议布局）</a></li>
+    </ul>
+  </div>
+
+  <h2 id="mock-a">📝 Mock Final A · 拼接版（限时 90 分钟）</h2>
+
+  <p>10 道多 part 题，覆盖 Lec 1-25 主要考点。难度仿真 Final。<strong>不查答案、不查 cheat-sheet 之外的资料</strong>。</p>
+
+  <h3>Problem 1（Lec 4-5）· DataFrame Indexing + Querying ⭐⭐⭐</h3>
+  <div class="q-block">
+    <div class="q-source"><span class="qid">P1</span> DataFrame 综合 <span class="q-points">~8 分钟</span></div>
+    <p>DataFrame <code>cars</code>（mock）有列：<code>'model'</code> (str index), <code>'year'</code> (int), <code>'price'</code> (float), <code>'mpg'</code> (float), <code>'class'</code> (str, 如 "Compact"/"Midsize")。已设 <code>'model'</code> 为 index。</p>
+    <p><strong>(a)</strong> 哪个表达式返回 "Prius" 这一行的 mpg？</p>
+    <ol type="A">
+      <li><code>cars.loc['Prius'].get('mpg')</code></li>
+      <li><code>cars.iloc['Prius'].get('mpg')</code></li>
+      <li><code>cars.get('mpg').loc['Prius']</code></li>
+      <li><code>cars['Prius']['mpg']</code></li>
+    </ol>
+    <p><strong>(b)</strong> 写一行：返回所有 2010 年后（含 2010）且 mpg &gt; 40 的<strong>Compact 车</strong>的 DataFrame。</p>
+    <p><strong>(c)</strong> 写一行：在所有 Midsize 车中，按 price 降序找最贵那辆的 model 名（一个 string）。</p>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>(a) A 和 C 都对</strong>。
+        <ul>
+          <li>A：<code>.loc['Prius']</code> 返回 Series → <code>.get('mpg')</code> 取 mpg</li>
+          <li>B ✗：<code>.iloc</code> 用整数，不能传 string</li>
+          <li>C：先 <code>.get('mpg')</code> 拿 mpg Series（仍以 model 为 index）→ <code>.loc['Prius']</code> 取该 model</li>
+          <li>D ✗：babypandas 没有方括号取 column 的语法</li>
+        </ul>
+      </p>
+      <p><strong>(b)</strong>：
+        <pre><code>cars[(cars.get('year') &gt;= 2010) &amp; (cars.get('mpg') &gt; 40) &amp; (cars.get('class') == 'Compact')]</code></pre>
+        ⚠️ 三个条件用 <code>&amp;</code> 连，每个用<strong>括号</strong>包好（precedence 陷阱）。<strong>不</strong>能用 <code>and</code>。
+      </p>
+      <p><strong>(c)</strong>：
+        <pre><code>cars[cars.get('class') == 'Midsize'].sort_values(by='price', ascending=False).index[0]</code></pre>
+        关键：(1) 先过滤 Midsize；(2) sort_values 降序；(3) 因为 <code>'model'</code> 已经是 index，<strong>第一行的 index 值</strong> = 最贵那辆的 model。用 <code>.index[0]</code>（不是 <code>.iloc[0].get('model')</code>，因为 model 不在列里）。
+      </p>
+    </details>
+  </div>
+
+  <h3>Problem 2（Lec 7）· Density Histogram ⭐⭐⭐</h3>
+  <div class="q-block">
+    <div class="q-source"><span class="qid">P2</span> Histogram bin height <span class="q-points">~7 分钟</span></div>
+    <p>500 名 UCSD 学生，drawn 一个 density histogram of <code>'hours_studied'</code>，bins = <code>np.arange(0, 41, 5)</code>。bin <code>[10, 15)</code> 的 <strong>height = 0.06</strong>。</p>
+    <p><strong>(a)</strong> 多少学生 study 时间在 <code>[10, 15)</code>？</p>
+    <p><strong>(b)</strong> 如果改 bins = <code>np.arange(0, 41, 10)</code>，bin <code>[10, 20)</code> 包含原 <code>[10, 15)</code> 和 <code>[15, 20)</code>（后者 height = 0.04）。新 bin 的 height？</p>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>(a)</strong> bin width = 5，proportion = height × width = 0.06 × 5 = <strong>0.30</strong>。count = 0.30 × 500 = <strong>150 名学生</strong>。</p>
+      <p><strong>(b)</strong> 新 bin 总 proportion = 0.30 + 0.04·5 = 0.30 + 0.20 = 0.50。新 width = 10。<br>
+      新 height = 0.50 / 10 = <strong>0.05</strong>。</p>
+      <p class="warn">⚠️ 高频陷阱：<strong>rebin 后高度<em>不是</em>简单平均</strong>。要先算总 proportion 再除以新 width。<br>
+      density histogram 公式：<code>Height = Proportion / Width</code>，所有 bin 总面积 = 1。</p>
+    </details>
+  </div>
+
+  <h3>Problem 3（Lec 8-9）· Apply + GroupBy + Merge ⭐⭐⭐</h3>
+  <div class="q-block">
+    <div class="q-source"><span class="qid">P3</span> apply + groupby + merge 综合 <span class="q-points">~10 分钟</span></div>
+    <p>DataFrame <code>orders</code> 有列 <code>'customer_id'</code>、<code>'product'</code>、<code>'amount'</code>。DataFrame <code>customers</code> 以 <code>'customer_id'</code> 为 index，有列 <code>'name'</code> 和 <code>'tier'</code> (其中 tier 是 "gold"/"silver"/"bronze")。</p>
+    <p><strong>(a)</strong> 写一个函数 <code>price_range(amount)</code> 返回 string："low"（≤50）、"mid"（50-200）、"high"（&gt;200）。然后用它给 <code>orders</code> 加一列 <code>'range'</code>。</p>
+    <p><strong>(b)</strong> 用 <code>groupby(['tier', 'range'])</code> 统计每个 (tier, range) 组合下的订单数。哪个语法对？</p>
+    <ol type="A">
+      <li><code>merged = orders.merge(customers, left_on='customer_id', right_index=True); merged.groupby(['tier', 'range']).count()</code></li>
+      <li><code>orders.groupby(['tier', 'range']).count()</code></li>
+      <li><code>customers.groupby(['tier', 'range']).count()</code></li>
+    </ol>
+    <p><strong>(c)</strong> 若 <code>orders</code> 有 1000 行、<code>customers</code> 有 200 行（每个 customer 在 <code>orders</code> 中至少出现 1 次），<code>orders.merge(customers, ...)</code> 后<strong>预测行数</strong>？</p>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>(a)</strong>：
+        <pre><code>def price_range(amount):
+    if amount &lt;= 50:
+        return "low"
+    elif amount &lt;= 200:
+        return "mid"
+    else:
+        return "high"
+
+orders = orders.assign(range=orders.get('amount').apply(price_range))</code></pre>
+        ⚠️ <code>.apply(price_range)</code> 不带括号（传函数<strong>名</strong>不是调用）。
+      </p>
+      <p><strong>(b) A</strong>。orders 没有 tier 列，必须先 merge 进 customers 的信息。<br>
+        B ✗（缺 tier 列）、C ✗（customers 没 range 列）。
+      </p>
+      <p><strong>(c) 1000 行</strong>。每个 order 与 unique customer 1对1 匹配（inner join），orders 全部保留。<br>
+        ⚠️ <strong>不</strong>是 1000 × 200 = 200000，<strong>不</strong>是 1200（不是 union）。merge 的行数 = 匹配次数。
+      </p>
+    </details>
+  </div>
+
+  <h3>Problem 4（Lec 11-12）· Probability + Simulation ⭐⭐⭐</h3>
+  <div class="q-block">
+    <div class="q-source"><span class="qid">P4</span> 概率 + 模拟 <span class="q-points">~10 分钟</span></div>
+    <p>一个袋子里 5 红、3 蓝、2 绿球。</p>
+    <p><strong>(a)</strong> <strong>无放回</strong>抽 3 个，全是红球的概率？</p>
+    <p><strong>(b)</strong> <strong>有放回</strong>抽 3 个，<strong>至少 1 个</strong>蓝球的概率？</p>
+    <p><strong>(c)</strong> 写代码：用 simulation 估算 (b) 的概率（10000 次重复，输出一个数）。</p>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>(a)</strong>：5/10 × 4/9 × 3/8 = 60/720 = <strong>1/12 ≈ 0.0833</strong>。</p>
+      <p><strong>(b)</strong>：P(at least 1 blue) = 1 − P(no blue) = 1 − (7/10)³ = 1 − 0.343 = <strong>0.657</strong>。</p>
+      <p><strong>(c)</strong>：
+        <pre><code>colors = np.array(['R']*5 + ['B']*3 + ['G']*2)
+counter = 0
+for i in np.arange(10000):
+    draws = np.random.choice(colors, 3, replace=True)
+    if np.count_nonzero(draws == 'B') &gt;= 1:
+        counter = counter + 1
+counter / 10000</code></pre>
+        ⚠️ 关键 4 个点：(1) <code>replace=True</code>；(2) at least 1 用 <code>&gt;= 1</code>；(3) <code>np.count_nonzero(draws == 'B')</code> 数 True；(4) 最后<strong>除以 10000</strong>。
+      </p>
+    </details>
+  </div>
+
+  <h3>Problem 5（Lec 14-15）· Bootstrap CI + 解读 ⭐⭐⭐</h3>
+  <div class="q-block">
+    <div class="q-source"><span class="qid">P5</span> Bootstrap + CI 解读 <span class="q-points">~10 分钟</span></div>
+    <p>有 <code>my_sample</code>（n=200）。要用 bootstrap 构造 <strong>92%</strong> CI for population <em>median</em> of <code>'income'</code>。</p>
+    <p><strong>(a)</strong> 填空（10000 次 bootstrap）：</p>
+    <pre><code>boot_medians = np.array([])
+for i in np.arange(10000):
+    resample = my_sample.sample(___(i)___, replace=___(ii)___)
+    boot_medians = np.append(boot_medians, resample.get('income').___(iii)___)
+
+ci = [np.percentile(boot_medians, ___(iv)___),
+      np.percentile(boot_medians, ___(v)___)]</code></pre>
+    <p><strong>(b)</strong> 算出的 92% CI 是 <code>[42000, 48000]</code>。下面哪些表述<strong>正确</strong>？多选：</p>
+    <ol type="A">
+      <li>92% probability that the true median income is in [42000, 48000].</li>
+      <li>92% of all households have income between 42000 and 48000.</li>
+      <li>If we repeated this entire sampling-and-bootstrap process many times, about 92% of resulting intervals would contain the true median income.</li>
+      <li>The sample median is between 42000 and 48000.</li>
+    </ol>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>(a)</strong>：(i) <code>my_sample.shape[0]</code>，(ii) <code>True</code>，(iii) <code>median()</code>，(iv) <code>4</code>，(v) <code>96</code>。<br>
+      92% CI → 砍掉两端各 4% → percentile (100−92)/2 = 4 和 (100+92)/2 = 96。
+      </p>
+      <p><strong>(b) 答案：C 和 D</strong>。</p>
+      <ul>
+        <li>A ❌ "probability" 陷阱——CI 和 truth 都固定，<strong>不</strong>是概率语义。</li>
+        <li>B ❌ "households" 陷阱——CI 是 median <strong>分布</strong>的中间 92%，不是个体值的范围。</li>
+        <li>C ✅ 唯一正确的"process"解读。</li>
+        <li>D ✅ sample median 在 bootstrap 分布中心附近，大概率落 CI 内（除非极端情况）。</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>Problem 6（Lec 16-17）· Chebyshev / Normal / CLT ⭐⭐⭐</h3>
+  <div class="q-block">
+    <div class="q-source"><span class="qid">P6</span> Chebyshev / CLT 综合 <span class="q-points">~10 分钟</span></div>
+    <p>UCSD 学生 GPA 的 population mean = 3.2，SD = 0.6（任意分布）。</p>
+    <p><strong>(a)</strong> 用 Chebyshev：<em>至多</em>多少比例的学生 GPA 在 <strong>[2.0, 4.4]</strong> 范围<em>之外</em>？</p>
+    <p><strong>(b)</strong> 若 GPA 服从 normal 分布，多少比例的 GPA 在 [2.0, 4.4] 之内？</p>
+    <p><strong>(c)</strong> 抽取 n=144 学生的 sample。sample mean GPA 的 <strong>SD</strong>（即 SE）是多少？sample mean 在 [3.1, 3.3] 内的概率？（GPA 任意分布，但 n=144 够大用 CLT）</p>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>(a)</strong>：[2.0, 4.4] 是 mean ± 2 SD（2.0 = 3.2 − 2·0.6，4.4 = 3.2 + 2·0.6）。<br>
+      Chebyshev：z=2 → 至少 1 − 1/4 = 75% 在范围<em>内</em> → 至多 <strong>25%</strong> 在范围之外。
+      </p>
+      <p><strong>(b)</strong>：Normal 68/95/99.7 法则：±2 SD → <strong>~95%</strong> 之内。</p>
+      <p><strong>(c)</strong>：SE = pop SD / √n = 0.6 / 12 = <strong>0.05</strong>。<br>
+      sample mean 分布近似 normal（CLT），mean = 3.2，SD = 0.05。<br>
+      [3.1, 3.3] = 3.2 ± 0.1 = 3.2 ± 2·SE = 2 个 SE 范围 → 约 <strong>95%</strong>。
+      </p>
+      <p class="warn">⚠️ <strong>SD vs SE 关键区分</strong>：(a)(b) 用 population SD = 0.6；(c) 用 SE = 0.05（sample mean 的 SD）。混了就全错。</p>
+    </details>
+  </div>
+
+  <h3>Problem 7（Lec 18-20）· Sample Size + Hypothesis Testing ⭐⭐⭐</h3>
+  <div class="q-block">
+    <div class="q-source"><span class="qid">P7</span> Sample size + p-value <span class="q-points">~10 分钟</span></div>
+    <p><strong>(a)</strong> 你要估 UCSD 学生中 vegetarian 的比例，目标：95% CI 宽度 ≤ <strong>0.06</strong>。最少要采集多少学生？</p>
+    <p><strong>(b)</strong> 你做了一个 hypothesis test：</p>
+    <ul>
+      <li>Null：UCSD 学生中 vegetarian 比例 = 0.25</li>
+      <li>Alt：UCSD 学生中 vegetarian 比例 ≠ 0.25</li>
+      <li>Test statistic：|sample proportion − 0.25|</li>
+    </ul>
+    <p>得到 p-value = <strong>0.03</strong>。下面哪些结论正确？多选：</p>
+    <ol type="A">
+      <li>Reject null at 0.05 significance.</li>
+      <li>Reject null at 0.01 significance.</li>
+      <li>Fail to reject null at 0.05 significance.</li>
+      <li>Accept the null at 0.05 significance.</li>
+      <li>If null is true, the probability of seeing data as or more extreme is about 3%.</li>
+    </ol>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>(a)</strong>：proportion polling，用 0/1 数据 SD 上界 = 0.5。<br>
+      n ≥ (4·SD/w)² = (4·0.5/0.06)² = (2/0.06)² = 33.33² = <strong>1112 学生</strong>（向上取整）。
+      </p>
+      <p><strong>(b) 答案：A 和 E</strong>。</p>
+      <ul>
+        <li>A ✅ p = 0.03 &lt; 0.05 → reject</li>
+        <li>B ❌ p = 0.03 &gt; 0.01 → fail to reject at 0.01</li>
+        <li>C ❌（在 0.05 下要 reject）</li>
+        <li>D ❌ <strong>永远不 accept</strong>——只能 fail to reject</li>
+        <li>E ✅ 这是 p-value 的<em>正确</em>解读</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>Problem 8（Lec 21-22）· CI as Hypothesis Test + Permutation ⭐⭐⭐</h3>
+  <div class="q-block">
+    <div class="q-source"><span class="qid">P8</span> CI 反推 + 选工具 <span class="q-points">~10 分钟</span></div>
+    <p><strong>(a)</strong> 你声称"UCSD 学生 vegetarian 比例 = 0.20"。用 bootstrap 算出 95% CI = <strong>[0.22, 0.28]</strong>。在 5% 显著性下决策？</p>
+    <p><strong>(b)</strong> 下面 4 个问题，每个最合适的工具是？（选 hypothesis testing / permutation testing / CLT-CI / regression）</p>
+    <ul>
+      <li>(i) UCSD 男生平均身高是不是 175 cm？</li>
+      <li>(ii) UCSD 男生和女生平均身高有差异吗？</li>
+      <li>(iii) UCSD 学生 GPA 跟睡眠时长有关系吗？</li>
+      <li>(iv) UCSD 学生中 vegetarian 比例的范围是多少？</li>
+    </ul>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>(a)</strong>：0.20 <strong>不</strong>在 [0.22, 0.28] 内 → <strong>reject null</strong>。声称的 0.20 与数据不一致。</p>
+      <p><strong>(b)</strong>：</p>
+      <ul>
+        <li>(i) <strong>hypothesis testing</strong>（含 CLT-CI 反推 also OK）—— null: mean = 175，单 sample vs 已知 value</li>
+        <li>(ii) <strong>permutation testing</strong> —— 两组比较，没有 known population，shuffle group labels</li>
+        <li>(iii) <strong>regression</strong> —— 两个 continuous 变量的关系</li>
+        <li>(iv) <strong>CLT-CI</strong> 或 bootstrap CI —— 估 population proportion</li>
+      </ul>
+      <p class="tip">⚠️ <strong>工具选择决策树</strong>：单样本 vs 已知值 → hypothesis；两样本是否同分布 → permutation；估 parameter → CI；两连续变量关系 → regression。</p>
+    </details>
+  </div>
+
+  <h3>Problem 9（Lec 23-24）· Correlation + Regression ⭐⭐⭐</h3>
+  <div class="q-block">
+    <div class="q-source"><span class="qid">P9</span> r + 单位换算 + 反推 <span class="q-points">~12 分钟</span></div>
+    <p>UCSD 课程的 <code>'midterm'</code> 和 <code>'final'</code> 成绩 linearly associated，r = 0.7。midterm：mean = 75，SD = 10。final：mean = 70，SD = 15。</p>
+    <p><strong>(a)</strong> 求 regression line 在 original units 下的 slope m 和 intercept b（predict final from midterm）。</p>
+    <p><strong>(b)</strong> 某学生 midterm 90 分。预测他 final 多少分？</p>
+    <p><strong>(c)</strong> 若<strong>把 midterm 和 final 成绩都按 1.2 倍重新 scaling</strong>（grade inflation），下面三个量怎么变？</p>
+    <ul>
+      <li>r：</li>
+      <li>slope（predicting new final from new midterm）：</li>
+      <li>intercept：</li>
+    </ul>
+    <p><strong>(d)</strong> 真实情况：某学生 midterm 90、final 80。residual？</p>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>(a)</strong>：m = r · SD_y / SD_x = 0.7 · 15 / 10 = <strong>1.05</strong>。<br>
+        b = mean_y − m · mean_x = 70 − 1.05 · 75 = 70 − 78.75 = <strong>−8.75</strong>。
+      </p>
+      <p><strong>(b)</strong>：predicted final = 1.05 · 90 + (−8.75) = 94.5 − 8.75 = <strong>85.75</strong>。</p>
+      <p><strong>(c)</strong>：x 和 y 同时 × 1.2：
+        <ul>
+          <li>r: <strong>stay same</strong>（线性变换不变）</li>
+          <li>slope: <strong>stay same</strong>（SD_y 和 SD_x 同步 × 1.2，比例不变）</li>
+          <li>intercept: <strong>× 1.2</strong>（b = mean_y − m·mean_x，mean_y 和 mean_x 都 × 1.2，slope 不变 → b × 1.2）→ −10.5</li>
+        </ul>
+      </p>
+      <p><strong>(d)</strong>：residual = actual − predicted = 80 − 85.75 = <strong>−5.75</strong>。<br>
+      ⚠️ 不要写 +5.75（"predicted − actual" 是错的顺序）。
+      </p>
+    </details>
+  </div>
+
+  <h3>Problem 10（Lec 25）· Residual Plot 解读 + Prediction Interval ⭐⭐⭐</h3>
+  <div class="q-block">
+    <div class="q-source"><span class="qid">P10</span> Residuals 综合 <span class="q-points">~8 分钟</span></div>
+    <p>用 weight 预测 mpg of cars。数据 n = 200，mean weight = 3000 lbs。<strong>residual plot 显示明显的 U 形（先正、后负、再正）</strong>。</p>
+    <p><strong>(a)</strong> 从这个 residual plot 可以得出哪些结论？多选：</p>
+    <ol type="A">
+      <li>r 一定接近 0。</li>
+      <li>线性 fit 不是 best model；可能 nonlinear 更好。</li>
+      <li>regression line 的 RMSE 比某条其他直线大。</li>
+      <li>residual plot 是 patternless 的。</li>
+    </ol>
+    <p><strong>(b)</strong> 你 bootstrap 算了一组 prediction intervals。weight = 2500、3000、3500 中，哪个对应的 prediction interval 最<strong>窄</strong>？</p>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>(a) 答案：B 只有</strong>。</p>
+      <ul>
+        <li>A ❌ curved residual 不暗示 r 弱</li>
+        <li>B ✅ 唯一可靠结论</li>
+        <li>C ❌ regression line 就是 RMSE 最小的<em>直线</em></li>
+        <li>D ❌ 显然有 U 形 pattern</li>
+      </ul>
+      <p><strong>(b)</strong>：<strong>weight = 3000</strong>（等于 mean_x，最窄）。3500 离 mean 500，2500 离 mean 500，两者一样宽；3000 最窄。</p>
+    </details>
+  </div>
+
+  <div class="ok">
+    <strong>🎯 Mock A 完成后</strong>：
+    <ul>
+      <li>错题→ 标记 lecture → 回到对应 section 重看知识点</li>
+      <li>用时超过 90 分钟 → 检查"哪里卡了"（概念还是计算）</li>
+      <li>感觉良好 → 立刻接 Wi26 Final 真题（下面 link）</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <h2 id="real-finals">📋 历年 Final 真题（必刷）</h2>
+
+  <p>本地已爬了 <strong>17 套</strong> Final 真题，都在 <code>practice_site/</code> 下。建议<strong>限时 3 小时</strong>完整刷一套，不查答案。下面按推荐优先级排序：</p>
+
+  <table>
+    <thead><tr><th>Final</th><th>本地路径</th><th>主题</th><th>备注</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Winter 2026 Final</strong> ⭐⭐⭐</td>
+        <td><code>practice_site/wi26-final/index.html</code></td>
+        <td>San Diego Zoo</td>
+        <td>最新一份，最反映出题趋势。优先刷。</td>
+      </tr>
+      <tr>
+        <td><strong>Fall 2025 Final</strong> ⭐⭐⭐</td>
+        <td><code>practice_site/fa25-final/index.html</code></td>
+        <td>Snow / cities</td>
+        <td>同 instructor（Janine + Peter），出题风格一致</td>
+      </tr>
+      <tr>
+        <td>Spring 2025 Final</td>
+        <td><code>practice_site/sp25-final/index.html</code></td>
+        <td>Hunger Games</td>
+        <td>Janine 出题，含 regression 大题</td>
+      </tr>
+      <tr>
+        <td>Winter 2025 Final</td>
+        <td><code>practice_site/wi25-final/index.html</code></td>
+        <td>Harry Potter</td>
+        <td>含 broomstick regression（residual plot 经典题）</td>
+      </tr>
+      <tr>
+        <td>Fall 2024 Final</td>
+        <td><code>practice_site/fa24-final/index.html</code></td>
+        <td>Bookstore</td>
+        <td>含 Bill's Book Bonanza regression 大题</td>
+      </tr>
+      <tr>
+        <td>Spring 2024 Final</td>
+        <td><code>practice_site/sp24-final/index.html</code></td>
+        <td>Apartments</td>
+        <td>含 IKEA prediction interval + Sophie 公寓 residual 经典题</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    <strong>📌 真题刷法建议</strong>：
+    <ol>
+      <li>打印或在 iPad 上展开 PDF（真考是纸上做题、不能 click 解答）。本地 HTML 顶部都有 "PDF version available here" 链接，去 <code>practice.dsc10.com</code> 下载 PDF。</li>
+      <li>限时 3 小时，<strong>不查 answer accordion、不查 cheat sheet 之外的资料</strong>。</li>
+      <li>做完<strong>当场对答案、计分</strong>（每题难度⭐+ avg score 都在答案里）。</li>
+      <li>错题或 avg score 低于 60% 的题：回相关 section 重看 → 写到 cheat sheet 上。</li>
+    </ol>
+  </div>
+
+  <hr>
+
+  <h2 id="traps">🔥 30 题陷阱速刷</h2>
+
+  <p>每题 1-2 分钟。覆盖 4 个模块的最高频陷阱。答案默认折叠，做完一个看一个。</p>
+
+  <h3>Midterm 范围（Lec 1-12）· 8 题</h3>
+
+  <div class="trap">
+    <p><span class="trap-num">T1</span>babypandas 取列用什么语法？<span class="trap-tag">Lec 4</span></p>
+    <details><summary>答案</summary><p><strong><code>df.get('col')</code></strong>。<strong>不能</strong>用 <code>df['col']</code>。<code>.get(['col'])</code> 返回单列 DataFrame，<code>.get('col')</code> 返回 Series。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T2</span><code>.loc[5]</code> vs <code>.iloc[5]</code>？<span class="trap-tag">Lec 4</span></p>
+    <details><summary>答案</summary><p><code>.loc</code> 按 <strong>index label</strong>（可以是 string 或 int label）；<code>.iloc</code> 按 <strong>整数位置</strong>。如果 index 是 0/1/2/3...，两者结果一样；如果 index 被 set 成 string，<code>.iloc</code> 仍按位置。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T3</span>布尔过滤用 <code>and</code> 还是 <code>&amp;</code>？<span class="trap-tag">Lec 5</span></p>
+    <details><summary>答案</summary><p><strong><code>&amp;</code></strong>（和 <code>|</code> 配对）。每个条件用括号包：<code>df[(df.get('a')&gt;0) &amp; (df.get('b')&lt;5)]</code>。<strong>不能</strong>用 <code>and</code>/<code>or</code>。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T4</span>density histogram 的 height 是什么？<span class="trap-tag">Lec 7</span></p>
+    <details><summary>答案</summary><p><strong>Height = Proportion / Width</strong>。所有 bin 面积之和 = 1。bin 是 <code>[a, b)</code> 半开区间（最后一个右端闭合）。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T5</span><code>series.apply(func)</code> vs <code>series.apply(func())</code>？<span class="trap-tag">Lec 8</span></p>
+    <details><summary>答案</summary><p><strong>必须传函数<em>名</em>（不带括号）</strong>：<code>series.apply(my_func)</code>。带括号是先调用 my_func() 再把返回值传给 apply，错。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T6</span>merge 默认是 inner join 还是 outer join？没匹配的行怎么样？<span class="trap-tag">Lec 9</span></p>
+    <details><summary>答案</summary><p>默认 <strong>inner join</strong>。没匹配的行<strong>消失</strong>。预测行数 = 两边 join key 配对总次数（不是简单的 max/sum）。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T7</span><code>np.append(arr, x)</code> 要不要重新赋值？<span class="trap-tag">Lec 10</span></p>
+    <details><summary>答案</summary><p><strong>必须</strong>重新赋值：<code>arr = np.append(arr, x)</code>。<code>np.append</code> 返回新 array，不改原 array。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T8</span>"至少 1 个" 概率怎么算？<span class="trap-tag">Lec 11</span></p>
+    <details><summary>答案</summary><p>用 complement：<strong>P(at least 1) = 1 − P(none)</strong>。如 "至少 1 个红"（n 次有放回，红比例 p）= 1 − (1−p)<sup>n</sup>。</p></details>
+  </div>
+
+  <h3>Quiz 3 范围（Lec 13-18）· 8 题</h3>
+
+  <div class="trap">
+    <p><span class="trap-num">T9</span>SRS 必须 with replacement 还是 without？<span class="trap-tag">Lec 13</span></p>
+    <details><summary>答案</summary><p>SRS = Simple Random Sample = <strong>without replacement</strong>，且每行有<strong>相同概率</strong>被选。<code>df.sample(n)</code> 默认 without replacement = SRS。<code>df.sample(n, replace=True)</code> <strong>不是</strong> SRS。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T10</span>Bootstrap loop 三件套？<span class="trap-tag">Lec 14</span></p>
+    <details><summary>答案</summary><p>(1) <code>resample = sample.sample(sample.shape[0], replace=True)</code>（<strong>同 sample size</strong>、<strong>with replacement</strong>）；(2) 算 statistic 加进 array；(3) 重复 N 次（通常 10000）。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T11</span>92% CI 用哪两个 percentile？<span class="trap-tag">Lec 14</span></p>
+    <details><summary>答案</summary><p>(100−c)/2 和 (100+c)/2。所以 92% → percentile <strong>4 和 96</strong>（不是 8 和 92）。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T12</span>"X% chance the true mean is in this CI"——这种描述对吗？<span class="trap-tag">Lec 15</span></p>
+    <details><summary>答案</summary><p><strong>错</strong>。CI 是固定的（已经算出来），truth 也是固定的，<strong>没有概率语义</strong>。唯一正确描述："X% of <em>intervals</em> generated by this <em>process</em> contain the truth."</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T13</span>Chebyshev：z = 2, 3, 4 对应保证多少比例？<span class="trap-tag">Lec 16</span></p>
+    <details><summary>答案</summary><p>z=2 → 至少 <strong>75%</strong>；z=3 → 至少 <strong>88.8%</strong>（= 8/9）；z=4 → 至少 <strong>93.75%</strong>（= 15/16）。任何分布都成立。Normal 68/95/99.7 只对 normal。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T14</span>95% CLT-based CI 公式？<span class="trap-tag">Lec 17</span></p>
+    <details><summary>答案</summary><p><strong>[mean − 2·SD/√n, mean + 2·SD/√n]</strong>，其中 SD 是 sample SD（≈ population SD），n 是 sample size。SE = SD/√n。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T15</span>Sample size for proportion polling（95% CI 宽度 w）？<span class="trap-tag">Lec 18</span></p>
+    <details><summary>答案</summary><p><strong>n ≥ (4·SD/w)²</strong>。0/1 数据 SD 上界 = <strong>0.5</strong>。所以 polling 公式：n ≥ (4·0.5/w)² = (2/w)²。w 是<strong>总宽度</strong>不是 margin。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T16</span><code>np.random.multinomial(n, [p1, p2, p3])</code> 返回什么？<span class="trap-tag">Lec 18</span></p>
+    <details><summary>答案</summary><p>长度 3 的 array，元素是 <strong>counts</strong>（不是 proportions）。p 数组之和必须 = 1。要算 proportion 需自己 / n。</p></details>
+  </div>
+
+  <h3>Quiz 4 范围（Lec 18-22）· 8 题</h3>
+
+  <div class="trap">
+    <p><span class="trap-num">T17</span>Null vs Alt 哪个必须 well-defined probability model？<span class="trap-tag">Lec 19</span></p>
+    <details><summary>答案</summary><p><strong>Null</strong> 必须是可以从中模拟的<em>明确</em>分布（例如 "fair coin"、"proportion = 0.5"）。Alt 可以是任意"不同"的说法。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T18</span>Alt 是单边 ("A &gt; B") 还是双边 ("A ≠ B") 时 test statistic 带不带 abs？<span class="trap-tag">Lec 19</span></p>
+    <details><summary>答案</summary><p>双边 → <strong>带 abs</strong>（|A − B|）；单边 → <strong>不带 abs</strong>（A − B）。Wi26 Q4 P2.2 直接考。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T19</span>p-value 的精确定义？<span class="trap-tag">Lec 20</span></p>
+    <details><summary>答案</summary><p>Under null is true，观察到 <strong>"observed 或更极端"</strong> 的 test statistic 的概率。<strong>不</strong>是 P(null is true)。<strong>不</strong>是 P(under alt)。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T20</span>p-value 决策："Accept the null" 对不对？<span class="trap-tag">Lec 20</span></p>
+    <details><summary>答案</summary><p><strong>永远错</strong>。只能 <em>reject</em> 或 <em>fail to reject</em>。"accept" 在 hypothesis testing 中是禁词。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T21</span>TVD 公式？只用于哪种数据？<span class="trap-tag">Lec 20-21</span></p>
+    <details><summary>答案</summary><p><strong>TVD = np.abs(dist1 − dist2).sum() / 2</strong>。只用于 <strong>categorical</strong> distribution（多个 category 的 proportions）。数值数据用 difference of means。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T22</span>用 CI 反推 hypothesis test 的前提？<span class="trap-tag">Lec 21</span></p>
+    <details><summary>答案</summary><p>Alt 必须是 <strong>双边</strong>（"param ≠ x"）。在 p% 显著性下用 (100−p)% CI。x 在 CI 内 → fail to reject；不在 → reject。单边 alt <strong>不</strong>能直接用 CI。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T23</span>Permutation 是 with replacement 还是 without？<span class="trap-tag">Lec 22</span></p>
+    <details><summary>答案</summary><p>Permutation = <strong>shuffle labels（不放回）</strong>，每个 row 出现 1 次但 group label 被随机分配。<code>np.random.permutation(col)</code>。Bootstrap = with replacement。<strong>两者不能混</strong>。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T24</span>p = 0.5 时 "exactly half of simulated stats were less extreme than observed" 对不对？<span class="trap-tag">Lec 20</span></p>
+    <details><summary>答案</summary><p><strong>对</strong>（Wi25 Q5 P1.2 官方答案）。p-value = count(stats ≥ observed) / N，p = 0.5 → 一半 ≥、另一半 &lt; observed → "exactly half less extreme" 字面成立。</p></details>
+  </div>
+
+  <h3>Final 增量范围（Lec 23-25）· 6 题</h3>
+
+  <div class="trap">
+    <p><span class="trap-num">T25</span>r 的公式（一句话）？<span class="trap-tag">Lec 23</span></p>
+    <details><summary>答案</summary><p><strong>r = mean of (x_su · y_su)</strong>，即 "x 和 y 都标准化后乘积的均值"。<code>(standard_units(df.get(x)) * standard_units(df.get(y))).mean()</code>。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T26</span>r = 0 等价于 "no association" 吗？<span class="trap-tag">Lec 23</span></p>
+    <details><summary>答案</summary><p><strong>不等价</strong>。r = 0 只意味着 "no <em>linear</em> association"。Parabola y = x² 有强 association 但 r ≈ 0。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T27</span>Regression line 在 original units 下的 slope 和 intercept 公式？<span class="trap-tag">Lec 24</span></p>
+    <details><summary>答案</summary><p><strong>m = r · SD_y / SD_x</strong>（SD_y 在分子！），<strong>b = mean_y − m · mean_x</strong>。Regression line 必过 (mean_x, mean_y)。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T28</span>"95% sample means within 2 SDs of pop mean，due to CLT" Yes 还是 No？<span class="trap-tag">Lec 17 / Wi26 Q1.2</span></p>
+    <details><summary>答案</summary><p><strong>Yes, due to CLT</strong>（官方答案，措辞陷阱！）。官方解读"2 SDs"为"2 SDs of sample-mean distribution"（即 2 SE）。<em>不</em>是直觉的"2 pop SD"。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T29</span>residual = ? <span class="trap-tag">Lec 25</span></p>
+    <details><summary>答案</summary><p><strong>residual = actual y − predicted y</strong>。方向不能反！predicted = 5.4、actual = 2.1 → residual = −3.3（不是 +3.3）。</p></details>
+  </div>
+
+  <div class="trap">
+    <p><span class="trap-num">T30</span>Bootstrap prediction interval 在哪里最窄？<span class="trap-tag">Lec 25</span></p>
+    <details><summary>答案</summary><p>在 <strong>x = mean_x</strong> 处最窄；远离时变宽。Sp24 Q12 P2.3：mean = 140，100 vs 120 哪个 wider？答 <strong>100</strong>（离 mean 更远）。</p></details>
+  </div>
+
+  <hr>
+
+  <h2 id="final-check">✅ 考前 final check（30 条 5 秒秒杀）</h2>
+
+  <p>考试早晨 30 分钟过一遍。每条都该<strong>不假思索</strong>答出。</p>
+
+  <div class="checklist">
+    <label><input type="checkbox"><span> babypandas 取列：<code>df.get('col')</code>，不是 <code>df['col']</code></span></label>
+    <label><input type="checkbox"><span> 布尔过滤：<code>&amp;</code> 和 <code>|</code>，每个条件加括号</span></label>
+    <label><input type="checkbox"><span> Density histogram：Height = Proportion / Width，总面积 = 1</span></label>
+    <label><input type="checkbox"><span> bin 是 <code>[a, b)</code> 半开（最后一个右端闭）</span></label>
+    <label><input type="checkbox"><span> <code>.apply(func)</code> 传函数名不带括号</span></label>
+    <label><input type="checkbox"><span> merge 默认 inner join，没匹配消失</span></label>
+    <label><input type="checkbox"><span> <code>np.append(arr, x)</code> 必须重新赋值</span></label>
+    <label><input type="checkbox"><span> "at least 1" 用 1 − P(none)</span></label>
+    <label><input type="checkbox"><span> Simulation：循环 + counter + 最后除以 reps</span></label>
+    <label><input type="checkbox"><span> SRS = without replacement，<code>df.sample(n)</code> 默认就是</span></label>
+    <label><input type="checkbox"><span> Bootstrap：<code>sample.sample(sample.shape[0], replace=True)</code></span></label>
+    <label><input type="checkbox"><span> c% CI 用 percentile (100−c)/2 和 (100+c)/2</span></label>
+    <label><input type="checkbox"><span> CI 解读：唯一对的是 "X% of <em>intervals</em> from this <em>process</em> contain truth"</span></label>
+    <label><input type="checkbox"><span> Chebyshev：z=2→75%、z=3→88.8%、z=4→93.75%</span></label>
+    <label><input type="checkbox"><span> Normal：68 / 95 / 99.7</span></label>
+    <label><input type="checkbox"><span> 95% CLT CI：[mean − 2·SD/√n, mean + 2·SD/√n]</span></label>
+    <label><input type="checkbox"><span> 通用 z：<code>cdf(z) = (1 + c) / 2</code></span></label>
+    <label><input type="checkbox"><span> Sample size for proportion：n ≥ (4·0.5/w)²，w 是<strong>总</strong>宽度</span></label>
+    <label><input type="checkbox"><span> Hypothesis test 四步：null/alt → test stat → simulate under null → p-value 决策</span></label>
+    <label><input type="checkbox"><span> Test stat：单边 alt 不带 abs；双边 alt 带 abs</span></label>
+    <label><input type="checkbox"><span> p-value = under null 看 observed 或更极端的概率</span></label>
+    <label><input type="checkbox"><span> "Accept the null" 永远错</span></label>
+    <label><input type="checkbox"><span> TVD = <code>np.abs(d1-d2).sum() / 2</code>，仅 categorical</span></label>
+    <label><input type="checkbox"><span> CI 反推 test：alt 必须双边；x 在 CI 内 → fail to reject</span></label>
+    <label><input type="checkbox"><span> Permutation = shuffle labels（不放回），不是 bootstrap</span></label>
+    <label><input type="checkbox"><span> Correlation r = mean of (x_su × y_su)，r ∈ [-1, 1]</span></label>
+    <label><input type="checkbox"><span> r 对线性变换不变；只衡量 linear（parabola 反例）</span></label>
+    <label><input type="checkbox"><span> Regression line: m = r·SD_y/SD_x，b = mean_y − m·mean_x；必过 (mean_x, mean_y)</span></label>
+    <label><input type="checkbox"><span> residual = actual − predicted（方向不能反）</span></label>
+    <label><input type="checkbox"><span> Prediction interval 在 x = mean_x 处最窄</span></label>
+  </div>
+
+  <hr>
+
+  <h2 id="cheat-sheet">📋 笔记参考（1 page 双面建议布局）</h2>
+
+  <p>真考允许 <strong>1 page double-sided handwritten notes</strong>。下面是推荐内容（手写练 2-3 遍记得快）：</p>
+
+  <h3>正面（Lec 13-22 推断 + Lec 23-25 prediction）</h3>
+  <ul>
+    <li><strong>Bootstrap loop 模板</strong>（带占位符）</li>
+    <li><strong>95% CLT CI 公式</strong> + 通用 z 公式 <code>cdf(z) = (1+c)/2</code></li>
+    <li><strong>Sample size 公式</strong> + 0/1 SD 上界 = 0.5</li>
+    <li><strong>Chebyshev 表</strong>：z = 2,3,4 → 75%, 88.8%, 93.75%</li>
+    <li><strong>Normal 68/95/99.7</strong></li>
+    <li><strong>Hypothesis test 流程图</strong>：null/alt → simulate under null → p-value</li>
+    <li><strong>TVD 公式</strong> + 适用场景（categorical）</li>
+    <li><strong>Permutation 流程</strong> + 与 bootstrap 区别</li>
+    <li><strong>Regression 公式</strong>：r, m, b 三件套（每个公式写大写）</li>
+    <li><strong>residual 公式</strong>：actual − predicted（方向重要！）</li>
+    <li><strong>Prediction interval bootstrap 模板</strong></li>
+    <li><strong>r 不变量 / regression line 必过 (mean_x, mean_y)</strong></li>
+  </ul>
+
+  <h3>背面（Lec 1-12 DataFrame &amp; Probability + 高频陷阱）</h3>
+  <ul>
+    <li><strong>常用 DataFrame 方法</strong>：<code>.loc</code>/<code>.iloc</code>/<code>.get</code>/<code>.assign</code>/<code>.sort_values</code>/<code>.set_index</code>/<code>.reset_index</code>/<code>.groupby</code>/<code>.merge</code>/<code>.take</code></li>
+    <li><strong>布尔过滤</strong>：<code>&amp;</code>/<code>|</code>/<code>~</code> 三件套 + 括号陷阱</li>
+    <li><strong>String methods</strong>：<code>.str.contains</code>/<code>.str.split</code>/<code>.str.replace</code></li>
+    <li><strong>Density histogram</strong>：Height × Width = Proportion</li>
+    <li><strong>概率规则</strong>：addition (mutex)/multiplication (independent)/complement/conditional</li>
+    <li><strong>Simulation 模板</strong>：<code>for i in np.arange(reps)</code> + counter + 除 reps</li>
+    <li><strong>np.random 三件套</strong>：<code>choice</code>/<code>multinomial</code>/<code>permutation</code> 各做什么</li>
+    <li><strong>CI 解读 唯一正确版</strong>（措辞 verbatim）</li>
+    <li><strong>Yes/No, due to CLT 措辞陷阱</strong>（Wi26 Q1.2 套路）</li>
+    <li><strong>单位换算 cheat 表</strong>：r 不变、SD 跟着变、slope/intercept 公式拆解</li>
+    <li><strong>"该用什么工具"决策树</strong>（hypothesis vs permutation vs CI vs regression）</li>
+  </ul>
+
+  <p class="tip">⏰ <strong>记忆 hack</strong>：把"<em>最容易记混的</em>"放在最显眼位置——CI 解读、yes/no due to CLT、residual 方向、slope 公式方向。考试遇到立刻定位到 cheat sheet 对应位置。</p>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="index.html">📗 Final 总目录</a></span>
+  <span><a href="03-residuals.html">← 上一节</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 7 · Mock Quiz 3 - DSC10 Quiz3</title>
+<style>
+  :root {
+    --bg: #fafaf7; --text: #1f2328; --muted: #57606a;
+    --accent: #0969da; --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e; --code-text: #cdd6f4;
+    --warn-bg: #fff8c5; --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff; --tip-border: #54aeff;
+    --danger-bg: #ffebe9; --danger-border: #cf222e;
+    --ok-bg: #dafbe1; --ok-border: #1a7f37;
+    --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781;
+    --border: #d0d7de; --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; margin: 20px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .q-points { color: var(--muted); font-size: 13px; float: right; }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .timer-box { background: linear-gradient(135deg, #ffebe9, #fff8c5); border: 2px solid #d4a72c; border-radius: 10px; padding: 16px 20px; margin: 24px 0; text-align: center; }
+  .timer-box strong { font-size: 18px; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .score-card { background: #fff; border: 2px solid var(--accent); border-radius: 10px; padding: 16px 20px; margin: 30px 0; }
+  .qid { color: var(--accent); font-weight: 700; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 Quiz3 总目录</a></span>
+  <span><a href="06-sample-size-models.html">← 上一节</a></span>
+</nav>
+
+<main>
+  <h1>Section 7 · Mock Quiz 3（综合模拟）</h1>
+  <p class="meta">
+    <strong>覆盖</strong>：Section 1-6 全部考点综合｜
+    <strong>时长建议</strong>：45 分钟（实际 Quiz 3 也是 45 分钟）｜
+    <strong>使用方法</strong>：先盖住所有答案，<strong>限时</strong>做一遍，再核对。
+  </p>
+
+  <div class="timer-box">
+    <strong>⏱️ 开始计时前请深呼吸</strong><br>
+    手边准备好笔、纸、计算器。45 分钟一气呵成，模拟真实考试节奏。
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#mock-a">📝 模拟卷 A（综合精选 6 题，~45 分钟）</a></li>
+      <li><a href="#mock-b">📝 模拟卷 B（W26 真题改编，~45 分钟）</a></li>
+      <li><a href="#highstakes">🎯 高频陷阱题速刷（25 道，~20 分钟）</a></li>
+      <li><a href="#scoring">✅ 自评 & 错题分析</a></li>
+    </ul>
+  </div>
+
+  <h2 id="mock-a">📝 模拟卷 A · 综合精选 6 题</h2>
+  <p class="meta">取材自 Sp24、Sp25、F25、W26 的高频问法重新组合。每题做完再展开答案。<strong>建议限时 45 分钟</strong>。</p>
+
+  <div class="q-block">
+    <div class="q-source"><span class="qid">Problem 1</span> · Sampling & Definitions <span class="q-points">~6 分钟</span></div>
+    <p><strong>1.1</strong> Suppose <code>students</code> is a DataFrame containing every student at UCSD (the entire population). Which of the following code lines produces a Simple Random Sample (SRS) of 50 students? Select all that apply.</p>
+    <ul>
+      <li>(A) <code>students.take(np.arange(50))</code></li>
+      <li>(B) <code>students.sample(50)</code></li>
+      <li>(C) <code>students.sample(50, replace=True)</code></li>
+      <li>(D) <code>np.random.choice(students.get('name'), 50, replace=False)</code></li>
+      <li>(E) <code>np.random.choice(students.get('name'), 50)</code></li>
+    </ul>
+    <p><strong>1.2</strong> True / False:</p>
+    <ul>
+      <li>(a) Parameters are fixed; statistics vary across samples.</li>
+      <li>(b) Larger SRS sizes lead to better estimates of parameters.</li>
+      <li>(c) The bootstrap distribution of the sample mean approximates the <strong>population</strong> distribution.</li>
+    </ul>
+    <details>
+      <summary>显示答案 & 解析</summary>
+      <p><strong>1.1</strong>: <strong>(B)</strong>。</p>
+      <ul>
+        <li>(A) ❌ <code>take(np.arange(50))</code> 取前 50 行，不随机。</li>
+        <li>(B) ✅ <code>.sample(50)</code> 默认 <code>replace=False</code>，标准 SRS。</li>
+        <li>(C) ❌ <code>replace=True</code>，不是 SRS。</li>
+        <li>(D) ⚠️ Tricky：<code>np.random.choice</code> 在<strong>列</strong>上采样（只拿 name），不是采 row。即使 <code>replace=False</code>，丢失了其他列。严格按 DSC10 题目意图通常视为<strong>不</strong>是。</li>
+        <li>(E) ❌ <code>np.random.choice</code> 默认 <code>replace=True</code>。</li>
+      </ul>
+      <p><strong>1.2</strong>: (a) ✅ True / (b) ✅ True / (c) ❌ False — 是 sampling distribution of <strong>sample mean</strong>，不是 population values 分布。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source"><span class="qid">Problem 2</span> · Bootstrap & CI Construction <span class="q-points">~10 分钟</span></div>
+    <p>UCSD 食堂调研。<code>food</code> 是一个 DataFrame，每行是一份 entrée，含 <code>price (float)</code>、<code>category (str)</code>。你从 <code>food</code> 抽了一个 SRS of 200 entrées 叫 <code>my_sample</code>。</p>
+    <p><strong>2.1</strong> Fill in: <code>my_sample = food.sample(__(a)__)</code>　（要 SRS）</p>
+    <p><strong>2.2</strong> Fill in the bootstrap code that computes a 10000-resample distribution of the <strong>mean price of vegan entrées</strong>:</p>
+<pre><code>vegan = __(b)__
+boot_means = np.array([])
+for i in np.arange(10000):
+    resample = vegan.sample(__(c)__, replace=__(d)__)
+    boot_means = np.append(boot_means, __(e)__)</code></pre>
+    <p><strong>2.3</strong> Fill in for an <strong>88% bootstrap CI</strong>:</p>
+<pre><code>left  = np.percentile(boot_means, __(f)__)
+right = np.percentile(boot_means, __(g)__)</code></pre>
+    <p><strong>2.4</strong> The distribution of <code>boot_means</code> approximates ____. (Pick one)</p>
+    <ul>
+      <li>(A) the population distribution of entrée prices</li>
+      <li>(B) the sampling distribution of the sample mean</li>
+      <li>(C) the empirical distribution of vegan prices</li>
+      <li>(D) a parameter</li>
+    </ul>
+    <details>
+      <summary>显示答案 & 解析</summary>
+      <p><strong>2.1 (a)</strong>: <code>200</code>（默认 replace=False = SRS）</p>
+      <p><strong>2.2 (b)</strong>: <code>my_sample[my_sample.get('category') == 'vegan']</code></p>
+      <p><strong>2.2 (c)</strong>: <code>vegan.shape[0]</code>（resample size 等于 subset 大小，不是 200）</p>
+      <p><strong>2.2 (d)</strong>: <code>True</code></p>
+      <p><strong>2.2 (e)</strong>: <code>resample.get('price').mean()</code></p>
+      <p><strong>2.3 (f)</strong>: <code>6</code>　<strong>(g)</strong>: <code>94</code>（88% → 两端各砍 6%）</p>
+      <p><strong>2.4</strong>: <strong>(B)</strong>。Bootstrap 分布近似 sampling distribution of the statistic (mean)。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source"><span class="qid">Problem 3</span> · CI Interpretation <span class="q-points">~5 分钟</span></div>
+    <p>承前 2.3，假设 CI 算出来是 <strong>[12.50, 15.20]</strong>. Select all valid interpretations:</p>
+    <ul>
+      <li>(A) There is an 88% probability that the population mean is in [12.50, 15.20].</li>
+      <li>(B) 88% of vegan entrées at UCSD have a price between $12.50 and $15.20.</li>
+      <li>(C) About 88% of the 10000 bootstrap means fell between $12.50 and $15.20.</li>
+      <li>(D) If we repeated the sample-then-bootstrap-then-CI procedure many times, ~88% of the resulting intervals would contain the population mean.</li>
+      <li>(E) The sample mean of vegan prices in <code>my_sample</code> is approximately in [12.50, 15.20].</li>
+    </ul>
+    <details>
+      <summary>显示答案 & 解析</summary>
+      <p><strong>答案：(C), (D), (E)</strong></p>
+      <ul>
+        <li>(A) ❌ "X% probability"陷阱。Parameter 固定，interval 固定，没有概率。</li>
+        <li>(B) ❌ "X% of values"陷阱。CI 描述 parameter，不描述个体值。</li>
+        <li>(C) ✅ 这就是 88% CI 的构造方式。</li>
+        <li>(D) ✅ Confidence is in the process. 正确解读。</li>
+        <li>(E) ✅ Sample mean 通常落在 boot 分布中心，CI 一般会包含它。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source"><span class="qid">Problem 4</span> · Chebyshev & Normal <span class="q-points">~6 分钟</span></div>
+    <p>The amount of time (in minutes) students study per week has mean <strong>20</strong> and SD <strong>6</strong>.</p>
+    <p><strong>4.1</strong> Find the smallest interval guaranteed to contain at least <strong>88.88%</strong> of the data. Both endpoints integers.</p>
+    <p><strong>4.2</strong> If the data is <strong>normally distributed</strong>, approximately what % of data is in the interval from 4.1?</p>
+    <p><strong>4.3</strong> Still assuming normal: find <code>x</code> in:</p>
+<pre><code>prop = stats.norm.cdf(x) - stats.norm.cdf(0)</code></pre>
+    <p>so that <code>prop</code> ≈ proportion of students studying between 20 and 26 minutes.</p>
+    <details>
+      <summary>显示答案 & 解析</summary>
+      <p><strong>4.1</strong>: 88.88% = 8/9 → 1/z² = 1/9 → <strong>z = 3</strong>。区间 = 20 ± 3·6 = <strong>[2, 38]</strong>。</p>
+      <p><strong>4.2</strong>: z=3 在 normal 下 ≈ <strong>99.73%</strong>。</p>
+      <p><strong>4.3</strong>: 标准化两个端点：
+      <code>x = (26−20)/6 = 1</code>，<code>0 = (20−20)/6</code>。所以 <code>x = 1</code>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source"><span class="qid">Problem 5</span> · CLT-based CI + Reverse-Engineering <span class="q-points">~10 分钟</span></div>
+    <p>You collect a sample of <strong>n = 100</strong> students. Sample mean study time = <strong>22 min</strong>, sample SD = <strong>5 min</strong>.</p>
+    <p><strong>5.1</strong> Compute a 95% CLT-based CI for the population mean.</p>
+    <p><strong>5.2</strong> If you instead collect n = 25 students with the same sample mean and SD, what's the new 95% CI?</p>
+    <p><strong>5.3</strong> You're shown a 95% CI = <strong>[18, 26]</strong> for some other dataset's population mean. The sample size was <strong>n = 9</strong>. What was the sample SD?</p>
+    <p><strong>5.4</strong> Given <code>stats.norm.cdf(1.28) = 0.90</code>, construct an <strong>80% CLT-based CI</strong> for the original sample (n=100, mean=22, SD=5).</p>
+    <details>
+      <summary>显示答案 & 解析</summary>
+      <p><strong>5.1</strong>: SE = 5/√100 = 0.5。CI = [22 − 2·0.5, 22 + 2·0.5] = <strong>[21, 23]</strong>。</p>
+      <p><strong>5.2</strong>: SE = 5/√25 = 1。CI = [22 − 2, 22 + 2] = <strong>[20, 24]</strong>。（n 从 100 → 25，n 变 1/4 → 宽度变 2 倍）</p>
+      <p><strong>5.3</strong>: Width = 26 − 18 = 8。Half-width = 4 = 2·SD/√9 = 2·SD/3 → SD = <strong>6</strong>。</p>
+      <p><strong>5.4</strong>: z 满足 cdf(z) = (1+0.80)/2 = 0.90 → z = 1.28。half-width = 1.28 · 0.5 = 0.64。CI = [22 − 0.64, 22 + 0.64] = <strong>[21.36, 22.64]</strong>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source"><span class="qid">Problem 6</span> · Sample Size for Polling <span class="q-points">~5 分钟</span></div>
+    <p>You want to estimate the proportion of UCSD students who own a bike. You want a 95% CI of width <strong>at most 0.04</strong>.</p>
+    <p><strong>6.1</strong> What is the minimum sample size required?</p>
+    <p><strong>6.2</strong> If you change the requirement to width ≤ 0.02 (halved), how many additional people must you sample beyond 6.1?</p>
+    <details>
+      <summary>显示答案 & 解析</summary>
+      <p><strong>6.1</strong>: n ≥ (4·0.5/0.04)² = (50)² = 2500。<strong>n = 2500</strong>。</p>
+      <p><strong>6.2</strong>: n ≥ (4·0.5/0.02)² = (100)² = 10000。多采 <strong>10000 − 2500 = 7500</strong> 人。（w 减半 → n 变 4 倍）</p>
+    </details>
+  </div>
+
+  <hr>
+
+  <h2 id="mock-b">📝 模拟卷 B · Winter 2026 Quiz 3（最新真题完整版）</h2>
+  <p class="meta">这是<strong>最近一次的 Quiz 3</strong>，最能反映出题趋势。完整做一遍。<strong>建议限时 45 分钟</strong>。</p>
+
+  <div class="q-block">
+    <div class="q-source"><span class="qid">W26 Problem 1</span> · Distribution Properties (Chebyshev / CLT / Skew)</div>
+    <p>(a) We expect at least <strong>75%</strong> of all sampled values of <code>plays_minchan</code> lie within 2 SDs of the population mean.</p>
+    <ul>
+      <li>Yes, due to CLT　/　Yes, due to Chebyshev's　/　No, due to CLT　/　No, due to Chebyshev's　/　Yes, other reasons　/　No, other reasons</li>
+    </ul>
+    <p>(b) We expect <strong>approximately 95%</strong> of all <strong>sample means</strong> lie within 2 SDs of the population mean.</p>
+    <ul><li>(same options)</li></ul>
+    <p>(c) If the distribution of <code>plays_minchan</code> is right-skewed but with no outliers, which is most likely true?</p>
+    <ul><li>median &gt; mean　/　mean &gt; median　/　mean = median</li></ul>
+    <p>(d) If both Minchan's and Ray's plays distributions are normal, will the pooled distribution be approximately normal?</p>
+    <ul><li>Always　/　Sometimes　/　Never</li></ul>
+    <details>
+      <summary>显示答案 & 解析</summary>
+      <p>(a) <strong>Yes, due to Chebyshev's</strong>。Chebyshev: ≥ 1 − 1/2² = 75% within 2 SDs，对任何分布成立。</p>
+      <p>(b) <strong>Yes, due to CLT</strong>（⚠️ 措辞陷阱 — 官方答案）。CLT → sample means 分布近似 normal；该分布的 SD = SE。题目"within 2 standard deviations of the population mean"中"SDs"按官方解读 = sample means 分布的 SD（即 SE），所以由 CLT 直接给 95%。许多人会误答 No（把 SDs 当成 population SD）。<strong>详细两种解读对照见 Section 4 此题完整解析。</strong></p>
+      <p>(c) <strong>mean &gt; median</strong>。右偏 → mean 跟着 tail 拉到右边。</p>
+      <p>(d) <strong>Sometimes</strong>。两个 normal mix 后只有 mean、SD 相同时才仍 normal；否则可能 bimodal。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source"><span class="qid">W26 Problem 2</span> · SRS Identification</div>
+    <p>Select all sampling methods that give a Simple Random Sample (SRS) of 20 songs from <code>songs</code>:</p>
+    <ul>
+      <li>(A) <code>songs.sample(20, replace=1)</code></li>
+      <li>(B) <code>np.random.multinomial(20, np.ones(songs.shape[0]) / songs.shape[0])</code></li>
+      <li>(C) <code>np.random.choice(songs.get("song_name"), 20)</code></li>
+      <li>(D) Randomly pick 20 genres without replacement, then within each genre pick a song.</li>
+      <li>(E) Randomly pick 20 artists without replacement, then within each artist pick a song.</li>
+      <li>(F) None of the above.</li>
+    </ul>
+    <details>
+      <summary>显示答案 & 解析</summary>
+      <p><strong>(F) None of the above</strong>。</p>
+      <ul>
+        <li>(A) ❌ replace=1 is truthy = True → 有放回。</li>
+        <li>(B) ❌ multinomial 永远有放回。</li>
+        <li>(C) ❌ choice 默认 replace=True；并且只取了一列。</li>
+        <li>(D)(E) ❌ Stratified sampling，每首歌概率与 genre/artist 大小相关。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source"><span class="qid">W26 Problem 3</span> · Bootstrap & CI</div>
+    <p>Ray collected an SRS of his whole playlist (unspecified size) → <code>ray_playlist</code>. Bootstrap to construct an 80% CI for the population mean of plays:</p>
+<pre><code>boot_means = np.array([])
+for i in range(1000):
+    sim = ray_playlist.___(a)___.get("plays_ray").mean()
+    boot_means = np.append(boot_means, sim)
+left = np.percentile(boot_means, ___(b)___)
+right = np.percentile(boot_means, ___(c)___)</code></pre>
+    <p>(d) The distribution of <code>boot_means</code> approximates: (A) sampling distribution of sample mean; (B) population distribution; (C) empirical distribution of plays; (D) probability distribution of plays</p>
+    <p>(e) Which interpretations of the resulting CI [a, b] are correct?</p>
+    <ul>
+      <li>(A) 80% of songs have plays in [a, b]</li>
+      <li>(B) 80% probability the true mean is in [a, b]</li>
+      <li>(C) 80% of such intervals from repeating the process will contain the true mean</li>
+      <li>(D) 80% of the bootstrap means lie in [a, b]</li>
+    </ul>
+    <details>
+      <summary>显示答案 & 解析</summary>
+      <p>(a) <code>sample(ray_playlist.shape[0], replace=True)</code></p>
+      <p>(b) <code>10</code>　(c) <code>90</code>（80% → (100−80)/2 = 10）</p>
+      <p>(d) <strong>(A)</strong> sampling distribution of sample mean。</p>
+      <p>(e) <strong>(C)</strong> 是 frequentist 正解。(D) 字面上也对（构造方式），常作可选。课程标准答案通常只取 (C)。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source"><span class="qid">W26 Problem 4</span> · CLT-based CI (反推 + 非标准置信度)</div>
+    <p>Ray calculated a 95% CLT-based CI for the population mean of plays per song: <strong>[60.5, 100.5]</strong>. Sample size = <strong>25 songs</strong>.</p>
+    <p>(a) What is the SD of Ray's plays?</p>
+    <p>(b) If Ray increases the sample size to 100, how does the CI width change?</p>
+    <p>(c) Given <code>stats.norm.cdf(1.75) = 0.96</code>, what is the 92% CLT-based CI?</p>
+    <p>(d) Ray constructs a 99% CI from the same data. Compared to the 95% CI, is the 99% CI wider, narrower, or same?</p>
+    <details>
+      <summary>显示答案 & 解析</summary>
+      <p>(a) Width = 40, half-width = 20 = 2·SD/√25 = 2·SD/5 → <strong>SD = 50</strong>。</p>
+      <p>(b) n × 4 → width × 1/2 → <strong>halves</strong>。</p>
+      <p>(c) z = 1.75 (因为 cdf(z) = (1+0.92)/2 = 0.96)。SE = 50/√25 = 10。half-width = 1.75·10 = 17.5。Sample mean = (60.5+100.5)/2 = 80.5。CI = <strong>[63.0, 98.0]</strong>。</p>
+      <p>(d) <strong>Wider</strong>（更高置信 → 更宽）。</p>
+    </details>
+  </div>
+
+  <hr>
+
+  <h2 id="highstakes">🎯 高频陷阱题速刷（25 道 T/F + 选择）</h2>
+  <p class="meta">这 25 道每个都对应一个高频陷阱。<strong>2 秒内回答 + 1 秒内说出原因</strong>。错的标记下来重点复习。</p>
+
+  <ol>
+    <li><strong>SRS 必须 without replacement</strong>。
+      <details><summary>显示答案</summary><strong>True</strong>（DSC10 严格定义）</details>
+    </li>
+    <li><strong><code>df.sample(n)</code> 默认 with replacement</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。默认 <code>replace=False</code>。<code>np.random.choice</code> 才默认 True。</details>
+    </li>
+    <li><strong><code>np.random.multinomial</code> 是 SRS</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。永远有放回。</details>
+    </li>
+    <li><strong>Parameter 随样本变化</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。Parameter 是 population 的固定数。</details>
+    </li>
+    <li><strong>Sampling distribution of statistic 的 spread 与样本量无关</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。n ↑ → spread ↓（√n 反比）。</details>
+    </li>
+    <li><strong>Bootstrap 是从 sample 还是 population 中采样？</strong>
+      <details><summary>显示答案</summary><strong>Sample</strong>（关键定义）。从 population 采叫普通 sampling，不叫 bootstrap。</details>
+    </li>
+    <li><strong>Bootstrap 必须 with replacement</strong>。
+      <details><summary>显示答案</summary><strong>True</strong>。否则每个 resample 都是原 sample 的 permutation。</details>
+    </li>
+    <li><strong>Bootstrap resample 的 size 应当等于 population size</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。应等于<strong>原 sample size</strong>。</details>
+    </li>
+    <li><strong>90% CI 的 percentile 是 10 和 90</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。是 <strong>5 和 95</strong>。 (100−90)/2 = 5。</details>
+    </li>
+    <li><strong>80% CI 的 percentile 是 10 和 90</strong>。
+      <details><summary>显示答案</summary><strong>True</strong>。 (100−80)/2 = 10。</details>
+    </li>
+    <li><strong>"95% chance the true mean is in [a, b]"</strong> 是 95% CI 的正确解读？
+      <details><summary>显示答案</summary><strong>False</strong>。Parameter 固定，interval 固定，没有概率。</details>
+    </li>
+    <li><strong>"95% of sample values lie in this CI"</strong>？
+      <details><summary>显示答案</summary><strong>False</strong>。CI 描述 parameter，不描述 data values。</details>
+    </li>
+    <li><strong>99% CI 比 95% CI 窄</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。更高置信 → 更宽。</details>
+    </li>
+    <li><strong>Bootstrap 可用来估 population max</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。Resample max ≤ 原 sample max，永远低估。</details>
+    </li>
+    <li><strong>Right-skewed → mean &gt; median</strong>。
+      <details><summary>显示答案</summary><strong>True</strong>。"Mean follows tail."</details>
+    </li>
+    <li><strong>SD 可以为负数</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。SD ≥ 0。</details>
+    </li>
+    <li><strong>SD 可以为 0</strong>。
+      <details><summary>显示答案</summary><strong>True</strong>。当所有值相等。</details>
+    </li>
+    <li><strong>Sum of deviations from mean = 0</strong>。
+      <details><summary>显示答案</summary><strong>True</strong>。Mean 的定义性质。</details>
+    </li>
+    <li><strong>Chebyshev: mean ± 2 SD 至少包含 75%</strong>。
+      <details><summary>显示答案</summary><strong>True</strong>。1 − 1/4 = 0.75。</details>
+    </li>
+    <li><strong>Chebyshev 告诉我们 mean ± 1 SD 至少包含 50%</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。1 − 1/1 = 0 → 至少 0%（无意义）。</details>
+    </li>
+    <li><strong>Normal 分布下 ±2 SD 约包含 95%</strong>。
+      <details><summary>显示答案</summary><strong>True</strong>。68/95/99.7 法则。</details>
+    </li>
+    <li><strong>Standardization 把分布变成 normal</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。只是平移 + 缩放，分布形状不变。</details>
+    </li>
+    <li><strong>CLT 要求 population 是 normal</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。CLT 对<strong>任何</strong> population 成立。</details>
+    </li>
+    <li><strong>CLT 也适用于 sample median</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。CLT 只适用于 mean 和 sum。</details>
+    </li>
+    <li><strong>SD of 0s and 1s 的最大值是 1</strong>。
+      <details><summary>显示答案</summary><strong>False</strong>。是 <strong>0.5</strong>（at p=0.5）。</details>
+    </li>
+  </ol>
+
+  <hr>
+
+  <h2 id="scoring">✅ 自评 & 错题分析</h2>
+
+  <div class="score-card">
+    <h3>分数自评</h3>
+    <table>
+      <thead><tr><th>正确率</th><th>水平评估</th><th>建议</th></tr></thead>
+      <tbody>
+        <tr><td>≥ 90%</td><td>🌟 优秀</td><td>稳了，注意计算别错</td></tr>
+        <tr><td>75% - 89%</td><td>👍 良好</td><td>错的部分回到对应 Section 重读"陷阱"区</td></tr>
+        <tr><td>60% - 74%</td><td>⚠️ 需要强化</td><td>专门刷 Section 1-3 的真题；CI 解读必须 100%</td></tr>
+        <tr><td>&lt; 60%</td><td>🚨 重新学</td><td>从 Section 1 开始全部 checklist 重做一遍</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>错题分析模板</h3>
+  <p>对每道错题，回答以下 3 个问题：</p>
+  <ol>
+    <li><strong>错的是 concept 还是 calculation？</strong>
+      <ul>
+        <li>Concept 错 → 回 Section 的"知识点"</li>
+        <li>Calculation 错 → 抄一遍正确步骤</li>
+      </ul>
+    </li>
+    <li><strong>这是哪个陷阱？</strong>给它一个名字（如"replace 默认值反"、"X% chance 陷阱"、"sqrt law 用反"）。</li>
+    <li><strong>把对应 Section 的 checklist 项重做一次。</strong></li>
+  </ol>
+
+  <h3>考前最后 24 小时</h3>
+  <div class="tip">
+    <strong>必背清单（默写）</strong>：
+    <ol>
+      <li>Bootstrap loop 模板（含 <code>replace=True</code>、<code>.shape[0]</code>）</li>
+      <li>c% CI 的 percentile：(100−c)/2 和 (100+c)/2</li>
+      <li>95% CLT CI 公式：mean ± 2·SD/√n</li>
+      <li>z 通用公式：cdf(z) = (1+c)/2</li>
+      <li>Chebyshev：1 − 1/z²；z=2/3/4 → 75/88.8/93.75%</li>
+      <li>Normal 68/95/99.7 法则</li>
+      <li>Sample size 公式：n ≥ (4·SD/w)²；SD of 0/1 max = 0.5</li>
+      <li>CI 解读: confidence in <strong>process</strong>，~X% of intervals</li>
+    </ol>
+  </div>
+
+  <div class="warn">
+    <strong>考试当场易错三件</strong>：
+    <ol>
+      <li>读 <code>replace</code> 默认值有没有看对（choice True / sample False）</li>
+      <li>百分位算错（80% 是 10/90 不是 20/80）</li>
+      <li>SE 和 SD 混淆：CLT-based CI 用的是 SE = SD/√n，不是 SD 本身</li>
+    </ol>
+  </div>
+
+  <p style="text-align: center; font-size: 18px; margin-top: 40px;">📘 <strong>祝你 Quiz 3 拿满！</strong> 🎯</p>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="06-sample-size-models.html">← 上一节</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span>（最后一节）</span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

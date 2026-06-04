@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 7 · Mock Quiz 4 - DSC10 Quiz4</title>
+<style>
+  :root { --bg: #fafaf7; --text: #1f2328; --muted: #57606a; --accent: #0969da; --accent-bg: #ddf4ff; --code-bg: #1e1e2e; --code-text: #cdd6f4; --warn-bg: #fff8c5; --warn-border: #d4a72c; --tip-bg: #ddf4ff; --tip-border: #54aeff; --danger-bg: #ffebe9; --danger-border: #cf222e; --ok-bg: #dafbe1; --ok-border: #1a7f37; --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781; --border: #d0d7de; --q-bg: #f6f8fa; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+  .trap-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin: 10px 0; }
+  .trap-num { display: inline-block; background: var(--accent); color: #fff; border-radius: 50%; width: 28px; height: 28px; line-height: 28px; text-align: center; font-weight: 600; margin-right: 10px; font-size: 13px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📕 Quiz4 总目录</a></span>
+  <span><a href="06-permutation-testing.html">← 上一节</a></span>
+</nav>
+
+<main>
+  <h1>Section 7 · Mock Quiz 4（综合刷题）</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 18-22 综合 ｜
+    <strong>预计耗时</strong>：完整刷一遍约 2-3 小时（mock 卷限时 30 分钟做，然后核对、错题分析、25 题陷阱速刷）
+  </p>
+
+  <div class="meta">
+    <strong>🎯 使用方法</strong>：
+    <ol>
+      <li><strong>Mock A</strong>：限时 30 分钟做完，模拟真实 Quiz 4。做完查答案、错题归类</li>
+      <li><strong>Wi26 Quiz 4 完整真题</strong>：覆盖最接近范围（Lec 17-21），限时 30 分钟刷</li>
+      <li><strong>25 题陷阱速刷</strong>：考前 1 小时过一遍，每题 1 分钟，错的回到对应 section 重看</li>
+    </ol>
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#mock-a">📝 Mock Quiz A（拼接版，30 分钟）</a></li>
+      <li><a href="#wi26">📋 Winter 2026 Quiz 4 完整真题</a></li>
+      <li><a href="#traps">🔥 25 题陷阱速刷</a></li>
+      <li><a href="#final-check">✅ 考前 final check</a></li>
+    </ul>
+  </div>
+
+  <h2 id="mock-a">📝 Mock Quiz A · 拼接版（限时 30 分钟）</h2>
+
+  <p>从 8 份历年 Quiz 4/5 抽取符合 <strong>Lec 18-22</strong> 范围的题目，组合而成的模拟卷。<strong>限时 30 分钟，不查答案</strong>。</p>
+
+  <h3>Problem 1（Lec 18）· Sample Size</h3>
+  <div class="q-block">
+    <p>你要估计 UCSD 校园树木中橡树（oak）的比例（population parameter）。要做 <strong>95% CI 宽度不超过 0.04</strong>，最少需要采集多少棵树？</p>
+    <ol type="A">
+      <li>(4 · 0.5 / 0.04)² = 2500</li>
+      <li>(2 · 0.5 / 0.04)² = 625</li>
+      <li>(4 · 1 / 0.04)² = 10000</li>
+      <li>2 / 0.04 = 50</li>
+    </ol>
+    <details>
+      <summary>答案</summary>
+      <p><strong>A. 2500</strong>。Polling proportion 用 SD 上界 0.5；n ≥ (4·SD/w)² = (4·0.5/0.04)² = 2500。</p>
+      <p>注意干扰项 B 错在用 2（应该是 4，因为 CI 是 ±2·SD/√n）；C 错在用 SD=1（不是上界）；D 是开根号没平方。</p>
+    </details>
+  </div>
+
+  <h3>Problem 2（Lec 18）· Multinomial 一行代码</h3>
+  <div class="q-block">
+    <p>UCSD 树木 35% eucalyptus、25% pine、40% other。<strong>写一行代码</strong>，模拟从这个分布按比例抽 40 棵树（with replacement），输出长度 3 的 array，元素分别是 eucalyptus、pine、other 的数量。</p>
+    <details>
+      <summary>答案</summary>
+      <pre><code>np.random.multinomial(40, [0.35, 0.25, 0.40])</code></pre>
+      <p>注意：(1) 概率数组要按 eucalyptus、pine、other 顺序；(2) 第二个参数和必为 1；(3) <strong>不要</strong>除以 40（要 counts 不要 proportion）。</p>
+    </details>
+  </div>
+
+  <h3>Problem 3（Lec 19）· Test Statistic 选择 ⭐⭐⭐</h3>
+  <div class="q-block">
+    <p>测两 grader Jeffrey 和 Kate：</p>
+    <ul>
+      <li>Null: 两人 score 同分布</li>
+      <li>Alt: <strong>Jeffrey 给的分更低</strong></li>
+    </ul>
+    <p>下面哪些 test statistic 可以从 empirical distribution 直接算 p-value？多选：</p>
+    <ol type="A">
+      <li>Kate's mean − Jeffrey's mean</li>
+      <li>Jeffrey's mean − Kate's mean</li>
+      <li>|Kate's mean − Jeffrey's mean|</li>
+      <li>TVD of two distributions</li>
+    </ol>
+    <details>
+      <summary>答案 &amp; 解析</summary>
+      <p><strong>答案：A 和 B</strong>。</p>
+      <ul>
+        <li>A ✓：Jeffrey 低 → Kate − Jeffrey 大 → 右尾</li>
+        <li>B ✓：Jeffrey 低 → Jeffrey − Kate 负 → 左尾</li>
+        <li>C ✗：abs 后无法区分 Jeffrey 低 vs Kate 低</li>
+        <li>D ✗：scores 是数值，TVD 只用于 categorical</li>
+      </ul>
+    </details>
+  </div>
+
+  <h3>Problem 4（Lec 20）· p-value 决策 ⭐⭐⭐</h3>
+  <div class="q-block">
+    <p>p-value 评估为 <strong>0.07</strong>。结论？</p>
+    <ol type="A">
+      <li>Reject at both 0.01 and 0.05</li>
+      <li>Fail to reject at 0.01, reject at 0.05</li>
+      <li>Fail to reject at both 0.01 and 0.05</li>
+      <li>Accept the null at 0.05</li>
+    </ol>
+    <details>
+      <summary>答案</summary>
+      <p><strong>答案：C</strong>。p = 0.07 &gt; 0.05 → fail to reject at both。D 错（永远不 accept）。</p>
+    </details>
+  </div>
+
+  <h3>Problem 5（Lec 20-21）· TVD 手算 ⭐⭐</h3>
+  <div class="q-block">
+    <p>计算 dist1 = [0.20, 0.30, 0.50] 和 dist2 = [0.40, 0.10, 0.50] 之间的 TVD。</p>
+    <details>
+      <summary>答案</summary>
+      <p>|0.20−0.40| + |0.30−0.10| + |0.50−0.50| = 0.20 + 0.20 + 0 = 0.40<br>
+      TVD = <strong>0.40 / 2 = 0.20</strong></p>
+    </details>
+  </div>
+
+  <h3>Problem 6（Lec 21）· CI 反推决策 ⭐⭐⭐</h3>
+  <div class="q-block">
+    <p>声称 "true proportion = 0.50"。95% bootstrap CI 算出来是 <strong>[0.52, 0.58]</strong>。在 5% 显著性下结论？</p>
+    <details>
+      <summary>答案</summary>
+      <p>0.50 <strong>不</strong>在 [0.52, 0.58] 内 → <strong>reject the null</strong>。<br>
+      声称的 0.50 与 sample 不一致。</p>
+    </details>
+  </div>
+
+  <h3>Problem 7（Lec 22）· Permutation 代码 ⭐⭐⭐</h3>
+  <div class="q-block">
+    <p>研究 UCSD 男女生平均 sleep 时间是否不同。DataFrame <code>sleep</code> 有 <code>'gender'</code> 列（'M' 或 'F'）和 <code>'hours'</code> 列。Alt: 男生平均 sleep 时间不同于女生（双边）。Test stat: |mean_M − mean_F|。填空：</p>
+    <pre><code>def one_diff(df):
+    means = df.groupby(___(a)___).mean().get('hours')
+    return ___(b)___
+
+observed = one_diff(sleep.assign(shuf=sleep.get(___(c)___)))
+
+diffs = np.array([])
+for i in np.arange(10000):
+    shuf = ___(d)___
+    new_df = sleep.assign(shuf=shuf)
+    diffs = np.append(diffs, one_diff(new_df))
+
+p_value = np.count_nonzero(___(e)___) / 10000</code></pre>
+    <details>
+      <summary>答案</summary>
+      <ul>
+        <li>(a) <code>'shuf'</code></li>
+        <li>(b) <code>abs(means.loc['M'] - means.loc['F'])</code></li>
+        <li>(c) <code>'gender'</code>（observed 不打乱）</li>
+        <li>(d) <code>np.random.permutation(sleep.get('gender'))</code></li>
+        <li>(e) <code>diffs &gt;= observed</code>（abs 双边右尾）</li>
+      </ul>
+    </details>
+  </div>
+
+  <p class="meta">✅ <strong>30 分钟到</strong>，停笔对答案。错的题对应回相应 section 复盘。Section 1=P1+P2，Section 2=P3，Section 3=P4，Section 4=P5，Section 5=P6，Section 6=P7。</p>
+
+  <hr>
+
+  <h2 id="wi26">📋 Winter 2026 Quiz 4 完整真题（限时 30 分钟）</h2>
+
+  <p>Wi26 Q4 的 scope 是 Lec 17-21，<strong>最贴近</strong>本次 Quiz 4 范围。完整刷一遍，再核对。</p>
+
+  <p class="meta">📌 <strong>设定</strong>：grading DataFrame 有 50 行（Jeffrey 25 + Kate 25），列 <code>'grader'</code>, <code>'score'</code>, <code>'submission_id'</code>。Detective Peter 怀疑其中一位评分太严。</p>
+
+  <h3>Problem 1（Lec 20）</h3>
+  <div class="q-block">
+    <p>Peter 决定做 permutation test。下面哪个最佳描述 (a) 为什么用 permutation test，(b) 怎么做？</p>
+    <ol type="A">
+      <li>两 sample 测同分布。Under null，shuffle 组别 labels（如果同分布，labels 不该有意义）</li>
+      <li>两 sample 测同分布。Under null，resample with replacement from combined 50 scores</li>
+      <li>比较 Jeffrey scores 和已知 Quiz 3 population distribution。Under null，shuffle scores 重算</li>
+      <li>Shuffling 生成两个 random sample，估计 sampling distribution</li>
+    </ol>
+    <details>
+      <summary>答案：<strong>A</strong></summary>
+      <p>B 错是因为 resample with replacement 是 bootstrap，不是 permutation。C 错没 known population。D 错把 permutation 当 bootstrap。</p>
+    </details>
+  </div>
+
+  <h3>Problem 2.1（Lec 20）</h3>
+  <div class="q-block">
+    <p>Peter 怀疑 Jeffrey 比 Kate 严（Jeffrey 给的分更低）。选 null/alt：</p>
+    <ol type="A">
+      <li>Null: 同分布。Alt: Jeffrey 的 distribution 平均更小。</li>
+      <li>Null: Jeffrey 的 mean = 70。Alt: ≠ 70。</li>
+      <li>Null: 同分布。Alt: Jeffrey 的 distribution 完全在 Kate 之下。</li>
+      <li>Null: Jeffrey 的 mean = Kate 的 mean。Alt: ≠。</li>
+    </ol>
+    <details>
+      <summary>答案：<strong>A</strong></summary>
+    </details>
+  </div>
+
+  <h3>Problem 2.2（Lec 20）</h3>
+  <div class="q-block">
+    <p>哪些 test stat 可以直接算 p-value？多选：</p>
+    <ol type="A">
+      <li>Kate's mean − Jeffrey's mean</li>
+      <li>Jeffrey's mean − Kate's mean</li>
+      <li>|两组 mean 的差|</li>
+      <li>TVD of two score distributions</li>
+      <li>None of the above</li>
+    </ol>
+    <details>
+      <summary>答案：<strong>A 和 B</strong></summary>
+      <p>C 不对（abs 后单边 alt 无法判方向）；D 不对（scores 数值，TVD 只用于 categorical）。</p>
+    </details>
+  </div>
+
+  <h3>Problem 3（Lec 21）</h3>
+  <div class="q-block">
+    <p>填 (a) (b)：</p>
+    <pre><code>observed_stat = (abs(grading[grading.get('grader') == 'Kate']
+                  .get('score').mean())
+                 - abs(grading[grading.get('grader') == 'Jeffrey']
+                  .get('score').mean()))
+
+p_value = (simulated_stats ___(a)___ observed_stat).sum() / ___(b)___</code></pre>
+    <details>
+      <summary>答案</summary>
+      <ul>
+        <li>(a) <code>&gt;=</code></li>
+        <li>(b) <code>10000</code>（permutation 次数）</li>
+      </ul>
+      <p>解释：observed_stat = abs(Kate's mean) − abs(Jeffrey's mean) = Kate's mean − Jeffrey's mean（score 正数，abs 无效）。Jeffrey 严 → 这个差大 → 右尾。</p>
+    </details>
+  </div>
+
+  <h3>Problem 4（Lec 18）</h3>
+  <div class="q-block">
+    <p>估计 Jeffrey 给分低于 70 的比例。95% CLT-based CI。</p>
+    <p>(a) CI 宽度 ≤ 0.08，最少 sample size?<br>
+    (b) CI 宽度 ≤ 0.04，最少 sample 是 (a) 的几倍？</p>
+    <details>
+      <summary>答案</summary>
+      <p>(a) (4·0.5/0.08)² = <strong>625</strong></p>
+      <p>(b) <strong>4 倍</strong>（w 减半 → n 变 4 倍）</p>
+    </details>
+  </div>
+
+  <h3>Problem 5（Lec 19）</h3>
+  <div class="q-block">
+    <p>Jeffrey 说真比例 = 0.20。95% CI = [0.14, 0.40]。</p>
+    <p>5.1 5% 显著性下结论？</p>
+    <p>5.2 为什么？</p>
+    <details>
+      <summary>答案</summary>
+      <p>5.1：<strong>Fail to reject</strong>（B）。永不 Accept。</p>
+      <p>5.2：<strong>A</strong>："Because 0.20 lies inside the CI, the data are consistent with Jeffrey's claim"</p>
+    </details>
+  </div>
+
+  <h3>Problem 6（Lec 20）</h3>
+  <div class="q-block">
+    <p>TVD 是什么？</p>
+    <details>
+      <summary>答案：<strong>D. 两个 categorical distribution 距离的度量</strong></summary>
+    </details>
+  </div>
+
+  <p class="meta">✅ <strong>30 分钟到</strong>，再次对答案、归类错题。</p>
+
+  <hr>
+
+  <h2 id="traps">🔥 25 题陷阱速刷（每题 1 分钟）</h2>
+
+  <p>所有题目都是 T/F 或单选。考前最后过一遍。</p>
+
+  <div class="trap-item">
+    <span class="trap-num">1</span><strong>T/F</strong>：Null hypothesis 必须是 well-defined probability model，能 simulate 才行。
+    <details><summary>答</summary><strong>T</strong>。不能 simulate 的 hypothesis（如 "the coin is unfair"）只能当 alt。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">2</span><strong>T/F</strong>：可以"Accept the null"。
+    <details><summary>答</summary><strong>F</strong>。永远只能 "fail to reject"。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">3</span><strong>T/F</strong>：p-value 是 "null 为真的概率"。
+    <details><summary>答</summary><strong>F</strong>。p-value 是"在 null 为真前提下，看到 observed 或更极端的概率"。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">4</span>Test stat 选 abs vs 不带 abs：alt 是 "A &gt; B" 该用哪种？
+    <details><summary>答</summary><strong>不带 abs</strong>（A − B 或 B − A 都可以；要看右尾或左尾）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">5</span>p = 0.04，95% 显著性下结论？
+    <details><summary>答</summary><strong>Reject the null</strong>（0.04 &lt; 0.05）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">6</span>p = 0.04，99% 显著性下结论？
+    <details><summary>答</summary><strong>Fail to reject</strong>（0.04 &gt; 0.01）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">7</span><strong>T/F</strong>：TVD 可以用于比较 smokers vs non-smokers 婴儿的出生重分布。
+    <details><summary>答</summary><strong>F</strong>。birth weight 是数值，TVD 只用于 categorical。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">8</span>TVD 公式有除以 2 吗？
+    <details><summary>答</summary><strong>有</strong>。<code>np.abs(d1 - d2).sum() / 2</code>。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">9</span>TVD 的 range？
+    <details><summary>答</summary><strong>[0, 1]</strong>。0 = 完全相同，1 = 完全无 overlap。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">10</span>用 95% CI 做 hypothesis test，对应的显著性是？
+    <details><summary>答</summary><strong>5% (α = 0.05)</strong>。一般地：(100−p)% CI ↔ p% α。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">11</span>声称 mean = 5。95% CI = [4.8, 5.2]。5% 显著性下结论？
+    <details><summary>答</summary><strong>Fail to reject</strong>（5 ∈ CI）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">12</span>Polling proportion 时 SD 取什么作为上界？
+    <details><summary>答</summary><strong>0.5</strong>（√(p·(1-p)) 在 p=0.5 最大）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">13</span>CI 宽度 w 减半，sample size 怎么变？
+    <details><summary>答</summary><strong>变成原来 4 倍</strong>（n ∝ 1/w²）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">14</span><strong>T/F</strong>：Permutation test 用 <code>df.sample(n, replace=True)</code>。
+    <details><summary>答</summary><strong>F</strong>。那是 bootstrap。Permutation 用 <code>np.random.permutation</code>（不放回 shuffle）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">15</span><code>np.random.multinomial(50, [0.3, 0.7])</code> 返回什么？
+    <details><summary>答</summary><strong>长度为 2 的 counts array</strong>（不是 proportion）。如 array([15, 35])。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">16</span>测两 sample 同分布、知道是 numerical 数据，用什么 test stat？
+    <details><summary>答</summary><strong>difference of means</strong>（或 abs 版，按双边/单边）。<strong>不是 TVD</strong>。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">17</span>Permutation test 中应该 shuffle group label 还是 value column？
+    <details><summary>答</summary><strong>都可以</strong>（概念上）。具体看代码结构。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">18</span><strong>T/F</strong>：permutation test reject 后能推 causation。
+    <details><summary>答</summary><strong>F</strong>。只是相关，不是因果（Deflategate caveat）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">19</span>"95% of intervals contain truth" 是 CI 的正确解读吗？
+    <details><summary>答</summary><strong>True</strong>（这是 Quiz 3 重点；Quiz 4 也可能延伸考）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">20</span>Hypothesis test "highly significant" 指 p &lt; ?
+    <details><summary>答</summary><strong>p &lt; 0.01</strong>。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">21</span><strong>T/F</strong>：p-value 算用 <code>&gt;</code> 还是 <code>&gt;=</code> 都对。
+    <details><summary>答</summary><strong>F</strong>。必须 <code>&gt;=</code>（包含 observed 本身："as or more extreme"）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">22</span>"68% CI 宽度 ≤ 0.01" 用什么公式算 sample size？
+    <details><summary>答</summary>
+      <p>68% CI ⇒ ±1·SD/√n（不是 ±2）。所以 width = 2·SD/√n ≤ 0.01 → n ≥ (2·0.5/0.01)² = 10000。<br>
+      （这是 Wi25 Q4 P1 原题，常见误用 4·SD/√n —— 那是 95% CI 的公式）</p>
+    </details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">23</span>测一枚硬币是否偏 tails (alt 单边)。Test stat 用 <code>|heads − 200|</code> 对吗？
+    <details><summary>答</summary><strong>不对</strong>。单边 alt 不该用 abs。要用 <code>number of heads</code>（看左尾）或 <code>number of tails</code>（看右尾）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">24</span><strong>T/F</strong>：A/B test 在 DSC 10 等同于 permutation test。
+    <details><summary>答</summary><strong>T</strong>（Lec 22 明确说"For us, they mean the same thing"）。</details>
+  </div>
+
+  <div class="trap-item">
+    <span class="trap-num">25</span>用 <code>np.random.multinomial</code> 抽样后做 TVD test，count 还是 proportion？
+    <details><summary>答</summary><strong>Proportion</strong>。要把 counts 除以 sample size。TVD 输入必须是 proportion（和为 1）。</details>
+  </div>
+
+  <hr>
+
+  <h2 id="final-check">✅ 考前 final check</h2>
+
+  <div class="checklist">
+    <label><input type="checkbox"><span>能 1 秒识别 null/alt 配对是否正确（null 是 "no difference / same / = X"，alt 不能含 "causes"）</span></label>
+    <label><input type="checkbox"><span>能 1 秒决定 test stat 用不用 abs（alt 单边 不用，双边 用）</span></label>
+    <label><input type="checkbox"><span>能 1 秒判断 p-value 用 <code>&gt;=</code> 还是 <code>&lt;=</code>（看 alt 方向）</span></label>
+    <label><input type="checkbox"><span>能 1 秒做 p-value vs cutoff 决策（0.01 / 0.05 表）</span></label>
+    <label><input type="checkbox"><span>看到 "accept the null" 选项 → 直接排除</span></label>
+    <label><input type="checkbox"><span>看到 "TVD 用于 numerical 数据" → 直接排除</span></label>
+    <label><input type="checkbox"><span>看到 "reject → causation" 措辞 → 警觉，通常是陷阱</span></label>
+    <label><input type="checkbox"><span>能背 sample size 速算：n ≥ (2/w)²（polling，0/1 数据，SD=0.5）</span></label>
+    <label><input type="checkbox"><span>能 1 秒做"w 减半 → n × 4"</span></label>
+    <label><input type="checkbox"><span>能区分 multinomial / choice / permutation 三个函数</span></label>
+    <label><input type="checkbox"><span>能写出 permutation test 7 行代码模板（permute → assign → groupby → mean → diff → append → p-value）</span></label>
+    <label><input type="checkbox"><span>能写出 standard hypothesis test 5 行代码模板（multinomial → stat → append → p-value）</span></label>
+    <label><input type="checkbox"><span>能写出 TVD 一行公式 <code>np.abs(d1-d2).sum()/2</code></span></label>
+    <label><input type="checkbox"><span>能用 CI 做 hypothesis test（x ∈ CI → fail to reject）</span></label>
+    <label><input type="checkbox"><span>知道 6 种 "不能用 CI 做 test" 的场景</span></label>
+  </div>
+
+  <div class="ok">
+    <strong>🎯 临考心态</strong>：Quiz 4 的难度核心在 <em>概念熟悉度</em>，不在计算复杂。三类题型几乎覆盖全卷：
+    <ol>
+      <li><strong>概念判别</strong>（null/alt 配对、test stat 选择、TVD vs diff of means、permutation vs bootstrap）→ <em>记忆</em>题，要秒答</li>
+      <li><strong>代码填空</strong>（permutation 模板、p-value formula）→ 看清 alt 方向 + 配对原代码框架</li>
+      <li><strong>结论判断</strong>（p = 某值 → reject / 不 reject；x 在 CI 内 → fail to reject）→ <em>反射式</em>答题</li>
+    </ol>
+    每类至少做 5 道熟练。预祝考好！
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="06-permutation-testing.html">← 上一节</a></span>
+  <span><a href="index.html">📕 返回目录</a></span>
+  <span></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

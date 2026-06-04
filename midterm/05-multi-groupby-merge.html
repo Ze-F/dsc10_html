@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多列 Groupby 与 Merge - DSC10 Midterm 备考</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .nav-bottom {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+  .nav-top a, .nav-bottom a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 16px;
+    margin-top: 20px;
+    color: var(--muted);
+  }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+  }
+  .tier {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta {
+    background: #f6f8fa;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--tip-bg);
+    border-left: 4px solid var(--tip-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  details {
+    background: var(--q-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+  }
+  details[open] {
+    background: #fff;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+  }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) {
+    margin-top: 12px;
+  }
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .q-source {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .checklist {
+    background: #f0f9ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .checklist label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+  .checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 总目录</a></span>
+  <span><a href="04-functions-apply.html">← 上一节</a> <a href="06-conditionals-loops.html">下一节 →</a></span>
+</nav>
+
+<main>
+  <h1>Section 5: 多列 Groupby 与 Merge</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 9 ｜
+    <strong>Midterm出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1 (6/6)</span> ｜
+    <strong>预计学习时间</strong>：2-3 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+  <ul>
+    <li><strong>多列 groupby</strong>：<code>df.groupby(['col1', 'col2']).agg()</code> —— 产生 MultiIndex，每个唯一组合一行</li>
+    <li><strong>MultiIndex 扁平化</strong>：用 <code>.reset_index()</code> 把多层 index 还原回普通列</li>
+    <li><strong>merge 默认是 inner join</strong>：左右两边都要有匹配，否则该行消失</li>
+    <li><strong>预测 merge 行数</strong>（最高频考点！）：对每个 key 值，结果行数 = 左边出现次数 × 右边出现次数，再求和</li>
+    <li><strong>三种 merge 写法</strong>：<code>left_on=/right_on=</code>、<code>on=</code>（同名列）、<code>left_index=True/right_index=True</code>（按 index 合并）</li>
+  </ul>
+
+  <div class="warn">
+    <strong>🔥 出题套路</strong>：每份 midterm 几乎必考一道"merge 后有几行？"的题。掌握"<strong>对每个 key 数左右出现次数再相乘求和</strong>"这个算法，就能稳拿这分。
+  </div>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. 多列 groupby —— <code>groupby([col1, col2])</code></h3>
+  <p>把 <strong>列名 list</strong> 传给 <code>.groupby</code>，可以按多列同时分组。结果中每行对应一个<strong>唯一组合</strong>。</p>
+
+<pre><code># 例：roster 有 'section' 列（A/B/C/D）和 'first' 列（first name）
+# 想知道每个 section 里每个 first name 各有多少人
+counts = roster.groupby(['section', 'first']).count()
+# counts 的 index 是 MultiIndex (section, first)
+# 例如 (A, 'Aayushi')→ 1, (B, 'Andrew')→ 3, ...</code></pre>
+
+  <p><strong>核心理解</strong>：先按 <code>'section'</code> 分组，<strong>每组内</strong>再按 <code>'first'</code> 分组 —— 即"<strong>子组（subgroup）</strong>"，groups within groups。</p>
+
+  <div class="tip">
+    <strong>顺序问题</strong>：<code>groupby(['section', 'first'])</code> 与 <code>groupby(['first', 'section'])</code> 内容相同，只是行/列顺序不同。
+  </div>
+
+  <h3>2. MultiIndex 与 <code>.reset_index()</code></h3>
+  <p>多列 groupby 之后，结果的 index 是 <strong>MultiIndex</strong>（多层 index），每行的 index 是一个 tuple，例如 <code>('A', 'Aayushi')</code>。</p>
+
+  <p>用 <code>.reset_index()</code> 把 MultiIndex "压平"，使原来作为 index 的列变回普通列：</p>
+
+<pre><code>flat = roster.groupby(['section', 'first']).count().reset_index()
+# 现在 'section' 和 'first' 都是普通列，index 是 0, 1, 2, ...</code></pre>
+
+  <p>多列 groupby 的输出按列顺序<strong>字母排序</strong>（先按第一列字母序，第一列相同时按第二列字母序）。</p>
+
+  <h3>3. <code>.merge</code> —— 合并两个 DataFrame</h3>
+  <p>用 merge 把两个 DataFrame 按某个 key 拼起来。基本语法：</p>
+
+<pre><code># 三种写法
+
+# (1) 列名不同
+left.merge(right, left_on='col_a', right_on='col_b')
+
+# (2) 列名相同 —— 用 on=
+left.merge(right, on='col')
+
+# (3) 用 index 合并
+left.merge(right, left_index=True, right_on='col')
+left.merge(right, left_index=True, right_index=True)</code></pre>
+
+  <p><strong>结果规则</strong>：</p>
+  <ul>
+    <li>对左 DataFrame 的每一行，找右 DataFrame 中 key 匹配的所有行，配对组成新行。</li>
+    <li>左或右中找不到匹配的行 —— <span class="highlight">默认全部消失</span>（inner join）。</li>
+    <li>如果一边的 key 出现多次，会与另一边所有匹配的行各自配对（笛卡尔积）。</li>
+  </ul>
+
+  <h3 id="rowcount">4. ⭐ 预测 merge 后的行数（最重要！）</h3>
+
+  <div class="warn">
+    <strong>核心算法</strong>：
+    <ol>
+      <li>列出 left 和 right 中 key 列的<strong>所有唯一值</strong>。</li>
+      <li>对<strong>同时出现在两边</strong>的每个 key 值 <code>k</code>：数 left 中有几行（<code>L_k</code>），数 right 中有几行（<code>R_k</code>），贡献 <code>L_k × R_k</code> 行。</li>
+      <li>只在一边出现的 key 值 → 贡献 0 行（消失）。</li>
+      <li>把所有 key 值的贡献相加 = 总行数。</li>
+    </ol>
+  </div>
+
+  <h4>👇 完整 worked example（lec9 经典示例）</h4>
+
+<pre><code>offer_percentage:                clothes:
+  clothing_type  offer            item   retail_price
+0  Shirt          20            0  Dress  150
+1  Pants          30            1  Shirt   30
+2  Dress          50            2  Shoes   90
+3  Shorts         30            3  Pants   50
+4  Shoes          50            4  Shoes   70
+
+# offer_percentage.merge(clothes, left_on='clothing_type', right_on='item')</code></pre>
+
+  <p><strong>逐 key 计数</strong>：</p>
+  <table>
+    <tr><th>key 值</th><th>left 出现</th><th>right 出现</th><th>贡献</th></tr>
+    <tr><td>Shirt</td><td>1</td><td>1</td><td>1 × 1 = <strong>1</strong></td></tr>
+    <tr><td>Pants</td><td>1</td><td>1</td><td>1 × 1 = <strong>1</strong></td></tr>
+    <tr><td>Dress</td><td>1</td><td>1</td><td>1 × 1 = <strong>1</strong></td></tr>
+    <tr><td>Shorts</td><td>1</td><td>0</td><td>1 × 0 = <strong>0</strong>（消失）</td></tr>
+    <tr><td>Shoes</td><td>1</td><td>2</td><td>1 × 2 = <strong>2</strong>（一行配两行）</td></tr>
+    <tr><td colspan="3" style="text-align:right"><strong>合计</strong></td><td><strong>5 行</strong></td></tr>
+  </table>
+
+  <h3>5. Index-based merge</h3>
+  <p>当 key 是 index 而不是列时，用 <code>left_index=True</code> 或 <code>right_index=True</code>：</p>
+
+<pre><code># offers_by_item 的 index 是 'clothing_type'，clothes 中是 'item' 列
+offers_by_item.merge(clothes, left_index=True, right_on='item')</code></pre>
+
+  <p>如果一个 DataFrame 是按 index 来 merge 的（<code>set_index</code> 之后），但你想让它的 index 也变回普通列再 merge —— 先 <code>.reset_index()</code> 再 <code>.merge(...)</code>。</p>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：默认 inner join，不匹配的行直接消失</strong><br>
+    左 DataFrame 中 key 在右边找不到 → 那行<strong>不出现在结果里</strong>。所以 merge 后行数<strong>可能比左边少</strong>。<br>
+    <em>例</em>：Winter 2026 Q8.1 中，<code>pizza10</code> 的 10 个 kind 中只有 6 个出现在 <code>notes</code> 里 → 结果 6 行（不是 10）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：重复 key 导致行数膨胀（笛卡尔积）</strong><br>
+    一边 key 出现 a 次，另一边出现 b 次 → 结果有 <code>a × b</code> 行。<br>
+    <em>极端例</em>：左有 1 行 key=Shoes，右有 2 行 key=Shoes → 结果 2 行（左边那行被复制配两次）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：<code>on=</code> vs <code>left_on=/right_on=</code></strong><br>
+    <code>on='col'</code> 要求<strong>两边</strong>都有同名列。如果两边列名不同（如 <code>'clothing_type'</code> vs <code>'item'</code>），必须用 <code>left_on=/right_on=</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：dtype 不匹配 → 静默地变成空 DataFrame</strong><br>
+    例如左边 key 列是 <code>int</code>（<code>92109</code>），右边是 <code>str</code>（<code>"92109"</code>）—— pandas 不会报错，merge 结果是 0 行（或全是 NaN）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：merge 时 index 会丢失</strong><br>
+    如果 left 是按 <code>'word'</code> 设了 index 的，<code>left.merge(right, ...)</code> 之后 <code>'word'</code> 这个 index <strong>不再是 index</strong>，结果的 index 变成 0,1,2,...。<br>
+    解决：merge 前用 <code>.reset_index()</code> 把它变成普通列，merge 后再 <code>.set_index('word')</code>。<br>
+    <em>例</em>：Fall 2025 Q2.1。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：多列 groupby 后必须 <code>.reset_index()</code> 才能像普通列一样使用</strong><br>
+    没 reset 时，结果的 <code>'section'</code> 和 <code>'first'</code> 是 MultiIndex 的一部分，不能用 <code>.get('section')</code> 取出。
+  </div>
+
+  <div class="tip">
+    <strong>顺序无关性</strong>：<code>A.merge(B, ...)</code> 和 <code>B.merge(A, ...)</code> 结果<strong>内容相同</strong>，只是行/列顺序可能不同。考试中如果问"两个表达式是否等价"——只看内容、不看顺序时是等价的。
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <p>每题都涉及多列 groupby 或 merge。<strong>重点练 merge 行数预测</strong>。</p>
+
+  <div class="q-block">
+    <div class="q-source">题 1 — Fall 2024 Q9（merge 行数预测，最经典款）</div>
+    <p><code>treat</code> 有 200 行，含 15 种不同的 candy。<code>trick</code> 以 <code>"candy"</code> 为 index，有 25 行：其中 15 行对应 <code>treat</code> 中出现的 candy，另外 10 行是 <code>treat</code> 中没有的 candy。</p>
+    <pre><code>trick_or_treat = trick.merge(treat, left_index=True, right_on="candy")</code></pre>
+    <p>问：<code>trick_or_treat</code> 有几行？<br>选项：15 / 25 / 200 / 215 / 225 / 3000 / 5000</p>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案：200</strong></p>
+      <p><strong>逐 key 计数</strong>：</p>
+      <ul>
+        <li>trick 共 25 个 candy，每个出现 1 次（因为 candy 是 trick 的 index，唯一）。</li>
+        <li>这 25 个中：15 个在 treat 中也出现，10 个不在。</li>
+        <li>treat 共 200 行，分布在 15 种 candy 上。设第 i 种 candy 在 treat 中出现 <code>n_i</code> 次（<code>Σn_i = 200</code>）。</li>
+        <li>对那 15 个共有 candy：每个贡献 <code>1 × n_i</code>。求和 = <code>Σn_i = 200</code>。</li>
+        <li>那 10 个只在 trick 出现的 candy：贡献 0（inner join 消失）。</li>
+        <li>总和 = <strong>200</strong>。</li>
+      </ul>
+      <p><strong>中文解析</strong>：本质上 trick 是个"价格表"（每种糖一行），merge 之后相当于给 treat 的每行<strong>打上价格标签</strong>。所以行数 = treat 的行数 = 200。10 个 trick 中独有的 candy 在 treat 里没有匹配，全部消失。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">题 2 — Fall 2024 Q13（多列 groupby 嵌套解读，extra credit）</div>
+    <pre><code>double = treat.groupby("candy").count().groupby("address").count()
+# 已知 double.loc[1].get("how_many") 等于 5</code></pre>
+    <p>下列哪些是有效解读？</p>
+    <ol>
+      <li>有 5 户人家各自只发 1 种糖。</li>
+      <li>有 5 种糖各自只在 1 户人家发。</li>
+      <li>只有 1 户人家发 5 种糖。</li>
+      <li>只有 1 种糖在 5 户人家发。</li>
+    </ol>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案：1 和 2 都对</strong></p>
+      <p><strong>解析</strong>：</p>
+      <ul>
+        <li>第一步 <code>treat.groupby("candy").count()</code> → 每行一种 candy，<code>"address"</code> 列存"该 candy 出现在多少户家"，<code>"how_many"</code> 列存同样的数（count 把所有非聚合列填一样的 count）。</li>
+        <li>第二步 <code>.groupby("address").count()</code> → 把上面 DataFrame 按 <code>"address"</code> 列（其值是"该 candy 出现的户数"）分组。</li>
+        <li><code>.loc[1]</code> 即 <code>"address" = 1</code> 的那行 → 这些 candy 都"只出现在 1 户人家"。</li>
+        <li><code>.get("how_many")</code> 等于 5 → 这样的 candy 共有 5 种。</li>
+        <li>所以："有 5 种糖各自只在 1 户人家发" ✓ —— 选项 2 直接对。</li>
+        <li>选项 1 也等价：5 种糖各自只在 1 户出现 ⇔ 那 5 户各自<strong>从这角度看</strong>只发了这一种糖（这道题给的是 valid interpretation 而不是唯一）。注意官方答案两个都选。</li>
+      </ul>
+      <p><strong>关键 takeaway</strong>：嵌套 groupby 解读看：第一次 group 后<strong>每行代表什么</strong>，第二次 group 又把"代表"变成"分类标签"。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">题 3 — Winter 2025 Q5.2（用 merge 算 total cost）</div>
+    <p>面包菜单：Sourdough $2 / Whole Wheat $3 / Multigrain $4。<code>eaten</code> 是一个 numpy array，记录每片面包的种类。请用 merge 算总价。</p>
+    <pre><code>available = bpd.DataFrame().assign(
+    Type = ["Sourdough", "Whole Wheat", "Multigrain"]
+).assign(Cost = [2, 3, 4])
+consumed = bpd.DataFrame().assign(Eaten = eaten)
+combined = available.merge(consumed, left_on = __(d)__,
+                                     right_on = __(e)__)
+total_cost = combined.__(f)__</code></pre>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案</strong>：(d) <code>"Type"</code>; (e) <code>"Eaten"</code>; (f) <code>get("Cost").sum()</code></p>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>核心思路：consumed 中每片面包要"查表"得到价格 → 用 merge 把价格<strong>贴到</strong> consumed 的每一行上。</li>
+        <li>左 key = available 的 <code>"Type"</code>，右 key = consumed 的 <code>"Eaten"</code>。</li>
+        <li>对于 consumed 中每一行（一片面包），available 中正好有 1 行 type 匹配（available 是去重菜单）→ merge 后<strong>每片面包对应 1 行</strong>，行数 = <code>len(eaten)</code>。</li>
+        <li>每行已带上对应的 Cost → 把 Cost 列加起来就是总价。</li>
+      </ul>
+      <p><strong>对比 5.1（for-loop 法）</strong>：循环每种面包，<code>np.count_nonzero(eaten == bread) * price</code> 累加。两种方法都要会！</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">题 4 — Spring 2025 Q5.1 / 5.2（merge 写法 + 行数预测）</div>
+    <p><code>tariffs</code> 有 50 行，index 是 0..49，其中一列叫 <code>"Country"</code>。<code>trade_partners</code> 以 <code>"Country"</code> 为 index。<code>tariffs</code> 中所有国家都在 <code>trade_partners</code> 中，但 <code>trade_partners</code> 中有些国家不在 <code>tariffs</code>。</p>
+    <p><strong>5.1</strong>：写一行代码 merge tariffs 和 trade_partners。<br>
+       <strong>5.2</strong>：merged 有几行？</p>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>5.1 答案</strong>（写法之一）：</p>
+      <pre><code>merged = tariffs.merge(trade_partners, left_on="Country", right_index=True)</code></pre>
+      <p>因为 tariffs 中 Country 是普通列，trade_partners 中 Country 是 index。</p>
+      <p><strong>5.2 答案：50</strong></p>
+      <p><strong>逐 key 计数</strong>：</p>
+      <ul>
+        <li>tariffs 中每个 Country 出现 1 次（共 50 个）。</li>
+        <li>trade_partners 中每个 Country 也只出现 1 次（因为是 index，唯一）。</li>
+        <li>tariffs 的所有 Country 都在 trade_partners 里 → 每个 country 贡献 1 × 1 = 1 行。</li>
+        <li>50 个 country × 1 = <strong>50 行</strong>。</li>
+        <li>注意：trade_partners 中那些不在 tariffs 的 country，inner join 时直接消失。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">题 5 — Spring 2025 Q5.3（groupby 后 Proportion 是否仍 sum 到 1？）</div>
+    <p>原 <code>trade_partners</code> 的 <code>"Proportion"</code> 列加起来 = 1（所有进口比例之和）。下面哪些 DataFrame 中 <code>"Proportion"</code> 加起来仍是 1？</p>
+    <ol>
+      <li><code>trade_partners</code></li>
+      <li><code>trade_partners.groupby("Continent").mean()</code></li>
+      <li><code>trade_partners.groupby("Continent").sum()</code></li>
+      <li><code>merged</code></li>
+    </ol>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案：1 和 3</strong></p>
+      <ul>
+        <li>(1) ✓ 题目给定。</li>
+        <li>(2) ✗ 各 continent 的<strong>平均</strong> proportion 之和不一定等于 1。</li>
+        <li>(3) ✓ 各 continent 的<strong>总</strong> proportion 之和 = 所有国家的 proportion 之和 = 1。</li>
+        <li>(4) ✗ merged 是 inner join，丢掉了 trade_partners 中不在 tariffs 的国家 → proportion 之和 < 1。</li>
+      </ul>
+      <p><strong>关键 takeaway</strong>：merge 之后 proportion 之和"漏水"是个常见考点。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">题 6 — Spring 2025 Q5.4（按 group 画 median 图）</div>
+    <p>写一行代码，画图展示<strong>每个大洲</strong>的 median reciprocal tariff。</p>
+    <details>
+      <summary>显示答案与解析</summary>
+      <pre><code>merged.groupby("Continent").median().plot(kind="barh", y="Reciprocal Tariff")</code></pre>
+      <p><strong>解析</strong>：</p>
+      <ul>
+        <li>需要先在 merged 上做（不在 tariffs 上做，因为 tariffs 没有 Continent 列）。</li>
+        <li>按 <code>"Continent"</code> 分组 → 取 <code>.median()</code> → 画 <code>kind="barh"</code>（或 <code>"bar"</code>）的条形图，y 指定 tariff 列。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">题 7 — Fall 2025 Q2.1 / 2.2（reset_index/set_index 包夹 merge + 行数预测）</div>
+    <p><code>words</code> 以 <code>"word"</code> 为 index，有 5357 行。<code>tags</code> 是默认整数 index，有 36 行（每行一个 part-of-speech tag）。</p>
+    <pre><code>merged = words.reset_index().merge(__(a)__).set_index("word")</code></pre>
+    <p><strong>2.1</strong>：填空 (a) —— 想让 <code>"ps"</code>（words 中 tag 列）和 tags 中 tag 匹配。<br>
+    <strong>2.2</strong>：merged 有几行？</p>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>2.1 答案</strong>：<code>tags, left_on="ps", right_on="tag"</code></p>
+      <p><strong>2.2 答案：5357</strong></p>
+      <p><strong>逐 key 计数</strong>：</p>
+      <ul>
+        <li>每个 word 在 words 中出现 1 次，每行有一个 ps（tag）。</li>
+        <li>tags 中每个 tag 唯一（36 个 tag，每个 1 行）。</li>
+        <li>words 中所有 ps 必然是 36 个 tag 之一（题目说"All values in 'ps' are tags from Penn Treebank system"）。</li>
+        <li>所以每个 word 都能在 tags 中找到 1 个匹配 → 每行贡献 1 × 1 = 1。</li>
+        <li>总和 = 5357 行。</li>
+      </ul>
+      <p><strong>为什么要 reset_index/set_index 包夹</strong>：merge 会丢掉 index。先 reset 把 word 变成普通列保住，merge 后再 set_index('word') 恢复。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">题 8 — Fall 2025 Q5.1（多列 groupby 行数预测）</div>
+    <pre><code>grouped = (words.assign(
+              diff_category = words.get("diff").apply(classify_difficulty),
+              length_category = words.get("length").apply(classify_length))
+           .groupby(["diff_category", "length_category"])
+           .count()
+           .reset_index())</code></pre>
+    <p>已知：<code>classify_difficulty</code> 输出 <code>"easy"/"moderate"/"hard"</code>（3 类），<code>classify_length</code> 输出 <code>"short"/"medium"/"long"</code>（3 类）。题目假设<strong>每种组合至少有一个 word</strong>。</p>
+    <p>问 grouped 有几行？</p>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案：9 行</strong></p>
+      <p><strong>解析</strong>：多列 groupby 产生<strong>每个唯一组合一行</strong>。</p>
+      <ul>
+        <li>diff_category 有 3 个值，length_category 有 3 个值 → 共 3 × 3 = 9 种组合。</li>
+        <li>题目说每种组合至少有一个 word → 9 种组合全出现 → 9 行。</li>
+        <li>如果题目没说"每种组合至少一个"，结果只能 ≤ 9，没法精确算。</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">题 9 — Winter 2026 Q8.1（key 不完全重合的 merge）</div>
+    <p><code>pizza10</code> 有 10 行（10 种 pizza kind，每种 1 行），<code>notes</code> 有 8 行（index 是 kind，每个 kind 1 行）。题目说："some kinds in pizza do not appear in notes, and some kinds in notes do not appear in pizza"。看前面 notes 的定义，notes 的 8 个 kind 是: Cheese, Pepperoni, Veggie, Margherita, Hawaiian, Supreme, BBQ Chicken, White。pizza10 的 10 个 kind 是: Cheese, Pepperoni, Supreme, Hawaiian, Cheese, Pepperoni, Margherita, Cheese, Veggie, Bamboo。</p>
+    <pre><code>pizza10.merge(notes, left_on="kind", right_index=True).shape[0]</code></pre>
+    <p>选项：0 / 6 / 9 / 10 / Cannot be determined</p>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案：9</strong></p>
+      <p><strong>逐 key 计数</strong>（pizza10 中每行的 kind 是否在 notes 的 index 里）：</p>
+      <table>
+        <tr><th>pizza10 行</th><th>kind</th><th>在 notes 中？</th><th>贡献</th></tr>
+        <tr><td>0</td><td>Cheese</td><td>是</td><td>1</td></tr>
+        <tr><td>1</td><td>Pepperoni</td><td>是</td><td>1</td></tr>
+        <tr><td>2</td><td>Supreme</td><td>是</td><td>1</td></tr>
+        <tr><td>3</td><td>Hawaiian</td><td>是</td><td>1</td></tr>
+        <tr><td>4</td><td>Cheese</td><td>是</td><td>1</td></tr>
+        <tr><td>5</td><td>Pepperoni</td><td>是</td><td>1</td></tr>
+        <tr><td>6</td><td>Margherita</td><td>是</td><td>1</td></tr>
+        <tr><td>7</td><td>Cheese</td><td>是</td><td>1</td></tr>
+        <tr><td>8</td><td>Veggie</td><td>是</td><td>1</td></tr>
+        <tr><td>9</td><td>Bamboo</td><td>否</td><td>0</td></tr>
+      </table>
+      <p>合计：9 + 0 = <strong>9 行</strong>。</p>
+      <p><strong>关键</strong>：notes 中独有的 kind（如 BBQ Chicken, White）<strong>不影响</strong>左边来主导的 merge —— 但它们仍然消失（inner join）。pizza10 中独有的 Bamboo 也消失。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">题 10 — Spring 2024 Q6.1（按 index merge，部分重合）</div>
+    <p>charlie 有 172 行（联系人），norah 有 88 行。其中 12 个联系人两边共有，160 个仅 charlie 独有，76 个仅 norah 独有。两个表都以联系人 ID 为 index（每个 ID 唯一）。</p>
+    <pre><code>charlie.merge(norah, left_index=True, right_index=True).shape[0]</code></pre>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案：12</strong></p>
+      <p><strong>逐 key 计数</strong>：每个 ID 在 charlie 中出现 ≤ 1 次，在 norah 中出现 ≤ 1 次（index 唯一）。</p>
+      <ul>
+        <li>共有的 12 个 ID：每个贡献 1 × 1 = 1，共 12 行。</li>
+        <li>仅 charlie 独有的 160 个：在 norah 找不到 → 贡献 0。</li>
+        <li>仅 norah 独有的 76 个：在 charlie 找不到 → 贡献 0。</li>
+        <li>合计 <strong>12 行</strong>。</li>
+      </ul>
+      <p><strong>记忆口诀</strong>：两边 key 都唯一时，<strong>inner join 行数 = 两边 key 集合的交集大小</strong>。</p>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-source">题 11 — Spring 2024 Q6.2（key 重复时的笛卡尔积）</div>
+    <p>norah 不小心把那 12 个共有联系人复制了一份 → norah 现在 100 行（76 独有 + 12×2 共有的重复）。问：<code>norah.merge(norah, left_index=True, right_index=True).shape[0]</code> 是多少？</p>
+    <details>
+      <summary>显示答案与解析</summary>
+      <p><strong>答案：76 + 12 × (2 × 2) = 76 + 48 = 124 行</strong></p>
+      <p><strong>逐 key 计数</strong>（这是 norah 自己 merge 自己）：</p>
+      <ul>
+        <li>76 个独有 ID：每个在 norah 中出现 1 次 → 1 × 1 = 1，共 76 行。</li>
+        <li>12 个被复制的 ID：每个在 norah 中出现 2 次 → 2 × 2 = 4，共 12 × 4 = 48 行。</li>
+        <li>合计 = 76 + 48 = <strong>124 行</strong>。</li>
+      </ul>
+      <p><strong>陷阱</strong>：很多人会错答 100（norah 的行数）。重点是<strong>每个重复 ID 自配自</strong>变成 2×2=4 行，不是 2 行！</p>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解checklist</h2>
+  <p>对着Claude把以下每条都讲一遍，能完整复述说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>解释多列 groupby 的语法 <code>df.groupby(['col1', 'col2'])</code>，说明结果中每行代表什么。</span></label>
+    <label><input type="checkbox"><span>说明什么是 MultiIndex，为什么要用 <code>.reset_index()</code> 把它扁平化。</span></label>
+    <label><input type="checkbox"><span>预测：<code>df</code> 有 3 类 X 和 4 类 Y，<code>groupby(['X','Y']).count()</code> 最多有几行？什么时候少于这个？</span></label>
+    <label><input type="checkbox"><span>背出 merge 的三种语法：<code>left_on/right_on</code>、<code>on=</code>、<code>left_index/right_index</code>，各用在什么场景。</span></label>
+    <label><input type="checkbox"><span>解释为什么 merge 默认是 inner join，举例说明哪些行会消失。</span></label>
+    <label><input type="checkbox"><span>讲清"merge 行数预测算法"：对每个 key 值，左右出现次数相乘再求和。</span></label>
+    <label><input type="checkbox"><span>用 lec9 的 clothing 示例演示一遍：5 + 5 行的两个表 merge 得到 5 行的过程。</span></label>
+    <label><input type="checkbox"><span>当左右两边 key 都<strong>唯一</strong>时，inner join 后行数等于什么？（→ 两边 key 集合交集大小）</span></label>
+    <label><input type="checkbox"><span>当一边 key 重复 a 次另一边 b 次时，那个 key 在结果中产生几行？（→ a×b）</span></label>
+    <label><input type="checkbox"><span>解释 Spring 2024 Q6.2：norah 自 merge 自，为什么是 124 行不是 100 行。</span></label>
+    <label><input type="checkbox"><span>说出 dtype 不匹配（int vs str）时 merge 会发生什么。</span></label>
+    <label><input type="checkbox"><span>解释为什么有时 merge 前要 <code>reset_index()</code>，merge 后要 <code>set_index()</code>。</span></label>
+    <label><input type="checkbox"><span>判断：merge 的左右顺序换了，结果<strong>内容</strong>还相同吗？行/列<strong>顺序</strong>呢？</span></label>
+    <label><input type="checkbox"><span>讲解：Fall 2024 Q9 里为什么 trick (25行) merge treat (200行) 得到 200 行，而不是 215 或更多。</span></label>
+    <label><input type="checkbox"><span>讲解：Spring 2025 Q5.3 里为什么 merge 之后 Proportion 之和不再是 1。</span></label>
+    <label><input type="checkbox"><span>用 merge 写法实现"查表加价格再求和"模式（Winter 2025 Q5.2）。</span></label>
+    <label><input type="checkbox"><span>解释多列 groupby 输出的<strong>排序</strong>规则（先按第一列字母序，再第二列）。</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="04-functions-apply.html">← 上一节：函数与 apply</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="06-conditionals-loops.html">下一节：条件与循环 →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

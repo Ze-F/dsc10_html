@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 01 · Lab 7 — Regression (Old Faithful) · DSC10</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --ok-bg: #dafbe1;
+    --ok-border: #1a7f37;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .nav-bottom {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+  .nav-top a, .nav-bottom a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled {
+    color: var(--muted);
+    cursor: not-allowed;
+    text-decoration: none;
+  }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+  }
+  .tier {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta {
+    background: #f6f8fa;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--tip-bg);
+    border-left: 4px solid var(--tip-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .ok {
+    background: var(--ok-bg);
+    border-left: 4px solid var(--ok-border);
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin: 22px 0;
+  }
+  .q-id {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 2px 10px;
+    border-radius: 4px;
+    margin-right: 10px;
+    letter-spacing: 0.5px;
+  }
+  .q-title {
+    display: inline;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .q-stmt {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 10px 0;
+    border-left: 3px solid #d0d7de;
+    padding-left: 10px;
+    font-style: italic;
+  }
+  .think,
+  .why,
+  .pitfall-inline {
+    margin: 12px 0;
+    font-size: 14.5px;
+  }
+  .think  strong { color: #6f42c1; }
+  .why    strong { color: #1f883d; }
+  .pitfall-inline strong { color: #cf222e; }
+  .checklist {
+    background: #f0f9ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .checklist label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+  .checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .crosslink {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .crosslink h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .crosslink ul { margin: 4px 0; padding-left: 20px; }
+  .crosslink a { color: var(--accent); text-decoration: none; }
+  .crosslink a:hover { text-decoration: underline; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a class="disabled">⬅ 上一份（首份）</a> | <a href="02-hw6-hypothesis-permutation.html">下一份 ➡：HW 6</a></span>
+</nav>
+
+<main>
+  <h1>Practice 01 · Lab 7 — How Faithful is Old Faithful?</h1>
+  <p class="meta">
+    <strong>原始截止</strong>：Monday, June 1st 2026, 11:59 PM ｜
+    <strong>涵盖讲义</strong>：Lec 23–25 / CIT 15 ｜
+    <strong>对应模块</strong>：Final ｜
+    <strong>主题</strong>：Linear regression（correlation → regression line → prediction → residuals → divide-and-conquer） ｜
+    <strong>预计时长</strong>：1.5–2 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#overview">📋 作业概览 + 知识点回链</a></li>
+      <li><a href="#sec1">📚 Section 1 — How faithful is Old Faithful?（Q1.1–1.6）</a></li>
+      <li><a href="#sec2">📚 Section 2 — The regression line（Q2.1–2.2）</a></li>
+      <li><a href="#sec3">📚 Section 3 — Investigating the regression line（Q3.1–3.3）</a></li>
+      <li><a href="#sec4">📚 Section 4 — How accurate are different predictions?（Q4.1–4.2）</a></li>
+      <li><a href="#sec5">📚 Section 5 — Divide and conquer（Q5.1–5.5）</a></li>
+      <li><a href="#pitfalls">⚠️ 本作业典型陷阱</a></li>
+      <li><a href="#numbers">🔢 核心数值速查（autograder 反推）</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="overview">📋 作业概览</h2>
+
+  <p>Lab 7 是本学期最后一份 Lab，把 Lec 23–25 的 regression 内容串成一条线：</p>
+  <ol>
+    <li><strong>从 r 到 regression line</strong>（Section 1–2）—— 算 correlation、推 standard units 下的 regression line、再"拉伸"回 original units 拿到 slope &amp; intercept。</li>
+    <li><strong>用 line 做预测</strong>（Section 3）—— <code>predicted = slope * x + intercept</code>，Series arithmetic 即可批量预测。</li>
+    <li><strong>预测的可信度</strong>（Section 4）—— extrapolation 陷阱：超出数据范围的预测不可信。</li>
+    <li><strong>Divide and conquer</strong>（Section 5）—— 当 residual plot 显示两簇分离时，对每一簇分别拟合一条 line，往往比单条 line 更准（残差 spread 更小）。</li>
+  </ol>
+
+  <p><strong>Tier 速览</strong>（每题的 Final 考察价值）：</p>
+  <table>
+    <tr><th>题目</th><th>知识点</th><th>Final 价值</th></tr>
+    <tr><td>Q1.3</td><td><code>np.std</code> 是 population SD（÷n），<code>.std()</code> 默认是 sample SD（÷n−1）</td><td><span class="tier tier-1">⭐⭐⭐</span> babypandas 经典陷阱</td></tr>
+    <tr><td>Q1.6</td><td>r = mean of products of standard units</td><td><span class="tier tier-1">⭐⭐⭐</span> 定义必背</td></tr>
+    <tr><td>Q2.1</td><td>slope in original units = r · SD_y / SD_x（横拉竖拉直觉）</td><td><span class="tier tier-1">⭐⭐⭐</span> 公式必背</td></tr>
+    <tr><td>Q2.2</td><td>intercept = mean_y − slope · mean_x（line passes through (mean_x, mean_y)）</td><td><span class="tier tier-1">⭐⭐⭐</span> 公式必背</td></tr>
+    <tr><td>Q3.2–3.3</td><td>Series 算术批量预测/算残差，<u>不要</u> for-loop 或 .apply</td><td><span class="tier tier-2">⭐⭐</span></td></tr>
+    <tr><td>Q4.2</td><td>extrapolation 陷阱：只有数据范围 <em>内</em> 的预测才可信</td><td><span class="tier tier-1">⭐⭐⭐</span> 概念题高频</td></tr>
+    <tr><td>Q5.5</td><td>residual <em>spread</em>（不是 max/min）才是判断模型质量的标准</td><td><span class="tier tier-1">⭐⭐⭐</span></td></tr>
+  </table>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链 — 想深入某个概念，回到对应 section：</h4>
+    <ul>
+      <li>r 的定义、性质、对称性、与 linear 关系 → <a href="../final/01-correlation.html#r-def">final/01-correlation §r-def</a> 和 <a href="../final/01-correlation.html#r-linear">§r-linear</a></li>
+      <li>Regression line in SU → <a href="../final/01-correlation.html#reg-su">final/01-correlation §reg-su</a></li>
+      <li>Regression to the mean → <a href="../final/01-correlation.html#regression-to-mean">final/01-correlation §regression-to-mean</a></li>
+      <li>Slope/intercept in original units 推导 → <a href="../final/02-regression.html#orig-units">final/02-regression §orig-units</a></li>
+      <li>用 regression line 做预测 → <a href="../final/02-regression.html#predict">final/02-regression §predict</a></li>
+      <li>Errors &amp; residuals 定义 → <a href="../final/02-regression.html#errors">final/02-regression §errors</a></li>
+      <li>Residual plot 4 种 pattern → <a href="../final/03-residuals.html#patterns">final/03-residuals §patterns</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec1">📚 Section 1 — How faithful is Old Faithful?（Q1.1–1.6）</h2>
+
+  <p>Old Faithful 数据集每一行一次喷发，两列：<code>duration</code>（喷发时长 / 分钟）和 <code>wait</code>（到下一次喷发的等待时间 / 分钟）。共 272 行。目标：用 <code>duration</code> 预测 <code>wait</code>。</p>
+
+  <!-- Q1.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.1</span><span class="q-title">Scatter plot of the data</span>
+    <p class="q-stmt">"Make a scatter plot of the data. It's conventional to put the column we will try to predict on the vertical axis and the other column on the horizontal axis."</p>
+    <p class="think"><strong>💭 思路</strong>：要预测 <code>wait</code> → <code>wait</code> 上 y 轴，<code>duration</code> 上 x 轴。</p>
+<pre><code>faithful.plot(kind='scatter', x='duration', y='wait')</code></pre>
+    <p class="why"><strong>💡 为什么</strong>：scatter 的目的是 <em>先肉眼看 relationship</em>，再决定要不要用 linear regression。如果根本不是 roughly linear 的形状，硬套 regression line 就是错的（见 <a href="../final/01-correlation.html#r-linear">r-linear 章节</a>）。</p>
+  </div>
+
+  <!-- Q1.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.2</span><span class="q-title">Roughly linear? Positive or negative?</span>
+    <p class="q-stmt">选项：1 = 不线性；2 = 线性 + 负相关；3 = 线性 + 正相关。</p>
+    <p class="think"><strong>💭 思路</strong>：散点是从左下到右上（duration 越长，等待越久）→ 大致 linear + positive。</p>
+<pre><code>faith_q2 = 3</code></pre>
+    <p class="why"><strong>💡 为什么</strong>：在做 regression 之前肉眼判断 association direction 是好习惯——之后算 r 出来，符号要和你预测一致；不一致就要回头查代码。</p>
+  </div>
+
+  <!-- Q1.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.3</span><span class="q-title">Means, standard deviations, &amp; <code>faithful_su</code></span>
+    <p class="q-stmt">"Compute the mean and standard deviation of the eruption durations and waiting times. Then create a DataFrame called <code>faithful_su</code> containing the eruption durations and waiting times in <strong>standard units</strong>. <em>You must use <code>np.std</code> to calculate the standard deviation.</em>"</p>
+    <p class="think"><strong>💭 思路</strong>：标准单位 = (x − mean) / SD。每列分别做。最后用 <code>bpd.DataFrame().assign(...)</code> 拼出两列。</p>
+<pre><code>duration_mean = faithful.get('duration').mean()
+duration_std  = np.std(faithful.get('duration'))   # 注意是 np.std，不是 .std()
+wait_mean     = faithful.get('wait').mean()
+wait_std      = np.std(faithful.get('wait'))
+
+faithful_su = bpd.DataFrame().assign(
+    duration_su = (faithful.get('duration') - duration_mean) / duration_std,
+    wait_su     = (faithful.get('wait')     - wait_mean)     / wait_std
+)
+faithful_su</code></pre>
+    <p class="why"><strong>💡 为什么 <code>np.std</code> vs <code>.std()</code></strong>：<code>np.std(arr)</code> 默认除以 <em>n</em>（population SD），DSC10 全课都用这个。而 pandas 的 <code>Series.std()</code> 默认除以 <em>n−1</em>（sample SD，Bessel's correction），结果不一样！autograder 卡死的就是这个。</p>
+    <div class="warn"><strong>⚠️ 高频陷阱</strong>：把 <code>np.std(faithful.get('duration'))</code> 写成 <code>faithful.get('duration').std()</code>，<code>duration_std</code> 就会从 1.1393 变成 1.1414，整个 lab 的所有数字全错。题目里说"<em>You must use np.std</em>"是真的必须用。</div>
+    <div class="ok"><strong>✅ autograder 反推数值</strong>：<code>duration_std ≈ 1.139271210225768</code>、<code>wait_std ≈ 13.569960017586371</code>。</div>
+  </div>
+
+  <!-- Q1.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.4</span><span class="q-title">Scatter plot in standard units</span>
+    <p class="q-stmt">"Create a scatter plot of the data again, but this time in standard units."</p>
+<pre><code>faithful_su.plot(kind='scatter', x='duration_su', y='wait_su')</code></pre>
+    <p class="why"><strong>💡 为什么形状不变</strong>：standard units 只是 <em>线性变换</em>（减均值、除 SD），不改变点的相对位置。<code>.plot</code> 会自动 rescale axes，所以两张图看起来一模一样——这是题干里 lab 想让你注意的"读 ticks！"信号。</p>
+  </div>
+
+  <!-- Q1.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.5</span><span class="q-title">Correlation guess</span>
+    <p class="q-stmt">"Which would you guess is closest to the correlation: −1, 0, or 1?"</p>
+<pre><code>correlation_guess = 1</code></pre>
+    <p class="why"><strong>💡 为什么</strong>：散点强烈正相关，接近一条 line。所以 r 接近 1（精确值是 0.9008，但 lab 在此只让你三选一）。</p>
+  </div>
+
+  <!-- Q1.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.6</span><span class="q-title">Implement <code>correlation</code> and compute <code>r</code></span>
+    <p class="q-stmt">"Complete the implementation of the function <code>correlation</code>, which takes in a DataFrame <code>df</code> and two column names <code>x</code> and <code>y</code> and returns the correlation between the two columns."</p>
+    <p class="think"><strong>💭 思路</strong>：定义 r ≡ mean of (su(x) · su(y))。lab 已经预先给了 <code>standard_units(any_numbers)</code> 函数，可以直接用。</p>
+<pre><code>def correlation(df, x, y):
+    x_su = standard_units(df.get(x))
+    y_su = standard_units(df.get(y))
+    return (x_su * y_su).mean()
+
+r = correlation(faithful, 'duration', 'wait')
+r</code></pre>
+    <p class="why"><strong>💡 为什么 r 和 SU 是否独立无关</strong>：题目 hint 提到 "Does it matter if we compute the correlation between 'duration_su'/'wait_su' or 'duration'/'wait'?" 答：<u>不影响</u>。<code>correlation</code> 函数内部第一步就是把列转成 SU，再把 SU 又转一次 SU 还是原样。所以传 original 或 standardized 进去结果一样。</p>
+    <div class="ok"><strong>✅ 期望值</strong>：<code>r ≈ 0.9008111683218132</code>。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec2">📚 Section 2 — The regression line（Q2.1–2.2）</h2>
+
+  <p>Lec 23 教过：在 <strong>standard units</strong> 下，regression line 是 <code>wait_su = r × duration_su</code>（slope=r，过原点）。Section 2 的目标是把这条 line 换算回 <strong>original units</strong>，拿到 slope 和 intercept。</p>
+
+  <!-- Q2.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.1</span><span class="q-title">Slope in original units</span>
+    <p class="q-stmt">题干给出"stretching"直觉：把 SU 的 x 横向乘 <code>duration_std</code> 还原；横拉变缓 → slope 除以 <code>duration_std</code>。把 SU 的 y 纵向乘 <code>wait_std</code> 还原；纵拉变陡 → slope 乘以 <code>wait_std</code>。</p>
+    <p class="think"><strong>💭 思路</strong>：起点 slope = r（SU 下的）。横拉、竖拉 → <code>slope_original = r × wait_std / duration_std</code>。</p>
+<pre><code>slope = r * wait_std / duration_std
+slope</code></pre>
+    <p class="why"><strong>💡 为什么这个公式叫"必背 5 件套"之一</strong>：original units 下 slope 的<em>符号</em>由 r 决定（SD 永远非负），<em>数值</em>则由 SD 比值放大。这也是为什么 r 接近 ±1 时 slope 不一定大——还要看 SD_y/SD_x。</p>
+    <div class="ok"><strong>✅ autograder 反推</strong>：<code>(slope * 13 - 100) / 98 ≈ 0.40291...</code> → 解出 <code>slope ≈ 10.7296</code>。验算：0.9008 × 13.5700 / 1.1393 ≈ 10.7296 ✓</div>
+    <div class="tip"><strong>对比角度</strong>：见 <a href="../final/02-regression.html#unit-transforms">final/02-regression §unit-transforms</a>，那里讲了改单位（cm→m、°F→°C）对 slope/intercept/r 的影响。</div>
+  </div>
+
+  <!-- Q2.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.2</span><span class="q-title">Intercept</span>
+    <p class="q-stmt">"The regression line passes through the point (duration_mean, wait_mean). Rearrange <code>waiting time − wait_mean = slope × (eruption duration − duration_mean)</code> to find the intercept."</p>
+    <p class="think"><strong>💭 思路</strong>：把上式写成 <code>y = mx + b</code> 的形式 → <code>b = wait_mean − slope × duration_mean</code>。</p>
+<pre><code>intercept = wait_mean - slope * duration_mean
+intercept</code></pre>
+    <p class="why"><strong>💡 为什么 line 必过 (mean_x, mean_y)</strong>：这是 least squares 解的<u>必然</u>性质——见 <a href="../final/02-regression.html#least-squares">final/02-regression §least-squares</a>。考试反推 intercept 的题型几乎都基于这一性质。</p>
+    <div class="ok"><strong>✅ autograder 反推</strong>：<code>intercept ≈ 33.4744</code>。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec3">📚 Section 3 — Investigating the regression line（Q3.1–3.3）</h2>
+
+  <p>有了 slope &amp; intercept，<code>wait = slope × duration + intercept</code> 就是 regression line。这一节练用它做预测，并定义 residual。</p>
+
+  <!-- Q3.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.1</span><span class="q-title">Predict for duration = 2 and 5 minutes</span>
+<pre><code>two_minute_predicted_waiting_time  = slope * 2 + intercept
+five_minute_predicted_waiting_time = slope * 5 + intercept</code></pre>
+    <div class="ok"><strong>✅ 期望</strong>：
+      <br>• 2 分钟 → ≈ 54.93（autograder: 54.93 &lt; … &lt; 54.94）
+      <br>• 5 分钟 → ≈ 87.12（autograder: 87.12 &lt; … &lt; 87.13）
+    </div>
+  </div>
+
+  <!-- Q3.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.2</span><span class="q-title">Predictions for every row → <code>faithful_predictions</code></span>
+    <p class="q-stmt">"Make predictions for the waiting time after each eruption in the <code>faithful</code> DataFrame. <em>There is no need for a for-loop or even .apply; use Series arithmetic instead.</em>"</p>
+    <p class="think"><strong>💭 思路</strong>：Series 乘标量、加标量都是 broadcasting，一行搞定。然后 <code>.assign</code> 接一列。</p>
+<pre><code>faithful_predictions = faithful.assign(
+    predicted_wait = slope * faithful.get('duration') + intercept
+)
+faithful_predictions</code></pre>
+    <p class="why"><strong>💡 为什么不用 .apply</strong>：Series 算术（<code>slope * series + intercept</code>）天然向量化，速度比 <code>.apply</code> 快几十倍，代码也短。这正是 numpy/pandas 设计初衷。</p>
+    <div class="ok"><strong>✅ 验证第一行</strong>：duration=3.600 → 10.7296×3.6+33.4744 ≈ 72.101 ✓ （题干表格给的就是这个值）</div>
+  </div>
+
+  <!-- Q3.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.3</span><span class="q-title">Residuals → <code>faithful_residuals</code></span>
+    <p class="q-stmt">"Residuals are defined as follows (<strong>note that there is no absolute value</strong>): residual = actual wait − predicted wait."</p>
+<pre><code>faithful_residuals = faithful_predictions.assign(
+    residual = faithful_predictions.get('wait') - faithful_predictions.get('predicted_wait')
+)
+faithful_residuals</code></pre>
+    <p class="why"><strong>💡 为什么没有绝对值</strong>：residual 有正负——正残差表示 line <em>低估</em>了真实值，负残差表示 <em>高估</em>。如果取绝对值，就丢失了过/欠预测的方向信息，也无法验证"residuals 之和 = 0"（least squares 的关键性质）。</p>
+    <div class="warn"><strong>⚠️ 极常见陷阱</strong>：方向写反——<code>residual = predicted − actual</code> 是错的（虽然绝对大小一样，但符号反了，所有后续残差图的正负、上下都会反过来）。题目里的"<strong>no absolute value</strong>"加粗强调，就是怕你这两个都写错。</div>
+    <div class="tip"><strong>对比角度</strong>：见 <a href="../final/02-regression.html#errors">final/02-regression §errors</a> 和 <a href="../final/03-residuals.html#residuals">final/03-residuals §residuals</a>。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec4">📚 Section 4 — How accurate are different predictions?（Q4.1–4.2）</h2>
+
+  <!-- Q4.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.1</span><span class="q-title">Predict for 0 / 2.5 / 60 minutes</span>
+<pre><code>zero_minute_predicted_waiting_time           = 0    * slope + intercept
+two_point_five_minute_predicted_waiting_time = 2.5  * slope + intercept
+hour_predicted_waiting_time                  = 60   * slope + intercept</code></pre>
+    <p class="why"><strong>💡 为什么这三个值这么挑</strong>：lab 故意挑了 <strong>三种危险性递增</strong>的输入——0（物理上不可能）、2.5（在数据范围内但没有精确值）、60（远远超出数据范围）。下一题就要你判断哪些预测可信。</p>
+  </div>
+
+  <!-- Q4.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.2</span><span class="q-title">true_predictions — 哪些预测可信？</span>
+    <p class="q-stmt">5 个选项中选所有正确的（list 形式）：1=0 min 可信；2=2.5 min 可信；3=60 min 可信；4=我们有所有被预测 duration 的数据；5=我们有所有被预测 duration <strong>上下</strong>的数据。</p>
+    <p class="think"><strong>💭 思路</strong>：先查数据范围。faithful 的 duration 范围 ≈ 1.6–5.1 分钟。
+      <ul>
+        <li>0 → 远低于范围，且物理无意义 → <strong>不可信</strong>。</li>
+        <li>2.5 → 在 1.6–5.1 内，<strong>可信</strong>。虽然数据中没有 <em>恰好</em> 2.5 的点，但上下都有点。</li>
+        <li>60 → 远远超出范围（5.1 分钟以上一片空白）→ <strong>不可信</strong>，典型 extrapolation。</li>
+        <li>4 → "have data for all of the durations we predicted for"——0 和 60 都没有数据，错。</li>
+        <li>5 → "have data surrounding (above and below) all of the durations"——0 没有下方数据，60 没有上方数据，错。</li>
+      </ul>
+    </p>
+<pre><code>true_predictions = [2]</code></pre>
+    <p class="why"><strong>💡 为什么这是 Final 高频题型</strong>：Extrapolation 是 regression 的<u>核心警告</u>——line 在数据范围内可信，超出范围就是赌博。期末考"哪个预测可信"的题目几乎每年都有，关键点都是检查 input 是否在 <em>样本</em> 的 x 范围内。</p>
+    <div class="warn"><strong>⚠️ 常见错答</strong>：把 <code>[1, 2, 3]</code>（"all reliable"）或 <code>[2, 5]</code> 之类选项打包。错。autograder 明确 <code>set(true_predictions) == {2}</code>。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec5">📚 Section 5 — Divide and conquer（Q5.1–5.5）</h2>
+
+  <p>散点图显示 duration 有<strong>两簇</strong>：一簇在 ~2 分钟，一簇在 3.5–5 分钟。3 分钟可以划开两簇。这节用 <code>divide-and-conquer</code> 给每簇单独拟合一条 line，看预测是否更准。</p>
+
+  <!-- Q5.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.1</span><span class="q-title">Split + 各自 correlation</span>
+    <p class="q-stmt">"Create two DataFrames, <code>below_3</code> and <code>above_3</code>. <code>below_3</code> should contain all rows in <code>faithful</code> in which the duration is below 3, and <code>above_3</code> should contain all rows in <code>faithful</code> in which the duration is greater than or equal to 3. Then call your <code>correlation</code> function on both."</p>
+<pre><code>below_3 = faithful[faithful.get('duration') &lt; 3]
+above_3 = faithful[faithful.get('duration') &gt;= 3]
+
+below_3_r = correlation(below_3, 'duration', 'wait')
+above_3_r = correlation(above_3, 'duration', 'wait')</code></pre>
+    <p class="why"><strong>💡 为什么两个子集的 r 反而比整体小</strong>：直觉反常。<u>整体</u> r ≈ 0.90 之所以高，部分原因是两簇<em>之间</em>有大间隔，让"整体来看高度线性"。一旦把两簇拆开，每一簇内部的 r 就只反映该簇内部的 association ——而每一簇内点的 spread 都不太线性。所以 below_3 r ≈ 0.29，above_3 r ≈ 0.37。</p>
+    <div class="ok"><strong>✅ 期望</strong>：<code>below_3.shape[0] = 97</code>、<code>above_3.shape[0] = 175</code>、<code>[below_3_r, above_3_r] ≈ [0.2902, 0.3728]</code>。</div>
+    <div class="warn"><strong>⚠️ babypandas 提醒</strong>：<code>faithful[boolean_series]</code> 不是普通方括号取列——这是布尔过滤。要点是布尔 Series 必须用 <code>&amp;</code>/<code>|</code>（不是 <code>and</code>/<code>or</code>），且每段比较外加括号。这里只有一个条件，没那么复杂。</div>
+  </div>
+
+  <!-- Q5.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.2</span><span class="q-title"><code>slope_of</code> / <code>intercept_of</code></span>
+    <p class="q-stmt">"Both functions should take in a DataFrame <code>df</code> that contains a <code>duration</code> column and a <code>wait</code> column (both in <strong>original units</strong>, not standard units)."</p>
+<pre><code>def slope_of(df):
+    '''Return the slope of the regression line for the given DataFrame in original units.'''
+    r = correlation(df, 'duration', 'wait')
+    return r * np.std(df.get('wait')) / np.std(df.get('duration'))
+
+def intercept_of(df):
+    '''Return the intercept of the regression line for the given DataFrame in original units.'''
+    return df.get('wait').mean() - slope_of(df) * df.get('duration').mean()
+
+below_3_a = slope_of(below_3)
+below_3_b = intercept_of(below_3)
+above_3_a = slope_of(above_3)
+above_3_b = intercept_of(above_3)
+
+def wait_below_3(duration):
+    return below_3_a * duration + below_3_b
+
+def wait_above_3(duration):
+    return above_3_a * duration + above_3_b</code></pre>
+    <p class="why"><strong>💡 为什么把 slope 抽成函数</strong>：之前 Section 2 是对整体 faithful 算一次 slope/intercept；现在要对每一簇（below_3 / above_3）各算一次。把公式封装进函数比复制粘贴四遍干净，也是 Lab 7 想让你练的 abstraction。</p>
+    <div class="warn"><strong>⚠️ 题干强调"original units"</strong>：函数内 <code>np.std(df.get('wait'))</code>，不是 standard units 下的列。如果你不小心传了 <code>faithful_su</code>，得到的 SD 全是 1.0，公式就退化成 <code>slope = r</code> 了（这就是 SU 下的公式，不是 original units）。</div>
+    <div class="ok"><strong>✅ 期望</strong>：<code>[wait_below_3(1), wait_below_3(3), wait_above_3(3), wait_above_3(6)] ≈ [47.90, 60.60, 72.97, 89.28]</code>。</div>
+  </div>
+
+  <!-- Q5.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.3</span><span class="q-title"><code>predict_wait</code>：分段函数</span>
+<pre><code>def predict_wait(duration):
+    '''Return the wait predicted by the appropriate one of the two regression lines above.'''
+    if duration &lt; 3:
+        return wait_below_3(duration)
+    else:
+        return wait_above_3(duration)</code></pre>
+    <p class="why"><strong>💡 为什么用 <code>&lt; 3</code>（含等号在 <code>else</code>）</strong>：与 Q5.1 划分一致——<code>below_3</code> 用 <code>&lt; 3</code>，<code>above_3</code> 用 <code>&gt;= 3</code>，所以 <code>duration == 3</code> 走 above_3 那条 line。如果你的 if 写成 <code>&lt;= 3</code>，duration=3 就会走错 line（用 below 的参数），整张图会有 ε 错位。</p>
+    <div class="ok"><strong>✅ 期望</strong>：<code>[predict_wait(1.5), predict_wait(2.5), predict_wait(3.5), predict_wait(4.5)] ≈ [51.08, 57.43, 75.68, 81.12]</code>。</div>
+  </div>
+
+  <!-- Q5.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.4</span><span class="q-title">New residuals + residual plot</span>
+    <p class="q-stmt">前一个 cell 已经给了 <code>new_faithful = faithful.assign(predicted = faithful.get('duration').apply(predict_wait))</code>。这里继续加 <code>new_residuals</code> 列，并画残差图。</p>
+<pre><code>new_faithful = new_faithful.assign(
+    new_residuals = new_faithful.get('wait') - new_faithful.get('predicted')
+)
+
+new_faithful.plot(kind='scatter', x='duration', y='new_residuals',
+                  color='purple', figsize=(10, 5));</code></pre>
+    <p class="why"><strong>💡 为什么这里用 .apply 是合理的</strong>：<code>predict_wait</code> 内含 <code>if</code> 分支，不是简单的向量运算，Series 算术做不了。所以预先 cell 用 <code>.apply</code> 把 <code>predict_wait</code> 套在每一行的 duration 上，是必须的——这也是 .apply 真正的用场（向量化做不到时）。</p>
+    <div class="tip"><strong>对比 Q3.2</strong>：那里能纯 Series 算术（<code>slope * series + intercept</code>），就 <em>不要</em> 用 .apply；这里有 if 必须 .apply。区分这两种情况是 babypandas 的功夫。</div>
+  </div>
+
+  <!-- Q5.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.5</span><span class="q-title">new_predict — 新预测是否更准？</span>
+    <p class="q-stmt">选项：1=new 残差的 max/min 都更小，所以更准；2=new 残差的 <strong>spread</strong> 更小，所以更准；3=新预测更差（不能预测 duration=3 处）；4=两组残差看起来相似，无法判断。</p>
+    <p class="think"><strong>💭 思路</strong>：肉眼比较两张残差图。divide-and-conquer 把两簇分别拟合，每一簇内的残差更紧密贴近 0 line → <strong>spread 更小</strong> → 选项 2。</p>
+<pre><code>new_predict = 2</code></pre>
+    <p class="why"><strong>💡 为什么不是选项 1</strong>：max/min 只看 <em>极端</em>残差，可能两组的极值都差不多——但平均 spread（多数点偏离 0 的程度）变小才是 regression 改善的标志。这对应 RMSE 的概念：RMSE = √(mean(residual²))，spread 小 → RMSE 小 → 预测平均更准。见 <a href="../final/02-regression.html#rmse">final/02-regression §rmse</a>。</p>
+    <p class="why"><strong>💡 为什么不是选项 4</strong>：两张图肉眼明显<u>不同</u>。新残差图基本是"无 pattern 的小 blob"（divide and conquer 后），旧残差图则在 duration=2 附近有明显的左下→右上倾斜（残差有 pattern → 单条 line 不够 fit）。</p>
+    <div class="tip"><strong>对比角度</strong>：residual plot 4 种 pattern 在 <a href="../final/03-residuals.html#patterns">final/03-residuals §patterns</a>。Lab 7 此处看到的就是经典的"原模型 underfitting，拆开后变 patternless blob"案例。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="pitfalls">⚠️ 本作业典型陷阱（横切多题）</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：<code>np.std</code> 与 <code>.std()</code> 不等价</strong><br>
+    <code>np.std(arr)</code> 默认 ÷ n（population，DSC10 用这个）；<code>Series.std()</code> 默认 ÷ n−1（sample，pandas/babypandas 用这个）。Lab 7 题干明示要用 <code>np.std</code>。一旦写错，全 lab 数值都偏 ε。<strong>必背</strong>：DSC10 课程内的 SD 永远是 <code>np.std</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：residual 方向写反</strong><br>
+    <code>residual = actual − predicted</code> ✅，不是 <code>predicted − actual</code>。前者的正负含义是"实际比预测<em>高</em>多少"——line 低估时 residual 为正。后者绝对值相同但符号相反，残差图全部上下翻转，所有性质（mean = 0，line 上方点对应正残差）都反了。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：Extrapolation 不可信</strong><br>
+    任何 duration 在 [1.6, 5.1] 之外的预测都不可靠。即便 line 在那里"看起来很正常"，line 是<u>从数据拟合来的</u>，外推就是用没见过的 region 做赌博。Final 考试 100% 会问"哪些预测可信"——锁定在数据范围内的输入即可。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：r 接近 1 ≠ slope 大</strong><br>
+    Q2.1 的 <code>slope = r × SD_y / SD_x</code>：slope 受 SD 比值放大。Old Faithful 的 r=0.9008 但 slope=10.73，因为 SD_wait/SD_duration ≈ 11.9。r 只决定 slope 的 <strong>符号</strong> 和"在 SU 下的大小"，不决定 original units 的大小。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：判断模型质量看 <u>spread</u> 不是 max/min</strong><br>
+    Q5.5 选项 1（"max/min 都更小"）是错的诱饵。模型好坏看 residuals 的整体 spread（RMSE 的体现），不是单个极端残差。题干故意把 max/min 写得很具体来骗人。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：什么时候用 .apply、什么时候不用</strong><br>
+    Q3.2、Q3.3 用 <strong>Series 算术</strong>（向量化、快）：<code>slope * series + intercept</code>。Q5.4 必须 <strong>.apply</strong>，因为 <code>predict_wait</code> 内含 if 分支，单步向量化做不到。考试时如果函数内有条件分支，就该 .apply；如果是简单算术，禁用 .apply（写出来会被扣"不优雅"分）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7：subset 的 r 反而比整体小</strong><br>
+    Q5.1 看到的反直觉现象：整体 r=0.90，但 below_3 r=0.29、above_3 r=0.37。原因是整体的高 r 部分来源于两簇之间的<em>间隔</em>；一旦在簇<u>内</u>看，association 没那么强。这也解释了为什么 divide and conquer 反而能<em>提高</em>预测准度——不是因为 r 高，而是因为<u>每个 line 专心拟合一个 cluster 的 mean，避开"用一条线穿过两簇"的妥协</u>。
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="numbers">🔢 核心数值速查（autograder 反推）</h2>
+  <table>
+    <tr><th>量</th><th>值</th></tr>
+    <tr><td><code>r</code>（duration vs wait）</td><td>0.9008111683218132</td></tr>
+    <tr><td><code>duration_mean</code></td><td>≈ 3.488（lab 未直接列；可算）</td></tr>
+    <tr><td><code>duration_std</code></td><td>1.139271210225768</td></tr>
+    <tr><td><code>wait_mean</code></td><td>≈ 70.897（可算）</td></tr>
+    <tr><td><code>wait_std</code></td><td>13.569960017586371</td></tr>
+    <tr><td><code>slope</code></td><td>≈ 10.7296</td></tr>
+    <tr><td><code>intercept</code></td><td>≈ 33.4744</td></tr>
+    <tr><td>预测 wait | duration=2</td><td>≈ 54.93</td></tr>
+    <tr><td>预测 wait | duration=5</td><td>≈ 87.12</td></tr>
+    <tr><td>预测 wait | duration=3.6（第一行）</td><td>≈ 72.10</td></tr>
+    <tr><td><code>below_3</code> 行数 / <code>above_3</code> 行数</td><td>97 / 175</td></tr>
+    <tr><td><code>below_3_r</code> / <code>above_3_r</code></td><td>0.2902 / 0.3728</td></tr>
+    <tr><td>分段预测：<code>predict_wait(1.5, 2.5, 3.5, 4.5)</code></td><td>≈ 51.08, 57.43, 75.68, 81.12</td></tr>
+  </table>
+
+  <!-- ============================================================ -->
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <p>对着 Claude 把下面每条讲出来——讲得清就过，卡壳了就回去看对应章节。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① 为什么 SD 必须用 <code>np.std</code> 不用 <code>.std()</code>？两者除数分别是什么？</span></label>
+    <label><input type="checkbox"><span>② correlation r 的定义（一句话）+ 代码（3 行）。为什么传 original 列和传 SU 列结果一样？</span></label>
+    <label><input type="checkbox"><span>③ Standard units 下 regression line 是 <code>y_su = r · x_su</code>。从这条线"拉伸"回 original units 怎么得到 slope = r · SD_y / SD_x？为什么横拉除、竖拉乘？</span></label>
+    <label><input type="checkbox"><span>④ Regression line 必过哪个点？由此推 intercept = mean_y − slope · mean_x。</span></label>
+    <label><input type="checkbox"><span>⑤ residual 定义？方向（actual − predicted 还是反过来）？为什么没有绝对值？</span></label>
+    <label><input type="checkbox"><span>⑥ Q3.2 为什么用 Series 算术不用 .apply？Q5.4 为什么必须 .apply？两个判断标准是什么？</span></label>
+    <label><input type="checkbox"><span>⑦ Extrapolation：什么是它，为什么 Old Faithful 数据下 60 分钟的预测不可信？Q4.2 的 5 个选项哪个对、为什么其他 4 个错？</span></label>
+    <label><input type="checkbox"><span>⑧ Divide and conquer：为什么子集的 r 反而比整体小？为什么这并不意味着 divide-and-conquer 更差，反而可能更好？</span></label>
+    <label><input type="checkbox"><span>⑨ Q5.5：为什么判断模型质量看 residuals 的 spread，不是 max/min？这跟 RMSE 是什么关系？</span></label>
+    <label><input type="checkbox"><span>⑩ r ≈ 0.9 但 slope ≈ 10.7，这是矛盾吗？两个量的单位/取值范围分别是什么？</span></label>
+    <label><input type="checkbox"><span>⑪ Boolean filtering：<code>faithful[faithful.get('duration') &lt; 3]</code> 是什么意思？为什么不能写 <code>faithful['duration' &lt; 3]</code>？</span></label>
+    <label><input type="checkbox"><span>⑫ <code>predict_wait</code> 用 <code>&lt; 3</code> 还是 <code>&lt;= 3</code> 当分界？为什么要与 Q5.1 一致？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a class="disabled">⬅ 上一份（首份）</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="02-hw6-hypothesis-permutation.html">下一份 ➡：HW 6</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

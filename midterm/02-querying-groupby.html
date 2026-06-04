@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>查询与 Groupby (Section 2) - DSC10 Midterm 备考</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .nav-bottom {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+  .nav-top a, .nav-bottom a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 16px;
+    margin-top: 20px;
+    color: var(--muted);
+  }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+  }
+  .tier {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta {
+    background: #f6f8fa;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--tip-bg);
+    border-left: 4px solid var(--tip-border);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  details {
+    background: var(--q-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+  }
+  details[open] {
+    background: #fff;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+  }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) {
+    margin-top: 12px;
+  }
+  .q-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .q-source {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .checklist {
+    background: #f0f9ff;
+    border: 1px solid #54aeff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .checklist label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+  }
+  .checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📚 总目录</a></span>
+  <span><a href="01-dataframes-indexing.html">← 上一节</a> <a href="03-visualization-histograms.html">下一节 →</a></span>
+</nav>
+
+<main>
+  <h1>Section 2 · 查询与 Groupby</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 5（Querying and Grouping）｜
+    <strong>Midterm出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1 (6/6)</span> ｜
+    <strong>预计学习时间</strong>：2-3 小时
+  </p>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题（11 题）</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <p>本节是 DSC10 midterm 的<strong>核心地基</strong>。每一份历年 midterm（6/6）都会反复考察布尔过滤、多条件组合与 <code>groupby</code> 聚合 —— 而且常常和 Lec 4 的 <code>sort_values</code> / <code>iloc</code> / <code>.get</code> 串联成"链式 one-liner"。</p>
+
+  <h3>本节出现的题型</h3>
+  <ul>
+    <li><strong>布尔过滤</strong>：<code>df[df.get('col') == value]</code> 选行</li>
+    <li><strong>多条件组合</strong>：<code>&amp;</code>、<code>|</code>、<code>~</code>，每个条件外必须加括号</li>
+    <li><strong>计数行数 / 求比例</strong>：<code>.shape[0]</code> 或 <code>np.count_nonzero(bool_series)</code></li>
+    <li><strong>groupby 三步法</strong>：<code>.get([cols])</code> → <code>.groupby('cat')</code> → <code>.agg()</code></li>
+    <li><strong>找极值</strong>：<code>.sort_values(...).get('col').iloc[0]</code> 或 <code>.index[0]</code></li>
+    <li><strong>字符串过滤</strong>：<code>.str.contains</code>、<code>.str.startswith</code>、<code>.str.split</code></li>
+    <li><strong>等价改写</strong>：multi-select"哪些写法都对"题型（Wi26、Fa24 反复考）</li>
+  </ul>
+
+  <h3>反复出现的考察模式</h3>
+  <ul>
+    <li>给一段 <code>treat[(treat.get('a') == X) &amp; (treat.get('b') == Y)]</code>，问行数 / 列数 / 输出</li>
+    <li>给一个 <code>groupby('col').count()</code> 结果，问 <em>哪些行被合并了</em> / <em>row 数何时等于原表行数</em>（→ 当 col 是 index / 唯一 时）</li>
+    <li>填空 <code>pizza.get([__]).groupby(__).__().sort_values(__).__</code></li>
+    <li>"select all that apply"：列出 4–5 种链式写法，哪些等价于目标值</li>
+  </ul>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. 比较运算符产生 Boolean Series（broadcasting）</h3>
+  <p>对 Series 做比较（<code>==</code>、<code>!=</code>、<code>&lt;</code>、<code>&lt;=</code>、<code>&gt;</code>、<code>&gt;=</code>）会逐元素返回一个 <code>bool</code> 类型的 Series，长度与原 Series 一致：</p>
+<pre><code>states.get('Region') == 'West'
+# State
+# Alabama        False
+# Alaska          True
+# Arizona         True
+# ...
+# Name: Region, Length: 50, dtype: bool</code></pre>
+
+  <p>这种"标量与 Series 比较 → Series"的机制叫 <strong>broadcasting（广播）</strong>。</p>
+
+  <h3>2. 布尔过滤（query）</h3>
+  <p>用方括号把一个布尔 Series（或 list / array）传给 DataFrame：保留所有 <code>True</code> 的行。</p>
+<pre><code># 选出 Region 为 West 的所有州
+only_west = states[states.get('Region') == 'West']
+
+# 等价改法：先存下条件
+mask = states.get('Region') == 'West'
+only_west = states[mask]</code></pre>
+
+  <div class="tip">
+    <strong>📌 query 的两步骤心法</strong>：<br>
+    1️⃣ 造一个长度等于行数的 <code>True/False</code> 序列；<br>
+    2️⃣ 把这个序列传到 <code>df[ ... ]</code> 里。
+  </div>
+
+  <p>如果条件没有任何行匹配，结果就是一个 0 行 DataFrame（不会报错）。</p>
+
+  <h3>3. 多条件 — <code>&amp;</code> / <code>|</code> / <code>~</code></h3>
+  <table>
+    <tr><th>符号</th><th>含义</th><th>等价（错误！）写法</th></tr>
+    <tr><td><code>&amp;</code></td><td>AND（两个都为 True）</td><td><code>and</code> ❌</td></tr>
+    <tr><td><code>|</code></td><td>OR（至少一个 True）</td><td><code>or</code> ❌</td></tr>
+    <tr><td><code>~</code></td><td>NOT（取反）</td><td><code>not</code> ❌</td></tr>
+  </table>
+
+  <p><strong>每个条件外必须加括号</strong>，因为 <code>&amp;</code> 和 <code>|</code> 的运算优先级高于 <code>==</code>：</p>
+<pre><code># ✅ 正确
+states[(states.get('Party') == 'Republican') &amp; (states.get('Region') == 'South')]
+
+# ❌ 报错（&amp; 会先和 'Republican'/'South' 结合）
+states[states.get('Party') == 'Republican' &amp; states.get('Region') == 'South']
+
+# ❌ 报错（and 不能用于 Series）
+# ValueError: The truth value of a Series is ambiguous.
+states[(states.get('Party') == 'Republican') and (states.get('Region') == 'South')]</code></pre>
+
+  <h3>4. <code>.shape</code> — 求行数、求比例</h3>
+  <p><code>.shape</code> 是<strong>属性</strong>不是方法，<u>没有括号</u>。返回 <code>(行数, 列数)</code>：</p>
+<pre><code>only_rep = states[states.get('Party') == 'Republican']
+only_rep.shape       # (31, 6)
+only_rep.shape[0]    # 31  —— 行数
+only_rep.shape[1]    # 6   —— 列数
+
+# 求 Republican 比例
+only_rep.shape[0] / states.shape[0]    # 0.62</code></pre>
+
+  <div class="tip">
+    <strong>统计行数的几种等价写法</strong>（select-all-that-apply 常考）：
+    <ul>
+      <li><code>df[mask].shape[0]</code></li>
+      <li><code>np.count_nonzero(mask)</code> （True=1, False=0）</li>
+      <li><code>mask.sum()</code></li>
+    </ul>
+  </div>
+
+  <h3>5. <code>.index</code> 与 <code>.take([...])</code></h3>
+<pre><code>midwest_sorted.index           # Index(['Kansas', 'Minnesota', ...])
+midwest_sorted.index[0]        # 'Kansas'  —— 注意 index 不是 column！
+
+# .take 按整数位置选行（类似 Series.iloc）
+df.take([0, 1, 2])             # 前 3 行
+df.take(np.arange(3))          # 等价</code></pre>
+
+  <p><strong>要点</strong>：<code>.get('State')</code> 在 <code>State</code> 已是 index 时会报 <code>KeyError</code>，这时用 <code>.index</code>。</p>
+
+  <h3>6. 列操作三件套：<code>.assign</code> / <code>.drop</code> / <code>.get</code></h3>
+<pre><code># 加一列（关键字必须是合法 Python 标识符，所以列名不能有空格）
+states.assign(Pop_in_millions=states.get('Population') / 1_000_000)
+
+# 删列
+df.drop(columns=['Population'])
+
+# .get 单列名 → Series；list of 列名 → DataFrame（即使 list 只有一个元素）
+states.get('Capital City')          # Series
+states.get(['Capital City'])        # DataFrame (1 列)
+states.get(['Capital City', 'Party'])  # DataFrame (2 列)</code></pre>
+
+  <h3>7. <code>groupby</code> 三步工作流</h3>
+  <p>「<strong>I-G-A</strong>」：<u>I</u>solate columns → <u>G</u>roup → <u>A</u>ggregate。</p>
+<pre><code># 第 1 步：选出 grouping 列 + 要聚合的列
+# 第 2 步：.groupby(分组列) —— 该列变成 index
+# 第 3 步：调用聚合方法
+states.get(['Region', 'Population']).groupby('Region').sum()
+
+# 输出：index=Region, 列=Population
+#                Population
+# Region
+# Midwest          68985454
+# Northeast        57609148
+# South           125576562
+# West             78588572</code></pre>
+
+  <p><strong>聚合方法</strong>：<code>.sum()</code>、<code>.mean()</code>、<code>.median()</code>、<code>.max()</code>、<code>.min()</code>、<code>.count()</code>。</p>
+
+  <div class="warn">
+    ⚠️ <strong>babypandas 没有 <code>.size()</code></strong>！groupby 后数每组行数请用 <code>.count()</code>（逐列数 <em>非空</em>，无缺失时每列都等于组的行数）。<br>
+    顺带一提：DataFrame 顶层也没有 <code>.size</code> 属性。想要整张表的行数，用 <code>df.shape[0]</code>（详见陷阱 5）。
+  </div>
+
+  <h3>8. groupby 后的常见模式</h3>
+<pre><code># 模式 A：找极值对应的 group label —— 用 .index[0]
+(states
+   .get(['Region', 'Population'])
+   .groupby('Region')
+   .sum()
+   .sort_values(by='Population', ascending=False)
+   .index[0])
+# 'South'
+
+# 模式 B：取出一个特定 group 的某个聚合值
+df.groupby('cat').mean().get('col').iloc[0]
+
+# 模式 C：reset_index() 把 group 列变回普通列
+df.groupby('cat').count().reset_index()</code></pre>
+
+  <h3>9. Series 字符串方法 <code>.str.*</code></h3>
+<pre><code># 子串包含 → bool Series
+treat.get('candy').str.contains('Sour')
+
+# 字符串切分 → Series of list
+treat.get('address').str.split(',')
+
+# 前缀 / 后缀
+contacts.get('Phone').str.startswith('987')
+contacts.get('Phone').str.endswith('6789')   # 注意区分 .endswith</code></pre>
+
+  <p>这些方法都返回新 Series，不修改原数据。<code>.str.contains</code> 配合布尔过滤用得最频繁。</p>
+
+  <h3>10. 链式 one-liner（Lec 5 后半的精髓）</h3>
+<pre><code># 多步骤合一行；过长时用括号包起来分行
+(states[states.get('Region') == 'Midwest']
+   .sort_values(by='Land Area', ascending=False)
+   .index[0])
+# 'Kansas'</code></pre>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：<code>&amp;</code> vs <code>and</code></strong><br>
+    Series 之间的"逻辑与"必须用 <code>&amp;</code>（按位运算符，逐元素）。<code>and</code> 是 Python 内建短路逻辑，会试图把整个 Series 转成单个 bool，触发 <code>ValueError: The truth value of a Series is ambiguous</code>。<code>|</code> vs <code>or</code> 同理。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：忘记给每个条件加括号</strong><br>
+    <code>&amp;</code> 优先级 <em>高于</em> <code>==</code>。<code>a == 1 &amp; b == 2</code> 会被 Python 解析为 <code>a == (1 &amp; b) == 2</code>，结果错或直接报错。<u>每个 <code>==</code> 表达式外必须裹括号</u>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：<code>groupby</code> 后 grouping column 跑到 index 去了</strong><br>
+    <code>states.groupby('Region').sum()</code> 之后 <code>'Region'</code> 不再是普通列，而是 index。要用 <code>.index</code>（不带括号）取它，或先 <code>.reset_index()</code> 把它变回列。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：聚合方法对<u>非数字列</u>的怪异行为</strong><br>
+    <code>.sum()</code> 在字符串列上会把字符串首尾相连（如 <code>"SpringfieldIndianapolis..."</code>）；<code>.mean()</code> 在字符串列上会报错。<strong>babypandas 不再像旧版 pandas 那样默默丢列</strong>，所以推荐先 <code>.get([需要的列])</code> 再 <code>.groupby</code>，避免意外。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：<code>.size</code> 在 babypandas 中不存在 —— 但要分清两个语境</strong><br>
+    课件那句「<em>avoid using <code>.size()</code> which is similar but not the same as <code>.count()</code></em>」是针对 <strong>groupby 场景</strong>说的，那里 <code>gb.size()</code> 和 <code>gb.count()</code> 才真的"相似但不同"（前者是每组行数 Series，后者是每组每列非空数的 DataFrame）。<br><br>
+    在 <strong>DataFrame 顶层</strong>，<code>.size</code> 其实跟 <code>.shape</code> 才是一类（都是描述维度的属性，<code>df.size</code> = rows × cols），跟 <code>.count()</code> 关系不大。所以：
+    <ul style="margin:6px 0 0 18px;">
+      <li>想要"DataFrame 有几行" → 用 <code>df.shape[0]</code> ✅（最常用、最干净）</li>
+      <li>想要"每组有几行" → 用 <code>df.groupby('x').count().get('任一列').iloc[i]</code>（见陷阱 6）</li>
+      <li>不要写 <code>df.size</code> 或 <code>gb.size()</code> —— babypandas 都没有</li>
+    </ul>
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：<code>.count()</code> 是逐列数非空</strong><br>
+    <code>df.groupby('Region').count()</code> 的输出每一列都是该 group 的行数（因为没有缺失值时所有列都一样）。要"取 Region=Midwest 的州数"，可以从<u>任何一列</u>读 <code>.get('Capital City').iloc[0]</code>，但语义上要清楚每列的数字含义相同只是巧合。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7：<code>.groupby('col').max()</code> ≠ "找最大那一行"</strong><br>
+    <code>max</code> 是逐列独立求最大值。课件原话："<em>While it's true that the highest rated movie from the 1990s has a rating of 9.2, that movie is <strong>not</strong> Unforgiven – instead, Unforgiven is the movie that's the latest in the alphabet among all movies from the 1990s.</em>" 要"找最大对应的行"，请用 <code>sort_values</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 8：<code>.shape</code> 没有括号</strong><br>
+    <code>.shape</code> 是 attribute（属性），<code>.shape()</code> 会报错。同理 <code>.index</code>、<code>.columns</code> 也不带括号。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 9：<code>states['West']</code> 写法不能用</strong><br>
+    babypandas 中取列必须用 <code>.get('col')</code>，不能用方括号。方括号 <code>df[...]</code> 只用于<u>布尔过滤</u>。
+  </div>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <p>下面 11 道题都来自历年 midterm，按知识点排序。先尝试自己做，再展开答案。</p>
+
+  <!-- ============ Q1 Spring 2025 Q1.1 / 1.2 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Spring 2025 · Problem 1.1 + 1.2 （Lec 5 — 单条件查询）</p>
+    <p>背景：<code>tariffs</code> 有 50 行，列 <code>Country</code>、<code>Tariffs Charged to USA</code>、<code>Reciprocal Tariff</code>（int 表示百分比）。</p>
+    <p><strong>1.1</strong> 写一行代码，求 <code>Reciprocal Tariff</code> 最高的国家名。</p>
+    <p><strong>1.2</strong> 写一行代码，求 <code>Reciprocal Tariff</code> 高于 30% 的国家数量。</p>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># 1.1 —— 排序后取 index 第一个
+tariffs.sort_values(by='Reciprocal Tariff', ascending=False).get('Country').iloc[0]
+
+# 或者：先 set_index('Country') 再取 index[0]
+tariffs.sort_values(by='Reciprocal Tariff', ascending=False).get('Country').iloc[0]
+
+# 1.2 —— 布尔过滤后数行数
+tariffs[tariffs.get('Reciprocal Tariff') &gt; 30].shape[0]</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>1.1 是"找最大对应的行"经典模式：<code>sort_values</code> 降序后用 <code>.iloc[0]</code> 取第一行的某列值。</li>
+        <li>1.2 是"过滤 + 数行"经典模式：<code>df[mask].shape[0]</code>。等价写法包括 <code>(tariffs.get('Reciprocal Tariff') &gt; 30).sum()</code> 和 <code>np.count_nonzero(tariffs.get('Reciprocal Tariff') &gt; 30)</code>。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q2 Winter 2026 Q2 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Winter 2026 · Problem 2 （Lec 5 — 布尔过滤 + max + 等价改写）</p>
+    <p>填空使表达式得到一个 <code>float</code>，是所有 ingredient 数大于 10 的 pizza 中的最高 rating：</p>
+<pre><code>pizza[ ___(a)___ ].___(b)___</code></pre>
+    <p><strong>2.2</strong> 哪些写法可以填到 (b)？多选：</p>
+    <ol type="A">
+      <li><code>get("rating").apply(max)</code></li>
+      <li><code>get("rating").max()</code></li>
+      <li><code>sort_values("rating", ascending=False).get("rating").iloc[0]</code></li>
+      <li><code>sort_values("rating", ascending=True).get("rating").iloc[-1]</code></li>
+      <li>None of the above</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># (a)
+pizza.get("num_ingredients") &gt; 10
+
+# (b) 正确选项: B、C、D
+# B: .get("rating").max()       —— 直接对 Series 取 max
+# C: 降序后 iloc[0] —— 第一个就是最大
+# D: 升序后 iloc[-1] —— 最后一个就是最大
+
+# A 错误：apply(max) 会把 max 函数应用到每个元素（每个 float 上），
+#         单个 float 取 max 是它自己，结果只是返回原 Series，不是单个 float</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>(a) 标准布尔过滤——筛出 ingredient 数大于 10 的 pizza。</li>
+        <li>(b) 这种"找最大值的等价写法"是 Wi26 / Fa24 高频题型。注意 <code>apply(max)</code> 是<strong>对每个元素</strong>应用 max——而每个元素本身是一个 <code>float</code>，<code>max(float)</code> 不合法，实际会出问题，是错误选项。</li>
+        <li>背心法：<strong>"取 Series 最大"四种写法</strong>：<code>.max()</code> / 降序 <code>.iloc[0]</code> / 升序 <code>.iloc[-1]</code> / 排序后 index 操作。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q3 Fall 2024 Q3 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Fall 2024 · Problem 3 （Lec 12 / Lec 5 — <code>.str.contains</code> + <code>&amp;</code> + <code>np.count_nonzero</code>）</p>
+    <p>背景：<code>treats</code> 有 <code>address</code> 和 <code>candy</code> 两列。</p>
+<pre><code>street = treats.get("address").str.contains("Street")
+sour   = treats.get("candy").str.contains("Sour")</code></pre>
+    <p><strong>3.1</strong> <code>street</code> 是什么类型？</p>
+    <p><strong>3.2</strong> <code>np.count_nonzero(street &amp; sour) &gt; sour.sum()</code> 是什么？</p>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># 3.1 —— Series（dtype=bool 的 Series，不是 bool 标量）
+
+# 3.2 —— False
+# np.count_nonzero(street &amp; sour)  数同时满足两个条件的行
+# sour.sum()                       数仅满足 sour 的行
+# 同时满足两个条件 ≤ 仅满足 sour 的行 → 不可能 &gt;
+# 所以结果是 False</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>3.1 关键：<code>.str.contains</code> 作用于 Series，返回的是<strong>布尔 Series</strong>（不是单个 bool）。这是高频选择题。</li>
+        <li>3.2 关键洞察：<code>A &amp; B</code> 的 True 数永远 ≤ <code>B</code> 的 True 数（交集大小不大于子集）。所以 <code>np.count_nonzero(street &amp; sour) ≤ sour.sum()</code>，不可能大于。注意 <code>True/False</code> 作为整数写就是 <code>True</code> / <code>False</code>，要按"恰好如何在 Python 中显示"来回答。</li>
+        <li>顺带：<code>np.count_nonzero(bool_series)</code> = <code>bool_series.sum()</code> = 满足条件的行数，是<strong>三种等价写法</strong>。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q4 Spring 2024 Q3 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Spring 2024 · Problem 3 （Lec 5 — 字符串后缀过滤）</p>
+    <p>写一个 Python 表达式，得到一个只包含<u>电话号码以 "6789" 结尾</u>的 contacts 的 DataFrame。<br>
+    <strong>注意</strong>：不许用 slicing；只能用本课程教过的方法。</p>
+    <details>
+      <summary>显示答案</summary>
+<pre><code>contacts[contacts.get("Phone").str.endswith("6789")]
+
+# 或者用 .str.contains 也可以（但若有 6789 出现在中间会误中），更精确用 endswith</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li><code>.str.endswith(suffix)</code> 是 Series 字符串方法，返回布尔 Series。</li>
+        <li>把这个布尔 Series 传到 <code>contacts[ ... ]</code> 里就完成过滤。</li>
+        <li><strong>区分</strong>：<code>.str.contains("6789")</code> 会匹配中间带 6789 的（如 "987-6789-123"）；要求严格以 6789 结尾用 <code>endswith</code>。</li>
+        <li><code>.str.startswith</code> 同理。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q5 Winter 2026 Q5 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Winter 2026 · Problem 5 （Lec 5 — 数行数的多种等价写法）</p>
+    <p>找出 gluten-free pizza slice 总数的<strong>所有正确</strong>写法（多选）：</p>
+    <ol type="A">
+      <li><code>pizza.set_index("store").get("gluten_free").sum()</code></li>
+      <li><code>pizza.get(["gluten_free", "store"]).groupby("store").sum()</code></li>
+      <li><code>pizza[pizza.get("gluten_free")].get("gluten_free").count()</code></li>
+      <li><code>pizza[pizza.get("gluten_free")].shape[0]</code></li>
+      <li><code>pizza.set_index("store").get("gluten_free").count()</code></li>
+      <li><code>pizza.get("gluten_free").shape[0]</code></li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># 正确：A、C、D
+# A：bool 列 .sum() → True=1 False=0，求和就是 True 数 ✅
+# C：先用 bool 列过滤（True 行保留），再 .count() ✅
+# D：先用 bool 列过滤，再 .shape[0] ✅
+
+# 错误：
+# B：返回 DataFrame（按 store 分组求和），不是单个数字
+# E：.count() 数 ALL 行（gluten_free 列没有缺失），返回总行数 ≠ True 数
+# F：返回总行数（不管 True/False）</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>这题集中考"如何数 True 行"。<u>四种正确写法</u>：(1) bool 列直接 <code>.sum()</code>；(2) 用 bool 列过滤后 <code>.shape[0]</code>；(3) <code>np.count_nonzero(bool)</code>；(4) <code>(bool).sum()</code>。</li>
+        <li><strong>关键陷阱</strong>：<code>.count()</code> 数的是<u>所有非空</u>行，不是 True 行——所以 E 错。</li>
+        <li>F：<code>.shape[0]</code> 在没过滤的 Series 上等于全部行数，也错。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q6 Winter 2025 Q2 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Winter 2025 · Problem 2.3 （Lec 5 — groupby + count + reset_index 后查询）</p>
+    <p>背景：<code>counts</code> 是经过 <code>with_affordability.groupby(["Dining Hall", "Affordability"]).count().reset_index()</code> 后再 <code>.assign(Count=...)</code> 得到的 DataFrame，恰好有列 <code>"Dining Hall"</code>、<code>"Affordability"</code>、<code>"Count"</code>。</p>
+    <p>已知 <code>"The Bistro"</code> 是 <code>"Cheap"</code> 类菜品最多的 dining hall。哪些表达式必然等于 The Bistro 的 Cheap 菜品数？多选：</p>
+    <ol type="A">
+      <li><code>counts.sort_values(by="Count", ascending=False).get("Count").iloc[0]</code></li>
+      <li><code>counts.get("Count").max()</code></li>
+      <li><code>(counts[counts.get("Affordability") == "Cheap"].sort_values(by="Count").get("Count").iloc[-1])</code></li>
+      <li><code>counts[counts.get("Dining Hall") == "The Bistro"].get("Count").max()</code></li>
+      <li><code>counts[(counts.get("Affordability") == "Cheap") &amp; (counts.get("Dining Hall") == "The Bistro")].get("Count").iloc[0]</code></li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># 正确：C、E
+# C：先过滤 Cheap，按 Count 升序后 iloc[-1] = 该子集的最大 Count
+#    = 所有 Cheap 类中最多那个 = The Bistro 的 Cheap 数 ✅
+# E：精确两条件过滤到唯一一行，iloc[0] 取该 Count ✅
+
+# 错误：
+# A：可能取到的是 Moderate 类某 hall 的 Count（不一定是 Cheap）
+# B：counts 全表 Count 最大值（同上原因，可能不是 Cheap）
+# D：The Bistro 在 Moderate / Expensive 类的 Count 可能更大</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>这题考"先 groupby reset_index，再写正确的过滤语句"。</li>
+        <li>关键观察：表里每行是一个 (Dining Hall, Affordability) 组合。所以"取 The Bistro × Cheap 的那一行"必须<strong>同时锁定两个条件</strong>。</li>
+        <li>A、B、D 都可能跑到错误的 (Hall, Affordability) 组合上去。</li>
+        <li>C 妙在"先按 Affordability 过滤再求最大"——既然题目说 Bistro 是 Cheap 最多的，那 Cheap 子集中的最大 Count 就是 Bistro 的。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q7 Winter 2026 Q4 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Winter 2026 · Problem 4 （Lec 5 — groupby 链式填空求"最佳邻里"）</p>
+    <p>填空使下面表达式 evaluates 到拥有"最高平均 rating" 的 neighborhood 名字（字符串）：</p>
+<pre><code>pizza.get([___(a)___]).groupby(___(b)___)
+                       .___(c)___.sort_values(__(d)__, ascending=False)
+                       .___(e)___</code></pre>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># (a) ["neighborhood", "rating"]   —— 只保留这两列
+# (b) "neighborhood"                —— 按 neighborhood 分组
+# (c) mean()                        —— 求平均
+# (d) "rating"  或  by="rating"     —— 按 rating 排序
+# (e) index[0]                      —— 取 index 第一个 = neighborhood 名字</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>这是 <code>groupby</code> 三步法（IGA）的标准填空。</li>
+        <li>(a) <strong>先 isolate</strong> 用得到的列（grouping 列 + 聚合列），可以避免无意义的字符串列被 mean() 报错。</li>
+        <li>(c) "平均 rating" → <code>.mean()</code>。</li>
+        <li>(e) groupby 后 grouping 列变成 <strong>index</strong>，所以取 neighborhood 名字用 <code>.index[0]</code>，<strong>不能</strong>用 <code>.get('neighborhood')</code>（已经不是 column 了）。</li>
+        <li>另一种等价写法：<code>.reset_index().get('neighborhood').iloc[0]</code>。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q8 Fall 2024 Q8 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Fall 2024 · Problem 8 （Lec 5 / Lec 9 — groupby 何时保留行数）</p>
+    <p>选择填法使表达式为 <code>True</code>：</p>
+<pre><code>treat.groupby(______).mean().shape[0] == treat.shape[0]</code></pre>
+    <ol type="A">
+      <li><code>"address"</code></li>
+      <li><code>"candy"</code></li>
+      <li><code>"neighborhood"</code></li>
+      <li><code>["address", "candy"]</code></li>
+      <li><code>["candy", "neighborhood"]</code></li>
+      <li><code>["address", "neighborhood"]</code></li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># 答案：D ["address", "candy"]
+# 原因：treat 每行 = "某地址某种糖"。多个糖来自同一地址，但每行的 (address, candy) 组合是唯一的。
+# 用 (address, candy) 这两列 groupby 时，每个组只有 1 行 → 输出行数 = 原表行数。
+# A 错：多个候选每地址有多种糖
+# B 错：同种糖在多家发
+# C 错：同 neighborhood 多家
+# E 错：(candy, neighborhood) 不是唯一 —— 同 neighborhood 多家发同一种糖
+# F 错：(address, neighborhood) 不唯一 —— 同地址有多种糖（neighborhood 重复）</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>这题考<strong>"groupby 输出行数 = ?"</strong>。规律：<u>当被分组的列组合是唯一识别每一行的"key"时，行数不变</u>。</li>
+        <li>记住：<code>groupby</code> 后行数 = 该列（组合）的<strong>不同值的个数</strong>。</li>
+        <li>题目隐含：address 和 candy 一起能唯一标识每行，因为题目数据每行是"某地址 给的 某种糖"。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q9 Fall 2024 Q11 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Fall 2024 · Problem 11 （Lec 5 — groupby + assign 多步推理）</p>
+    <p>背景：<code>tot</code> 是 trick × treat 的 merged DataFrame，含 <code>address</code>、<code>candy</code>、<code>how_many</code>、<code>price</code> 列。要计算<u>每个地址的 average cost per piece</u>（每块糖平均花费），结果 DataFrame indexed by <code>address</code>，含列 <code>avg_cost</code>。</p>
+    <p>哪些"Way"是正确的？多选（题目中 Way 1–5 见原 PDF；这里讲思路）。</p>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># 关键：每块糖平均花费 = 总花费 / 总块数 = sum(price * how_many) / sum(how_many)
+# 注意：每行的 price 是单价，how_many 是块数。所以总花费需要 price * how_many。
+
+# 正确做法骨架：
+ac = tot.assign(x = tot.get("price") * tot.get("how_many"))   # 每行的总花费
+ac = ac.groupby("address").sum()                              # 每地址的总花费 + 总块数
+ac = ac.assign(avg_cost = ac.get("x") / ac.get("how_many"))   # 平均 = 总花费/总块数
+ac = ac.get(["avg_cost"])
+
+# 这正是 Way 5 的写法 → 正确答案：Way 5
+
+# Way 1 错：直接 groupby.sum() 后 price/how_many —— 把单价加起来再除是错的
+# Way 2 错：先 price/how_many 得"单块花费"再 groupby.sum() 再 mean()，
+#          mean 在已经 sum 过的 DataFrame 上无意义
+# Way 3, 4 错：要么忘了 *how_many，要么忘了用 sum 的总块数</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>核心数学：<u>average cost per piece</u> 是一个加权平均——按糖块数加权。</li>
+        <li>做法：先在原表上算每行的 <code>price * how_many</code>（行级总花费），groupby sum 后再除以总块数。</li>
+        <li>陷阱：很多人会错以为"先算每行 price/how_many 再 mean"——但那是把每行视为同等权重，<u>没有按糖块数加权</u>。</li>
+        <li>这种"求加权平均"题型在 DSC10 反复出现。<strong>记住：sum / sum，不要 mean！</strong></li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q10 Spring 2024 Q8 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Spring 2024 · Problem 8 （Lec 5 / Lec 9 — groupby + count + max 找共享生日）</p>
+    <p>填空使表达式得到 <code>contacts</code> 中<strong>共享同一生日（不论年份）的最大人数</strong>：</p>
+<pre><code>contacts.groupby( ___(a)___ ).___(b)___.get("Phone").___(c)___</code></pre>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># (a) ["Month", "Day"]    —— 同月同日才算同生日
+# (b) count()              —— 数每组人数
+# (c) max()                —— 取最多那组的人数</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>"share same birthday"——题目特别提示<u>不要求同年</u>，所以分组按 (Month, Day) 而非 DOB 字符串本身。</li>
+        <li><code>.count()</code> 后随便取一列再 <code>.max()</code> 就能得到"最大组的大小"——题里挑了 <code>"Phone"</code> 列，但其实任何一列都行（除了 grouping 列已变成 index）。</li>
+        <li>这道题展示了 <strong>multi-column groupby</strong> 的早期版本（更多在 Lec 9 / Section 5 学）。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q11 Fall 2025 Q3 ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Fall 2025 · Problem 3 （Lec 5 / Lec 6 — bar chart 与 sort+filter+ascending 的 T/F）</p>
+    <p>背景：用如下代码绘制水平 bar chart，显示 difficulty 最高的 20 个单词：</p>
+<pre><code>(words.sort_values(by="diff", ascending=False).take(np.arange(20))
+       .plot(kind='barh', y="diff"));</code></pre>
+    <p><strong>3.1 T/F</strong>：The students found "decades" more difficult than any other word.</p>
+    <p><strong>3.2 T/F</strong>：If we removed <code>ascending=False</code>, the same info would show but in opposite order top-to-bottom.</p>
+    <p><strong>3.3 T/F</strong>：Changing <code>np.arange(20)</code> to <code>np.arange(15)</code> would show all words with diff &gt; 15.</p>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># 3.1 False
+# 看 bar chart：decades 是最底下的，但 barh 默认 index 从下往上递增，
+# 实际最难的词是 chart 顶部那个（scolding 或类似），不是 decades
+
+# 3.2 False
+# 移除 ascending=False（默认升序）后，take(np.arange(20)) 取的是 20 个最 EASY 的单词，
+# 完全不同的数据集，不只是顺序反转
+
+# 3.3 False
+# np.arange(15) 取前 15 个（最难的 15 个），跟 "diff &gt; 15" 完全不同的概念
+# np.arange(15) 是 take 行位置 0..14，不是过滤条件</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>3.1：barh（水平条形图）的轴方向常让人困惑。题目暗示要看图，并理解 sort_values 后 take 前 20——<strong>最难的在 iloc[0]</strong>，对应 barh 的最顶端。</li>
+        <li>3.2：<strong>关键陷阱</strong>。<code>sort_values</code> 默认 ascending=True，移除 <code>ascending=False</code> 后，<code>take(np.arange(20))</code> 取到的是<u>最简单</u>的 20 个，不是把同样数据反转。</li>
+        <li>3.3：混淆了 <strong>"取前 N 个"</strong>（<code>.take(np.arange(N))</code>，按位置）vs <strong>"按值过滤"</strong>（<code>df[df.get('diff') &gt; 15]</code>）。这是 DSC10 高频考察点。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q12 Winter 2026 Q3 (新趋势：fancy indexing 类比) ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Winter 2026 · Problem 3 （Lec 5 — numpy fancy indexing 类比 DataFrame query · NEW CONCEPT）</p>
+    <p>背景：<code>pizza10 = pizza.take(np.arange(10))</code> 是前 10 行。考虑：</p>
+<pre><code>positions = np.arange(pizza10.shape[0])
+result    = positions[pizza10.get("rating") &gt; 4].sum()</code></pre>
+    <p><strong>3.1</strong> <code>result</code> 代表什么？</p>
+    <p><strong>3.2</strong> 给定数据描述（10 行 rating 列：3.7, 4.0, 3.2, 4.5, 3.7, 4.9, 3.8, 4.6, 4.2, 2.5），<code>result</code> 等于多少？</p>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># 3.1 答案：The sum of the index positions from pizza10 for pizzas with rating &gt; 4
+# 解释：positions = [0,1,2,...,9]，bool mask 选出 rating&gt;4 的位置（[1,3,5,7,8]），
+#       这些数字相加 = 0+1+...+9 中 rating&gt;4 那些的位置和
+
+# 3.2 答案：23
+# rating &gt; 4 的位置是: 1 (4.0)? NO &gt; 4 严格大于
+# 实际：4.0 不大于 4。rating &gt; 4 的: 4.5(pos 3), 4.9(pos 5), 3.8 NO, 4.6(pos 7), 4.2(pos 8)
+# 1(no, 4.0=4)
+# 等等，4.0 严格大于 4 是 False；4.5 → 3 ✅；4.9 → 5 ✅；4.6 → 7 ✅；4.2 → 8 ✅
+# 还有？回看：3.7, 4.0, 3.2, 4.5, 3.7, 4.9, 3.8, 4.6, 4.2, 2.5
+# 严格 &gt; 4：只有 4.5, 4.9, 4.6, 4.2 → 位置 3, 5, 7, 8
+# Sum = 3 + 5 + 7 + 8 = 23 ✅</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>这是 W26 新考的题型——<strong>numpy fancy indexing 类比 DataFrame query</strong>。</li>
+        <li>关键观察：<code>positions[mask]</code> 和 <code>df[mask]</code> 思想完全一样——把布尔 mask 应用到数组上保留 True 位置。</li>
+        <li><code>positions = np.arange(10)</code> 就是 <code>[0,1,...,9]</code>，再用 mask 选出 True 的元素。</li>
+        <li>这种"位置数组 + bool mask + sum"的搭配，可以用来求"满足条件的<u>位置之和</u>"——是新颖的考点。</li>
+        <li>陷阱：<code>4.0 &gt; 4</code> 是 <strong>False</strong>（严格大于），不要把它算进去。</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ Q13 Fall 2024 Q13 (Extra Credit, 双 groupby 解读) ============ -->
+  <div class="q-block">
+    <p class="q-source">▍ Fall 2024 · Problem 13 (Extra Credit) （Lec 5 — 双 groupby 语义解读）</p>
+    <p>定义 <code>double = treat.groupby("candy").count().groupby("address").count()</code>。<br>
+    已知 <code>double.loc[1].get("how_many")</code> 等于 <code>5</code>。下列哪些解读正确？多选：</p>
+    <ol type="A">
+      <li>有 5 个 house 各自只发 1 种糖。</li>
+      <li>有 5 种糖各自只被 1 个 house 发。</li>
+      <li>只有 1 个 house 发 5 种糖。</li>
+      <li>只有 1 种糖被 5 个 house 发。</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+<pre><code># 答案：B  ("There are five types of candy that are each being given out by only one house.")
+#
+# 推导：
+# 第 1 步: treat.groupby("candy").count()
+#   → index = candy；每行 = "这种糖出现在多少行 = 多少 (house, candy) 组合"
+#   → 因 row 表 (house × candy)，"这种糖出现的行数" = 发这种糖的 house 数
+#   → 列 'address' 的值就是 "发该糖的房子数"
+#
+# 第 2 步: 再 .groupby("address").count()
+#   → 把第 1 步的 'address' 列（=发糖的房子数）当作分组键
+#   → index = address（数字，意为"几家发这种糖"）
+#   → 各列值 = "有多少种糖落在这一组"
+#
+# double.loc[1].get("how_many") = 5
+#   → "address (= 发糖房子数) 这一类 = 1" 的组里，有 5 种糖
+#   → 也即：有 5 种糖恰好只被 1 家发 → 选 B</code></pre>
+      <p><strong>中文解析</strong>：</p>
+      <ul>
+        <li>这是高级题，考察 groupby 后<strong>列的含义会变</strong>——原本是"address"（地址），groupby count 后"address"列变成"该糖出现的地址数"。</li>
+        <li>第二次 groupby 把这个"地址数"当分组键，结果 index=1 表示"恰好被 1 家发"的那一类。</li>
+        <li>这种题最有效的方法：<u>每一步都问自己"现在 index 是什么？列代表什么数？"</u>。</li>
+      </ul>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <p>对着 Claude 把以下每条都讲一遍，能完整复述就说明你掌握了。</p>
+  <div class="checklist">
+    <label><input type="checkbox"><span>解释 boolean Series 是怎么产生的（Series 与标量比较 → broadcasting）。</span></label>
+    <label><input type="checkbox"><span>说出 query 的两步骤："造 bool 序列" + "传到 <code>df[ ]</code>"。举例 <code>df[df.get('col') == X]</code>。</span></label>
+    <label><input type="checkbox"><span>解释 <code>&amp;</code> / <code>|</code> / <code>~</code> 与 Python 关键字 <code>and</code> / <code>or</code> / <code>not</code> 的区别，并说明为什么 Series 必须用前者。</span></label>
+    <label><input type="checkbox"><span>说明为什么多条件查询<u>每个条件外都必须加括号</u>（运算优先级）。</span></label>
+    <label><input type="checkbox"><span>说出 <code>.shape</code> 的两个用法：<code>.shape[0]</code> 行数、<code>.shape[1]</code> 列数；并强调<u>没有括号</u>。</span></label>
+    <label><input type="checkbox"><span>列举至少 <strong>3 种"数符合条件行数"</strong>的等价写法。</span></label>
+    <label><input type="checkbox"><span>说明 <code>.get('col')</code> 与 <code>.get(['col'])</code> 的返回类型差异（Series vs DataFrame）。</span></label>
+    <label><input type="checkbox"><span>说出 <code>.take([positions])</code> 的功能，以及它和 <code>.iloc</code>、<code>.loc</code> 的关系。</span></label>
+    <label><input type="checkbox"><span>背 groupby 的三步法 IGA：Isolate → Group → Aggregate；说明每步为什么必要。</span></label>
+    <label><input type="checkbox"><span>说出 6 种聚合方法：<code>.sum()</code>、<code>.mean()</code>、<code>.median()</code>、<code>.max()</code>、<code>.min()</code>、<code>.count()</code>；强调没有 <code>.size()</code>。</span></label>
+    <label><input type="checkbox"><span>解释 <code>groupby</code> 后 grouping 列变成 <strong>index</strong>，要怎么取它（<code>.index[0]</code> 或 <code>.reset_index()</code>）。</span></label>
+    <label><input type="checkbox"><span>解释为什么 <code>df.groupby('cat').max()</code> <strong>不会</strong> 给出"对应最大值的整行"——它是逐列独立求最大。</span></label>
+    <label><input type="checkbox"><span>讲清 <code>.count()</code> 在 groupby 后每一列的含义（数非空，所有列相同）。</span></label>
+    <label><input type="checkbox"><span>分析"<code>groupby</code> 后行数何时等于原表行数"（grouping 列组合是唯一标识时）。</span></label>
+    <label><input type="checkbox"><span>列举 <code>.str.contains</code> / <code>.str.startswith</code> / <code>.str.endswith</code> / <code>.str.split</code> 的用法和返回值。</span></label>
+    <label><input type="checkbox"><span>把 Spring 2025 Q1.1 那种"找最大对应的标签"用<u>3 种等价写法</u>各写一遍。</span></label>
+    <label><input type="checkbox"><span>解释 Wi26 Q3 那种"<code>positions[bool_mask]</code> 在 numpy 中"和"<code>df[bool_mask]</code> 在 DataFrame 中"的类比关系。</span></label>
+    <label><input type="checkbox"><span>口述 Fa24 Q11"求每地址 average cost per piece"——为什么必须先 <code>price * how_many</code>，不能直接 mean。</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="01-dataframes-indexing.html">← 上一节：DataFrame 索引</a></span>
+  <span><a href="index.html">📚 返回目录</a></span>
+  <span><a href="03-visualization-histograms.html">下一节：可视化与直方图 →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

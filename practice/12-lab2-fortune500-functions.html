@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 12 · Lab 2 — Fortune 500 &amp; Functions · DSC10</title>
+<style>
+  :root { --bg:#fafaf7; --text:#1f2328; --muted:#57606a; --accent:#0969da; --code-bg:#1e1e2e; --code-text:#cdd6f4; --warn-bg:#fff8c5; --warn-border:#d4a72c; --tip-bg:#ddf4ff; --tip-border:#54aeff; --ok-bg:#dafbe1; --ok-border:#1a7f37; --tier-1:#cf222e; --tier-2:#bf8700; --tier-3:#6e7781; --border:#d0d7de; }
+  * { box-sizing: border-box; } html { scroll-behavior: smooth; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.7; font-size:16px; }
+  .nav-top, .nav-bottom { background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:14px; flex-wrap:wrap; gap:8px; }
+  .nav-bottom { border-bottom:none; border-top:1px solid var(--border); margin-top:60px; }
+  .nav-top a, .nav-bottom a { color:var(--accent); text-decoration:none; margin-right:16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration:underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color:var(--muted); cursor:not-allowed; text-decoration:none; }
+  main { max-width:880px; margin:0 auto; padding:32px 24px 60px; }
+  h1 { font-size:28px; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:22px; margin-top:48px; border-left:4px solid var(--accent); padding-left:12px; }
+  p, ul, ol { margin:12px 0; } ul, ol { padding-left:28px; } li { margin:4px 0; }
+  code { font-family:"Menlo","Monaco","Consolas",monospace; background:#eef0f2; padding:2px 6px; border-radius:4px; font-size:14px; color:#cf222e; }
+  pre { background:var(--code-bg); color:var(--code-text); padding:16px; border-radius:8px; overflow-x:auto; font-size:14px; line-height:1.5; margin:16px 0; }
+  pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:14px; }
+  .tier { display:inline-block; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:600; margin-right:8px; }
+  .tier-1 { background:#ffebe9; color:var(--tier-1); border:1px solid #ffcecb; }
+  .tier-2 { background:#fff8c5; color:var(--tier-2); border:1px solid #d4a72c; }
+  .meta { background:#f6f8fa; border-left:4px solid var(--accent); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .warn { background:var(--warn-bg); border-left:4px solid var(--warn-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .tip { background:var(--tip-bg); border-left:4px solid var(--tip-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .ok { background:var(--ok-bg); border-left:4px solid var(--ok-border); padding:10px 14px; margin:12px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .q-block { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:18px 0; }
+  .q-id { display:inline-block; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:4px; margin-right:10px; letter-spacing:0.5px; }
+  .q-title { font-size:15px; font-weight:600; }
+  .why { margin:8px 0; font-size:14px; } .why strong { color:#1f883d; }
+  .checklist { background:#f0f9ff; border:1px solid #54aeff; border-radius:8px; padding:16px 20px; }
+  .checklist label { display:block; margin:8px 0; cursor:pointer; user-select:none; }
+  .checklist input[type="checkbox"] { margin-right:8px; transform:scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration:line-through; color:var(--muted); }
+  .toc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:24px 0; }
+  .toc ul { list-style:none; padding-left:0; } .toc li { margin:4px 0; } .toc a { color:var(--accent); text-decoration:none; }
+  .crosslink { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:20px 0; font-size:14px; }
+  .crosslink h4 { margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600; }
+  .crosslink ul { margin:4px 0; padding-left:20px; } .crosslink a { color:var(--accent); text-decoration:none; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="11-hw2-ikea-broadway-histograms.html">⬅ 上一份：HW 2</a> | <a class="disabled">完结 🎉</a></span>
+</nav>
+
+<main>
+  <h1>Practice 12 · Lab 2 — Fortune 500 &amp; Functions</h1>
+  <p class="meta">
+    <strong>截止</strong>：Thursday, April 16th at 11:59 PM ｜ <strong>Topics</strong>：BPD 6, 11, 12 ｜
+    <strong>对应模块</strong>：Midterm ｜ <strong>无 for-loop</strong>（除非 lab 明示）｜ <strong>预计时长</strong>：1.5 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#sec1">📚 Section 1 — Fortune 500 Companies（Q1.1–1.4）字符串 → 数字</a></li>
+      <li><a href="#sec2">📚 Section 2 — Defining Functions（Q2.1–2.5）</a></li>
+      <li><a href="#sec3">📚 Section 3 — Applying Functions（Q3.1–3.5）</a></li>
+      <li><a href="#sec4">📚 Section 4 — Last Year's Revenue（Q4.1–4.3）% Change 转换</a></li>
+      <li><a href="#sec5">📚 Section 5 — Distribution of Revenue（Q5.1–5.3）density histogram</a></li>
+      <li><a href="#pitfalls">⚠️ 典型陷阱</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链：</h4>
+    <ul>
+      <li>函数定义、.apply、.assign → <a href="../midterm/04-functions-apply.html">midterm/04-functions-apply</a></li>
+      <li>Density histogram → <a href="../midterm/03-visualization-histograms.html">midterm/03-visualization-histograms</a></li>
+    </ul>
+  </div>
+
+  <h2 id="sec1">📚 Section 1 — Fortune 500 Companies</h2>
+
+  <div class="q-block"><span class="q-id">Q 1.1</span><span class="q-title">'Revenue' 列的类型</span>
+<pre><code>revenue_type = type(raw_fortune_500.get('Revenue').iloc[0])</code></pre>
+    <p class="why"><strong>💡 <code>type(x)</code> 返回对象类型</strong>。Revenue 存的是 '$611.29' 这种字符串 → <code>str</code>。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.2</span><span class="q-title">Walmart 的 revenue string</span>
+<pre><code>walmart_revenue_string = raw_fortune_500.get('Revenue').iloc[0]
+# = '$611.29'</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.3</span><span class="q-title">string → 实际美元数</span>
+<pre><code>walmart_revenue = float(walmart_revenue_string.strip('$')) * 1e9</code></pre>
+    <p class="why"><strong>💡 三步</strong>：① <code>.strip('$')</code> 去掉 $ → '611.29'；② <code>float()</code> 转 float → 611.29；③ × 1e9（10 亿）→ 611,290,000,000。<u>注意</u>顺序：先 strip 再 float（float 不能解析 '$' 开头）。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 1.4</span><span class="q-title">定义 <code>convert_revenue_string_to_number</code></span>
+<pre><code>def convert_revenue_string_to_number(some_revenue_string):
+    return float(some_revenue_string.strip('$')) * 1e9</code></pre>
+    <p class="why"><strong>💡 把 Q1.3 的逻辑封装成函数</strong>。这是 Lab 2 的核心思想——发现重复模式 → 抽函数。Q3.2 会用这个函数批量处理。</p>
+  </div>
+
+  <h2 id="sec2">📚 Section 2 — Defining Functions</h2>
+
+  <div class="q-block"><span class="q-id">Q 2.1</span><span class="q-title"><code>to_percentage(proportion)</code></span>
+<pre><code>def to_percentage(proportion):
+    return proportion * 100
+
+twenty_percent = to_percentage(0.2)   # = 20.0</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.2</span><span class="q-title">应用到 sqrt(2)/2</span>
+<pre><code>a_percentage = to_percentage(a_proportion)   # ≈ 70.71</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.3</span><span class="q-title"><code>disemvowel</code>：链式 .replace</span>
+<pre><code>def disemvowel(a_string):
+    return a_string.replace('a', '').replace('e', '').replace('i', '')\
+                   .replace('o', '').replace('u', '')</code></pre>
+    <p class="why"><strong>💡 <code>.replace(old, new)</code> 字符串方法</strong>：返回<u>新</u>字符串（不修改原 string）。链式调用 — 每次替换都返回新 str，下一个 .replace 接着替换。</p>
+    <p class="why"><strong>💡 <code>.replace('a', '')</code></strong>：替换为<u>空</u>字符串 = 删除。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.4</span><span class="q-title"><code>num_non_vowels</code>：函数 composition</span>
+<pre><code>def num_non_vowels(a_string):
+    return len(disemvowel(a_string))</code></pre>
+    <p class="why"><strong>💡 一行 = 复用 + 计长度</strong>。这是 Lab 2 课程要点："function composition" —— 小函数组成大函数。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 2.5</span><span class="q-title"><code>print_kth_most_streamed_song(k)</code>：用 <code>print</code> 不 <code>return</code></span>
+<pre><code>def print_kth_most_streamed_song(k):
+    sorted_df = spotify_streams.sort_values(by='Streams (Billions)', ascending=False)
+    song_name = sorted_df.index[k - 1]
+    print('The song ranked number', k, 'for most all-time Spotify streams is', song_name)</code></pre>
+    <p class="why"><strong>💡 <code>k - 1</code> 因为 Python 0-index</strong>。第 1 名 → index[0]，第 2 名 → index[1]…</p>
+    <p class="why"><strong>💡 print vs return</strong>：print 在屏幕显示文字，函数返回值 None。如果外部赋值 <code>x = print_kth...()</code>，x 是 None。<u>区分</u>这两种 output 是面试常考点。</p>
+  </div>
+
+  <h2 id="sec3">📚 Section 3 — Applying Functions</h2>
+
+  <div class="q-block"><span class="q-id">Q 3.1</span><span class="q-title">3 个 callable 函数的 array</span>
+<pre><code>some_functions = np.array([max, min, len])</code></pre>
+    <p class="why"><strong>💡 函数是 first-class object</strong>——可以放进 array 里。<u>不带括号</u>（带括号是<u>调用</u>）。Python 把函数当成普通"对象"传递。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.2</span><span class="q-title">加 'Revenue_Dollars' 列（核心模板）</span>
+<pre><code>fortune_500 = raw_fortune_500.assign(
+    Revenue_Dollars=raw_fortune_500.get('Revenue').apply(convert_revenue_string_to_number)
+)</code></pre>
+    <p class="why"><strong>💡 <code>.apply</code> 套路</strong>：<code>Series.apply(func)</code> 把 func 应用到 Series 的<u>每个</u>元素，返回新 Series。然后 <code>.assign(NewCol=...)</code> 把这个新 Series 加成新列。</p>
+    <p class="why"><strong>💡 <code>apply(func)</code> 传函数<u>名</u></strong>，不带括号。<code>apply(func())</code> 是<u>调用 func 一次</u>把结果传进来——错。</p>
+    <div class="ok"><strong>✅ shape = (500, 11)</strong>（原 10 列 + 1 新列）。</div>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.3</span><span class="q-title">average revenue</span>
+<pre><code>average_revenue = fortune_500.get('Revenue_Dollars').mean()
+# ≈ 36,288,520,000 ≈ $36 billion</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.4</span><span class="q-title">profit / revenue 比例（Profit 也是 string）</span>
+<pre><code>profit_proportion = fortune_500.get('Profit').apply(convert_revenue_string_to_number) / fortune_500.get('Revenue_Dollars')</code></pre>
+    <p class="why"><strong>💡 <code>convert_revenue_string_to_number</code> 跨用于多列</strong>——只要列是 '$XX.YY' 这种格式，同一函数就能用。复用得很优雅。</p>
+    <p class="why"><strong>💡 Series ÷ Series = 逐元素</strong>，返回 Series。500 行 → 500 个比例。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 3.5</span><span class="q-title">median revenue by sector（横向条形图）</span>
+<pre><code>(fortune_500.get(['Sector', 'Revenue_Dollars'])
+    .groupby('Sector')
+    .median()
+    .sort_values(by='Revenue_Dollars', ascending=False)
+    .plot(kind='barh'))
+plt.xlabel('Median Revenue (Dollars)')</code></pre>
+    <p class="why"><strong>💡 一定先 <code>.get([..])</code> 再 groupby</strong>——避开非数值列报错。这是 babypandas 套路（前面 walkthrough 反复说过）。</p>
+  </div>
+
+  <h2 id="sec4">📚 Section 4 — Last Year's Revenue</h2>
+
+  <div class="q-block"><span class="q-id">Q 4.1</span><span class="q-title">filter → 转 % → 算 Previous_Revenue → assign</span>
+<pre><code>def convert_pct_to_number(pct_string):
+    return float(pct_string.replace('%', ''))
+
+filtered = fortune_500[fortune_500.get('% Change') != '(No previous year)']
+pct_change = filtered.get('% Change').apply(convert_pct_to_number)
+previous_revenue = filtered.get('Revenue_Dollars') / (pct_change / 100 + 1)
+with_previous_fortune_500 = filtered.assign(Previous_Revenue=previous_revenue)</code></pre>
+    <p class="why"><strong>💡 公式</strong>：current = previous × (1 + pct/100) → <strong>previous = current / (1 + pct/100)</strong>。注意分母是 <code>1 + pct/100</code>，不是 <code>1 + pct</code>。</p>
+    <p class="why"><strong>💡 必须先 filter '(No previous year)'</strong>——否则 <code>float('(No previous year)')</code> 会报错。</p>
+    <p class="why"><strong>💡 <code>.replace('%', '')</code></strong>：去掉 % 符号。<code>.strip</code> 也行（'%' 在末尾时），但 .replace 更通用。</p>
+    <div class="ok"><strong>✅ 期望</strong>：filtered shape = (471, ...)（500 − 29 个无去年数据）。Walmart 2021 ≈ $571.3B。</div>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.2</span><span class="q-title">2021 平均</span>
+<pre><code>average_revenue_2021 = with_previous_fortune_500.get('Previous_Revenue').mean()
+# ≈ $33.6B</code></pre>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 4.3</span><span class="q-title">scatter: 去年 vs 今年</span>
+<pre><code>with_previous_fortune_500.plot(kind='scatter', x='Previous_Revenue', y='Revenue_Dollars')</code></pre>
+    <p class="why"><strong>💡 应该看到强线性趋势</strong>——大公司去年大、今年也大。这暗示 regression 在这种数据上会很好用（铺垫 Final 内容）。</p>
+  </div>
+
+  <h2 id="sec5">📚 Section 5 — Distribution of Revenue</h2>
+
+  <div class="q-block"><span class="q-id">Q 5.1</span><span class="q-title">density histogram, 宽度 0.5×10¹¹</span>
+<pre><code>bins = np.arange(0, fortune_500.get('Revenue_Dollars').max() + 0.5 * 10**11, 0.5 * 10**11)
+fortune_500.plot(kind='hist', y='Revenue_Dollars', density=True, bins=bins)</code></pre>
+    <p class="why"><strong>💡 bins 公式</strong>：start=0，stop=max+step（保证 max 在最后一个 bin 里），step=0.5×10¹¹（500 亿美元）。<br>
+      Walmart 的 ~6 千亿在最右；大多数公司在最左（&lt; 500 亿）。
+    </p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.2</span><span class="q-title">从图<u>估</u>计 &gt; $100B 的公司数</span>
+<pre><code>num_companies_more_than_100_billion = 38</code></pre>
+    <p class="why"><strong>💡 视觉估算</strong>：从 100B（= 2 个 bin）起到最右的所有 bar 的<u>总面积</u> × 500（总公司数）≈ 38。<br>
+      <strong>必须是 int</strong>——autograder 测 <code>isinstance(..., numbers.Integral)</code>。Q5.3 用代码<u>验证</u>这个估计。</p>
+  </div>
+
+  <div class="q-block"><span class="q-id">Q 5.3</span><span class="q-title">用代码精确数</span>
+<pre><code>num_companies_more_than_100_billion_code = fortune_500[
+    fortune_500.get('Revenue_Dollars') &gt; 100 * 10**9
+].shape[0]
+# = 38</code></pre>
+    <p class="why"><strong>💡 模板：count via shape[0]</strong>。filter + <code>.shape[0]</code> = 行数。比 <code>.sum()</code> 或 <code>len()</code> 更标准。</p>
+    <p class="why"><strong>💡 教学意图</strong>：Q5.2 估、Q5.3 精确——验证你对 density histogram 的<u>读图</u>能力。一致 → 你读图对了；不一致 → 重新读图（或代码错）。</p>
+  </div>
+
+  <h2 id="pitfalls">⚠️ 典型陷阱</h2>
+  <div class="warn"><strong>陷阱 1</strong>：<code>strip('$')</code> 顺序——先去字符再 float。float('$611.29') 会报错。</div>
+  <div class="warn"><strong>陷阱 2</strong>：函数 .apply 传<u>名</u>不带 ()。带括号是调用。</div>
+  <div class="warn"><strong>陷阱 3</strong>：% Change 计算公式：<code>previous = current / (1 + pct/100)</code>，不是 <code>current / (1 + pct)</code>。</div>
+  <div class="warn"><strong>陷阱 4</strong>：先 filter '(No previous year)' 再转 float。否则 float 会报错。</div>
+  <div class="warn"><strong>陷阱 5</strong>：用 print() 函数返回 None，跟 return 不同。</div>
+  <div class="warn"><strong>陷阱 6</strong>：Q5.2 必须是 int（用 <code>int()</code> 包），不是 numpy int。</div>
+
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① <code>'$611.29'</code> 怎么变 611.29？为什么 strip 在 float 前面？</span></label>
+    <label><input type="checkbox"><span>② <code>.apply(func)</code> vs <code>.apply(func())</code> 的区别？什么时候带括号？</span></label>
+    <label><input type="checkbox"><span>③ Q4.1 的 previous = current / (1 + pct/100) 怎么推导？分母为什么不是 (1 + pct)？</span></label>
+    <label><input type="checkbox"><span>④ disemvowel 链式 .replace 为什么 work？每次返回什么？</span></label>
+    <label><input type="checkbox"><span>⑤ 函数 composition：num_non_vowels 复用 disemvowel —— 跟 HW 3 Q3.3 (monthly_payment 复用 interest+principal) 的关系？</span></label>
+    <label><input type="checkbox"><span>⑥ <code>np.array([max, min, len])</code> 为什么 work？Python 函数有什么特殊？</span></label>
+    <label><input type="checkbox"><span>⑦ Q5.2 (估) 跟 Q5.3 (精确) 怎么交叉验证？density histogram 怎么"看"出 count？</span></label>
+    <label><input type="checkbox"><span>⑧ print vs return 的本质区别？什么时候用哪个？</span></label>
+  </div>
+
+  <div class="tip" style="margin-top:48px;">
+    🎉 <strong>12 份 Practice walkthrough 完结！</strong>整套课程从 Lab 2 到 Lab 7、HW 2 到 HW 6、Midterm Project 全部已系统化。回到 <a href="index.html">Practice 目录</a> 看整体进度。
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="11-hw2-ikea-broadway-histograms.html">⬅ 上一份：HW 2</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a class="disabled">完结 🎉</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 06 · Lab 4 — Bootstrap &amp; German Tank · DSC10</title>
+<style>
+  :root { --bg:#fafaf7; --text:#1f2328; --muted:#57606a; --accent:#0969da; --code-bg:#1e1e2e; --code-text:#cdd6f4; --warn-bg:#fff8c5; --warn-border:#d4a72c; --tip-bg:#ddf4ff; --tip-border:#54aeff; --ok-bg:#dafbe1; --ok-border:#1a7f37; --tier-1:#cf222e; --tier-2:#bf8700; --tier-3:#6e7781; --border:#d0d7de; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.7; font-size:16px; }
+  .nav-top, .nav-bottom { background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:14px; flex-wrap:wrap; gap:8px; }
+  .nav-bottom { border-bottom:none; border-top:1px solid var(--border); margin-top:60px; }
+  .nav-top a, .nav-bottom a { color:var(--accent); text-decoration:none; margin-right:16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration:underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color:var(--muted); cursor:not-allowed; text-decoration:none; }
+  main { max-width:880px; margin:0 auto; padding:32px 24px 60px; }
+  h1 { font-size:28px; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:22px; margin-top:48px; border-left:4px solid var(--accent); padding-left:12px; }
+  h3 { font-size:18px; margin-top:28px; }
+  p, ul, ol { margin:12px 0; }
+  ul, ol { padding-left:28px; }
+  li { margin:4px 0; }
+  code { font-family:"Menlo","Monaco","Consolas",monospace; background:#eef0f2; padding:2px 6px; border-radius:4px; font-size:14px; color:#cf222e; }
+  pre { background:var(--code-bg); color:var(--code-text); padding:16px; border-radius:8px; overflow-x:auto; font-size:14px; line-height:1.5; margin:16px 0; }
+  pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:14px; }
+  .tier { display:inline-block; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:600; margin-right:8px; }
+  .tier-1 { background:#ffebe9; color:var(--tier-1); border:1px solid #ffcecb; }
+  .tier-2 { background:#fff8c5; color:var(--tier-2); border:1px solid #d4a72c; }
+  .meta { background:#f6f8fa; border-left:4px solid var(--accent); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .warn { background:var(--warn-bg); border-left:4px solid var(--warn-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .tip { background:var(--tip-bg); border-left:4px solid var(--tip-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .ok { background:var(--ok-bg); border-left:4px solid var(--ok-border); padding:10px 14px; margin:12px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .q-block { background:#fff; border:1px solid var(--border); border-radius:8px; padding:18px 20px; margin:22px 0; }
+  .q-id { display:inline-block; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:4px; margin-right:10px; letter-spacing:0.5px; }
+  .q-title { font-size:16px; font-weight:600; }
+  .q-stmt { color:var(--muted); font-size:14px; margin:10px 0; border-left:3px solid #d0d7de; padding-left:10px; font-style:italic; }
+  .think, .why { margin:12px 0; font-size:14.5px; }
+  .think strong { color:#6f42c1; }
+  .why strong { color:#1f883d; }
+  .checklist { background:#f0f9ff; border:1px solid #54aeff; border-radius:8px; padding:16px 20px; }
+  .checklist label { display:block; margin:8px 0; cursor:pointer; user-select:none; }
+  .checklist input[type="checkbox"] { margin-right:8px; transform:scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration:line-through; color:var(--muted); }
+  .toc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:24px 0; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { margin:4px 0; }
+  .toc a { color:var(--accent); text-decoration:none; }
+  .crosslink { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:20px 0; font-size:14px; }
+  .crosslink h4 { margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600; }
+  .crosslink ul { margin:4px 0; padding-left:20px; }
+  .crosslink a { color:var(--accent); text-decoration:none; }
+  table { border-collapse:collapse; width:100%; margin:16px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 12px; text-align:left; }
+  th { background:#f6f8fa; font-weight:600; }
+  hr { border:none; border-top:1px solid var(--border); margin:40px 0; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="05-lab5-su-chebyshev-sample-size.html">⬅ 上一份：Lab 5</a> | <a href="07-hw4-sampling-bootstrap.html">下一份 ➡：HW 4</a></span>
+</nav>
+
+<main>
+  <h1>Practice 06 · Lab 4 — Simulation, Sampling, Bootstrapping</h1>
+  <p class="meta">
+    <strong>原始截止</strong>：Thursday, May 7th 2026, 11:59 PM ｜
+    <strong>涵盖讲义</strong>：CIT 9.3（Simulation）+ CIT 10（Sampling）+ CIT 13.2（Bootstrapping） ｜
+    <strong>对应模块</strong>：Quiz 3 ｜
+    <strong>主题</strong>：模拟、估计 parameter、bootstrap 95% CI、with vs without replacement ｜
+    <strong>预计时长</strong>：3 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#overview">📋 作业概览 + 知识点回链</a></li>
+      <li><a href="#sec1">📚 Part 1 — Dungeons &amp; Dragons（Q1.1–1.6）模拟入门</a></li>
+      <li><a href="#sec2">📚 Part 2 — German Tank Problem（Q2.1–2.5）estimator 选择</a></li>
+      <li><a href="#sec3">📚 Part 3 — Resampling（Q3.1–3.5）bootstrap 基础</a></li>
+      <li><a href="#sec4">📚 Part 4 — Resampling via Simulation（Q4.1–4.5）bootstrap CI</a></li>
+      <li><a href="#sec5">📚 Part 5 — With or Without Replacement?（Q5）</a></li>
+      <li><a href="#pitfalls">⚠️ 本作业典型陷阱</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="overview">📋 作业概览</h2>
+
+  <p>Lab 4 是 Quiz 3 的<strong>核心 lab</strong>——把 bootstrap 的整套机制完整走一遍。逻辑链：</p>
+  <ol>
+    <li><strong>Part 1（D&amp;D）</strong>：练习模拟 + 引入"estimate parameter from sample"概念（用 min vs mean 两种方式估 modifier）。</li>
+    <li><strong>Part 2（German Tank）</strong>：经典统计 inference 案例——给一组坦克的 serial number，估计总产量 N。<u>区分</u> max-based 和 mean-based estimator。</li>
+    <li><strong>Part 3（Resampling）</strong>：解释什么是 bootstrap——有放回采样，与原样本大小相同。</li>
+    <li><strong>Part 4（Bootstrap CI）</strong>：用 simulate_estimates 函数把整个 bootstrap 流程封装，最后 percentile 取 95% CI。</li>
+    <li><strong>Part 5</strong>：直击 bootstrap 必须 <code>replace=True</code> 的原因。</li>
+  </ol>
+
+  <p><strong>Tier 速览</strong>：</p>
+  <ul>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q2.1：parameter vs statistic 区分（N 是 parameter，估计值是 statistic）。Quiz 3 必考。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q3.1：bootstrap 公式 <code>observations.sample(num_observations, replace=True)</code>。必背模板。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q4.3：95% bootstrap CI 取 <strong>2.5 和 97.5</strong> percentile（<u>不是</u> 5/95）。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q4.5：95% CI 的<u>正确</u>解读——"95% 的 intervals 包含 truth"，而<u>不是</u>"95% 概率 truth 在此 interval"。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q5：bootstrap 为什么必须 <code>replace=True</code>——不放回抽 n=原样本大小，每次都是原样本本身。</li>
+    <li><span class="tier tier-2">⭐⭐</span> Q2.4：mean-based estimate = 2 × sample mean（因为 uniform 1..N 的 mean ≈ N/2）。</li>
+  </ul>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链：</h4>
+    <ul>
+      <li>Bootstrap 流程、CI 构造 → <a href="../quiz3/02-bootstrap-ci.html#concepts">quiz3/02-bootstrap-ci</a></li>
+      <li>CI 解读（Q4.5 那个高频陷阱）→ <a href="../quiz3/03-ci-interpretation-spread.html#concepts">quiz3/03-ci-interpretation-spread</a></li>
+      <li>Parameter vs statistic、SRS → <a href="../quiz3/01-distributions-sampling.html#concepts">quiz3/01-distributions-sampling</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec1">📚 Part 1 — Dungeons &amp; Dragons</h2>
+
+  <p><strong>背景</strong>：D&amp;D 投 20 面骰，加 modifier，比阈值 17 算成功。Ashley 的角色 Saruman modifier = 11。这一节练模拟，然后<u>假装不知道 modifier</u>，从观察值估计。</p>
+
+  <!-- Q1.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.1</span><span class="q-title">单次模拟：<code>roll_result</code> / <code>modified_result</code> / <code>action_succeeded</code></span>
+<pre><code>possible_rolls = np.arange(1, 21)
+roll_result      = np.random.choice(possible_rolls)
+modified_result  = roll_result + 11
+action_succeeded = modified_result &gt;= 17</code></pre>
+    <p class="why"><strong>💡 <code>np.arange(1, 21)</code> 是 [1..20]</strong>（不含 21）。autograder 提示 "What values are possible when you roll a 20-sided die?"——就是怕你写成 <code>np.arange(20)</code>（=[0..19]）。</p>
+    <p class="why"><strong>💡 <code>action_succeeded</code> 是 bool</strong>——<code>&gt;= 17</code> 直接生成布尔值。<u>不</u>是 0/1 int。</p>
+  </div>
+
+  <!-- Q1.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.2</span><span class="q-title">10 次模拟 → <code>ten_reps</code></span>
+    <p class="q-stmt">"<strong>Do not</strong> use a for-loop here! Call <code>np.random.choice</code> with multiple arguments."</p>
+<pre><code>ten_reps = np.random.choice(possible_rolls, 10) + 11 &gt;= 17
+rough_success_chance = np.mean(ten_reps)</code></pre>
+    <p class="why"><strong>💡 <code>np.random.choice(arr, n)</code> 一次抽 n 个</strong>——返回 array。array + 标量 = 逐元素相加。<code>&gt;= 17</code> 也是逐元素 → bool array。<code>np.mean(bool_array)</code> = True 比例。</p>
+    <p class="why"><strong>💡 为什么不用 for</strong>：vectorized 速度比 for 快几十倍。lab 想让你养成"先想 vectorized 再想 for"的习惯。</p>
+  </div>
+
+  <!-- Q1.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.3</span><span class="q-title">理论概率 <code>theoretical_probability</code></span>
+<pre><code>theoretical_probability = 15 / 20   # 0.75</code></pre>
+    <p class="why"><strong>💡 推导</strong>：modifier = 11，需 roll + 11 ≥ 17 → roll ≥ 6。可能值 {6, 7, …, 20}，共 15 个。20 面骰每个等概率 → P(成功) = 15/20。</p>
+  </div>
+
+  <!-- Q1.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.4</span><span class="q-title"><code>simulate_modified_rolls()</code> 函数</span>
+<pre><code>modifier = 11
+num_rolls = 10
+
+def simulate_modified_rolls():
+    return np.random.choice(possible_rolls, num_rolls) + modifier
+
+modified_rolls = simulate_modified_rolls()</code></pre>
+    <p class="why"><strong>💡 返回 array of 10 modified rolls</strong>——每个数都是 12 到 31 之间（1+11 到 20+11）。注意函数体只一行，简单 reuse。</p>
+  </div>
+
+  <!-- Q1.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.5</span><span class="q-title">从 modified_rolls 估 modifier（min-based）</span>
+    <p class="q-stmt">"If we see that the smallest modified roll was 1, we know modifier = 0. If it's 13, we'll guess modifier = 13 − 1 = 12."</p>
+<pre><code>min_based_estimate = modified_rolls.min() - 1</code></pre>
+    <p class="why"><strong>💡 直觉</strong>：min(roll) 最小可能 = 1（骰子）。如果观察到的 min(modified) 是 m，那么<u>有可能</u> roll = 1 出现过，对应 modifier = m − 1。这是<u>下界</u>估计。</p>
+    <p class="why"><strong>💡 偏差</strong>：min-based estimate 总是<strong>偏低</strong>（除非真的运气好抽到 1）。因为 min(roll) 通常 &gt; 1，所以估出来的 modifier &gt; 真值。<u>注意</u>：少 10 次抽样的话很可能见不到 roll=1。</p>
+  </div>
+
+  <!-- Q1.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.6</span><span class="q-title"><code>estimate_modifier(nums)</code>（mean-based）</span>
+<pre><code>def estimate_modifier(nums):
+    '''Estimate the roll modifier based on observed modified rolls.'''
+    return np.mean(nums) - 10.5
+
+mean_based_estimate = estimate_modifier(modified_rolls)</code></pre>
+    <p class="why"><strong>💡 推导</strong>：1..20 的均值 = 10.5。所以 1+m, 2+m, …, 20+m 的均值 = 10.5 + m。已知样本均值 ≈ 10.5 + m → m ≈ sample_mean − 10.5。<u>这就是 mean-based estimator</u>。</p>
+    <p class="why"><strong>💡 比 min-based 更稳</strong>：用所有 10 个数（不只是 min），收敛快。但 mean-based 可能给出<u>非整数</u>（modifier 真值是 11，估出来 11.3 不奇怪），所以 lab 提示 "It's okay if your mean_based_estimate is not an integer."</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec2">📚 Part 2 — German Tank Problem</h2>
+
+  <p><strong>背景</strong>：二战盟军想估算德国坦克总产量 N。坦克 serial number 是 1..N。盟军看到的是 SRS 17 个 serial numbers。本节用同样的"max-based vs mean-based"对比，但这次主角变成了 N。</p>
+
+  <!-- Q2.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.1</span><span class="q-title">Parameter vs Statistic：<code>q2_1</code></span>
+    <p class="q-stmt">4 选项：1=N parameter, 估 parameter；2=N parameter, 估 statistic；3=N statistic, 估 parameter；4=N statistic, 估 statistic。</p>
+<pre><code>q2_1 = 2</code></pre>
+    <p class="why"><strong>💡 必背定义</strong>：
+      <ul>
+        <li><strong>Parameter</strong>：population 的某个数值（fixed but unknown）。N = 总坦克数 = parameter。</li>
+        <li><strong>Statistic</strong>：从 sample 算出来的数（random，随 sample 而变）。我们的估计 = statistic。</li>
+      </ul>
+      口诀："<u>p</u>arameter ↔ <u>p</u>opulation，<u>s</u>tatistic ↔ <u>s</u>ample"。每年 Quiz 3 都至少一题考这个区分。
+    </p>
+  </div>
+
+  <!-- Q2.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.2</span><span class="q-title"><code>plot_serial_numbers(df)</code></span>
+<pre><code>def plot_serial_numbers(df):
+    df.plot(kind='hist', y='serial_number', bins=np.arange(1, 202), ec='w')
+
+plot_serial_numbers(observations)</code></pre>
+    <p class="why"><strong>💡 bin 宽度 = 1</strong>：题目说 "bins of width 1 ranging from 1 to 200 inclusive" → <code>np.arange(1, 202)</code>（含 1，含 201 作为最后 bin 的右端）。<u>不</u>是 <code>np.arange(1, 200)</code>（不含 200）。</p>
+    <p class="why"><strong>💡 直方图应该"参差不齐"</strong>——17 个 serial number 散落在 1–200，所以 bin 高度大多是 0/density，少数是 ~0.06。</p>
+  </div>
+
+  <!-- Q2.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.3</span><span class="q-title">Max-based estimate</span>
+<pre><code>def calculate_max_based_estimate(nums):
+    return nums.max()
+
+max_based_estimate = calculate_max_based_estimate(observations.get('serial_number'))
+# = 135</code></pre>
+    <p class="why"><strong>💡 直觉</strong>：sample max ≤ N（任何坦克的 serial 都 ≤ 总产量）。所以 sample max 是 N 的<u>保守下界</u>。这次观察到的 17 个里最大是 135，所以 <strong>N ≥ 135</strong>。</p>
+    <p class="why"><strong>💡 偏差</strong>：max-based 总是<u>偏低</u>（≤ N），bias 大小取决于 sample 抽到接近 N 的元素的概率。这是 lab 想让你看到的：max-based 有偏。</p>
+  </div>
+
+  <!-- Q2.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.4</span><span class="q-title">Mean-based estimate（= 2 × sample mean）</span>
+<pre><code>def calculate_mean_based_estimate(nums):
+    return 2 * np.mean(nums)
+# 或 return nums.mean() * 2
+
+mean_based_estimate = calculate_mean_based_estimate(observations.get('serial_number'))
+# ≈ 122.47</code></pre>
+    <p class="why"><strong>💡 推导</strong>：population 是 uniform 1..N，mean = (N+1)/2 ≈ N/2（N 大时）。所以 sample_mean ≈ N/2 → N ≈ 2 × sample_mean。</p>
+    <p class="why"><strong>💡 验证</strong>：(47+42+57+79+26)/5 × 2 = 50.2 × 2 = 100.4。autograder 给了这个测试点 ✓</p>
+    <p class="why"><strong>💡 vs max-based</strong>：mean-based 用<u>所有</u> 17 个数，理论上更稳；但<u>这一次</u>抽样运气不好，<strong>122.47 &lt; max_based = 135</strong>，相当于估出来 N &lt; 135，跟我们已知 "N ≥ 135" 矛盾！这是 Q2.5 的关键。</p>
+  </div>
+
+  <!-- Q2.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.5</span><span class="q-title"><code>q2_5</code> mean_based_estimate 与 N 的关系</span>
+    <p class="q-stmt">5 个选项：1/2 是各种"≥ N"；3 是"definitely lower by at least 12"；4/5 是其他。</p>
+<pre><code>q2_5 = 3   # definitely lower by at least 12</code></pre>
+    <p class="why"><strong>💡 推理链</strong>：
+      <ol>
+        <li>max-based estimate = 135 → N ≥ 135（任何 sample max 都是 N 的下界）。</li>
+        <li>mean-based estimate ≈ 122.47 → 122.47 比 135 低 12+。</li>
+        <li>所以 mean-based <strong>必然</strong> 比 N 低 至少 12（因为 N ≥ 135 但 mean-based ≈ 122.47）。</li>
+      </ol>
+    </p>
+    <p class="why"><strong>💡 教学意图</strong>：lab 想让你看到——单一 sample 上 mean-based 不一定优于 max-based。需要<u>多次</u> sampling 才能判断哪个 estimator 平均更好。这就引出 bootstrap：用 resampling 模拟"如果再抽一遍会怎样"。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec3">📚 Part 3 — Resampling</h2>
+
+  <!-- Q3.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.1</span><span class="q-title"><code>simulate_resample()</code>：bootstrap 必备模板</span>
+<pre><code>def simulate_resample():
+    return observations.sample(num_observations, replace=True)
+
+one_resample = simulate_resample()</code></pre>
+    <p class="why"><strong>💡 必背模板</strong>：bootstrap = 从原 sample <u>有放回</u>抽 <u>n（=原 sample 大小）</u>个。这里 <code>num_observations = 17</code>。autograder 提示 "Make sure to sample with replacement!"——<u>必须</u> <code>replace=True</code>。</p>
+    <p class="why"><strong>💡 为什么大小要相同</strong>：bootstrap 的精神是"模拟一次平行宇宙的 SRS"。每次 SRS 的大小就是 n，所以 resample 也要 n。如果不同大小，<u>就不再是</u>"模拟同样过程"了。</p>
+  </div>
+
+  <!-- Q3.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.2</span><span class="q-title">画 resample 直方图（reuse Q2.2 函数）</span>
+<pre><code>plot_serial_numbers(one_resample)
+plot_serial_numbers(observations)</code></pre>
+    <p class="why"><strong>💡 观察</strong>：resample 的 histogram 跟 original 类似——同样的 17 个 serial number 框架，但因为有放回，<u>有些重复</u>（柱子比原 sample 高），<u>有些缺失</u>。</p>
+  </div>
+
+  <!-- Q3.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.3</span><span class="q-title">关于 resample 的 true statements</span>
+    <p class="q-stmt">4 个选项：1=resample 元素都来自原 sample；2=resample 总有重复；3=resample max 总等于 original max；4=original 无重复 serial。</p>
+<pre><code>true_statements = [1, 4]</code></pre>
+    <p class="why"><strong>💡 选项 1 ✓</strong>：bootstrap 是<u>从原 sample</u> 抽——元素肯定都来自原 sample。</p>
+    <p class="why"><strong>💡 选项 2 ✗</strong>：resample 可能没有重复（概率小但非 0）。比如 17 次抽样恰好抽到 17 个不同的——概率是 17!/(17^17) × C(17,17) 约 1.6×10⁻⁶（很小但不是 0）。所以"<u>总</u>有重复"错。</p>
+    <p class="why"><strong>💡 选项 3 ✗</strong>：resample max 可能小于 original max（如果没抽到原 sample 的最大元素）。如 original max = 135，resample 没抽到 135 → resample max ≤ 108（次大）。</p>
+    <p class="why"><strong>💡 选项 4 ✓</strong>：original observations 是 SRS without replacement 从 1..N，所以 17 个 serial 都不同。</p>
+  </div>
+
+  <!-- Q3.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.4</span><span class="q-title">两次 resample + 两个 estimate（for loop）</span>
+<pre><code>for i in np.arange(2):
+    resample = simulate_resample()
+    plot_serial_numbers(resample)
+    plt.show()
+    mean_est = calculate_mean_based_estimate(resample.get('serial_number'))
+    max_est  = calculate_max_based_estimate(resample.get('serial_number'))
+    print(f"Mean-based estimate for resample {i+1}:", mean_est)
+    print(f"Max-based estimate for resample {i+1}:",  max_est)
+    print('\n')</code></pre>
+    <p class="why"><strong>💡 观察</strong>：两次 resample 的 mean-based 数值<u>不同</u>（因 randomness），但 max-based 大概率<u>相同</u>（都 = 135，除非那次没抽到 135）。这暗示：mean-based 的<u>variance</u> 更大但<u>无偏</u>，max-based 的 variance 小但<u>有偏</u>（永远 ≤ N）。</p>
+  </div>
+
+  <!-- Q3.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.5</span><span class="q-title">P(resample max = 135) 精确概率</span>
+    <p class="q-stmt">"What's the chance that a resample's max is exactly 135?"</p>
+<pre><code>q3_5 = 1 - (16/17) ** 17   # ≈ 0.6432</code></pre>
+    <p class="why"><strong>💡 推导</strong>：resample max = 135 ⟺ <u>至少一次</u>抽到 135。所以 P(=135) = 1 − P(从来没抽到 135) = 1 − (16/17)<sup>17</sup>。<br>
+      每次抽样有 1/17 概率抽到 135，所以 17 次都不抽到的概率是 (16/17)<sup>17</sup>。
+    </p>
+    <p class="why"><strong>💡 数值 ≈ 0.64</strong>：约 64% 的 resample 会包含原 max。这意味着 max-based estimator 的 bootstrap 分布有<u>明显峰</u>在 135，剩下 36% 散落在更小的值上。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec4">📚 Part 4 — Resampling via Simulation</h2>
+
+  <!-- Q4.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.1</span><span class="q-title">通用 <code>simulate_estimates(df, size, statistic, reps)</code></span>
+<pre><code>def simulate_estimates(original_df, sample_size, statistic, repetitions):
+    estimates = np.array([])
+    for i in np.arange(repetitions):
+        sample = original_df.sample(sample_size, replace=True)
+        estimates = np.append(estimates, statistic(sample.get('serial_number')))
+    return estimates</code></pre>
+    <p class="why"><strong>💡 高阶函数</strong>：<code>statistic</code> 参数本身是个函数（如 calculate_mean_based_estimate）。这是 Python 的 first-class function——函数可以当参数。lab 想让你练这个"工厂模式"。</p>
+    <p class="why"><strong>💡 注意参数顺序</strong>：original_df, sample_size, statistic, repetitions。如果传错顺序，autograder 抓不出（参数类型不同会让 TypeError 出现）。</p>
+  </div>
+
+  <!-- Q4.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.2</span><span class="q-title">5000 次 bootstrap → <code>bootstrap_estimates</code></span>
+<pre><code>bootstrap_estimates = simulate_estimates(
+    observations, num_observations, calculate_mean_based_estimate, 5000
+)</code></pre>
+    <p class="why"><strong>💡 一行调用</strong>：把通用函数填上参数即可。observations（原数据），num_observations（=17，原大小），mean-based 函数，5000 次重抽。</p>
+  </div>
+
+  <!-- Q4.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.3</span><span class="q-title">95% bootstrap CI（必背：2.5 / 97.5！）</span>
+<pre><code>left_end  = np.percentile(bootstrap_estimates, 2.5)
+right_end = np.percentile(bootstrap_estimates, 97.5)</code></pre>
+    <p class="why"><strong>💡 必背公式</strong>：c% CI 的两个 percentile = (100−c)/2 和 (100+c)/2。
+      <ul>
+        <li>95% → 2.5 / 97.5</li>
+        <li>90% → 5 / 95</li>
+        <li>99% → 0.5 / 99.5</li>
+        <li>80% → 10 / 90</li>
+      </ul>
+    </p>
+    <div class="warn"><strong>⚠️ 高频陷阱</strong>：95% CI 写成 <code>np.percentile(arr, 5)</code> 和 <code>np.percentile(arr, 95)</code> 是<u>90% CI</u>，不是 95%。autograder 这里测 <code>left_end ∈ (90, 100)</code> 和 <code>right_end ∈ (145, 155)</code>，如果用 5/95 数值会偏窄。</div>
+  </div>
+
+  <!-- Q4.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.4</span><span class="q-title">假设 N = 150，整套流程再来一遍</span>
+<pre><code>population = bpd.DataFrame().assign(serial_number=np.arange(1, 150 + 1))
+new_observations = population.sample(70, replace=False)   # SRS without replacement
+
+new_bootstrap_estimates = simulate_estimates(
+    new_observations, 70, calculate_mean_based_estimate, 5000
+)
+
+new_left_end  = np.percentile(new_bootstrap_estimates, 2.5)
+new_right_end = np.percentile(new_bootstrap_estimates, 97.5)</code></pre>
+    <p class="why"><strong>💡 注意两个 sample 的区别</strong>：
+      <ul>
+        <li>"原 sample" = SRS <u>without</u> replacement from population（这是<u>现实</u>抽 tanks 的方式）。</li>
+        <li>"resample" = SRS <u>with</u> replacement from "原 sample"（bootstrap 的特点）。</li>
+      </ul>
+      Q4.4 两步都要：先 sample(70, replace=False) 得到 new_observations；再 bootstrap (replace=True) 5000 次。
+    </p>
+  </div>
+
+  <!-- Q4.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.5</span><span class="q-title">CI 覆盖 N 的比例 <code>q4_5</code>（CI 解读 ⭐⭐⭐）</span>
+<pre><code>q4_5 = 3   # 95%</code></pre>
+    <p class="why"><strong>💡 CI 95% 的正确解读</strong>：如果重复"从 population 抽 SRS → bootstrap → 取 95% CI"这个<u>过程</u> 1000 次，约 95% 的 CI 会包含真 N。这里只算了 1 个 CI，但 "if we repeated this many times, 95% of intervals would cover" 是 95% CI 的定义。</p>
+    <div class="warn"><strong>⚠️ 错误解读（必避免）</strong>：
+      <ul>
+        <li>❌ "95% 的概率 N 在这个 CI 里" —— N 是<u>固定的</u>，CI 也是<u>固定的</u>，要么在要么不在，概率不是 95%。</li>
+        <li>❌ "95% 的 N 落在 CI 里" —— N 只有<u>一个</u>，谈不上 95%。</li>
+        <li>✅ "重复该<u>过程</u>多次时，约 95% 的<u>intervals</u> 包含 truth"。<strong>必背</strong>。</li>
+      </ul>
+      Quiz 3 / Quiz 4 / Final 每一次都考。详见 <a href="../quiz3/03-ci-interpretation-spread.html#concepts">quiz3/03-ci-interpretation-spread</a>.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec5">📚 Part 5 — With or Without Replacement?</h2>
+
+  <!-- Q5.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.1</span><span class="q-title">不放回重抽 5000 次 → <code>estimates_without_replacement</code></span>
+    <p class="q-stmt">"Don't use simulate_estimates (which is with replacement). Write your own loop with <code>replace=False</code>."</p>
+<pre><code>estimates_without_replacement = np.array([])
+for i in np.arange(5000):
+    sample = original_sample.sample(70, replace=False)
+    est = calculate_mean_based_estimate(sample.get('serial_number'))
+    estimates_without_replacement = np.append(estimates_without_replacement, est)</code></pre>
+    <p class="why"><strong>💡 关键观察</strong>：original_sample.shape[0] = 70，sample(70, replace=False) → <u>取出全部 70 个</u>，每次完全相同。所以 mean 也完全相同。<code>np.all(np.isclose(estimates, 149.514...))</code> 永远 True——5000 个值<u>一模一样</u>。</p>
+  </div>
+
+  <!-- Q5.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 5.2</span><span class="q-title">为什么 bootstrap 必须 with replacement？</span>
+    <p class="why"><strong>💡 核心理由</strong>：bootstrap 是要<u>模拟从 population 反复抽 SRS</u> 这件事。如果不放回抽 n（=原 sample 大小）个，<u>必然</u> 抽出原样本本身——根本没有"variability"，无法生成不同 estimate 的分布。<br>
+      <strong>必须 <code>replace=True</code></strong>：有放回让 resample 之间真的<u>不同</u>，从而 estimate 分布有 spread，才能做 percentile CI。
+    </p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="pitfalls">⚠️ 本作业典型陷阱</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：bootstrap 必须 <code>replace=True</code>，size = 原 sample size</strong><br>
+    Q3.1 写错的两种：① 漏了 <code>replace=True</code>（默认 False，结果跟原样本一样）；② size 写错了不等于 num_observations。两个错误都让 bootstrap 失效。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：95% CI 用 2.5 / 97.5 percentile，不是 5 / 95</strong><br>
+    Q4.3。c% CI 公式：(100−c)/2 和 (100+c)/2。考试反复考。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：CI 解读（Q4.5）</strong><br>
+    "95% intervals from this process contain truth"<u>才</u>对。"95% probability truth is in this interval" 错（truth 和 interval 都是固定的）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：parameter vs statistic（Q2.1）</strong><br>
+    N（population 总数）= parameter；从 sample 算的估计 = statistic。考试考这区分时常常加干扰项（如把 "estimate" 说成"true value"）。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：估计 N 时 max-based 是 lower bound</strong><br>
+    Q2.5：sample max ≤ N 永远成立。所以"max-based 估计是 N 的<u>下界</u>"——如果你的另一个 estimator（如 mean-based）算出来比 max-based 还小，那它必然低估了 N。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：mean-based estimator 公式 = 2 × sample mean</strong><br>
+    Q2.4。基于 uniform 1..N 的 mean ≈ N/2。<u>不</u>是 sample mean × 1，<u>不</u>是 sample mean − 0.5。这跟 Q1.6 的 mean − 10.5 是同一思想：用 sample mean 反推 population 参数。
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① <code>np.random.choice(arr, n)</code> 跟 for-loop 抽 n 次的关系？为什么 vectorized 更优？</span></label>
+    <label><input type="checkbox"><span>② min-based 和 mean-based estimator 各自的优缺点？什么时候哪个更好？</span></label>
+    <label><input type="checkbox"><span>③ German Tank：为什么 sample max ≤ N 永远成立？这怎么帮我们判断其他 estimator 的偏差？</span></label>
+    <label><input type="checkbox"><span>④ Mean-based estimator = 2 × sample mean 怎么推的？为什么乘 2？</span></label>
+    <label><input type="checkbox"><span>⑤ Parameter vs Statistic：定义？哪个 fixed、哪个 random？口诀？</span></label>
+    <label><input type="checkbox"><span>⑥ Bootstrap 公式：<code>orig.sample(n, replace=True)</code>——为什么 n 必须等于原大小？为什么必须 with replacement？</span></label>
+    <label><input type="checkbox"><span>⑦ Q3.5：P(resample max = original max) = 1 − (16/17)<sup>17</sup>。推导？为什么是"至少一次"？</span></label>
+    <label><input type="checkbox"><span>⑧ Q4.3：95% CI = (2.5, 97.5) percentile，<u>不是</u> (5, 95)。公式 (100−c)/2 怎么用？</span></label>
+    <label><input type="checkbox"><span>⑨ Q4.5：CI 的<u>正确</u>解读？"95% probability truth is in CI" 为什么错？</span></label>
+    <label><input type="checkbox"><span>⑩ Q5：为什么 bootstrap 必须 <code>replace=True</code>？不放回会发生什么？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="05-lab5-su-chebyshev-sample-size.html">⬅ 上一份：Lab 5</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="07-hw4-sampling-bootstrap.html">下一份 ➡：HW 4</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 3 · p-values &amp; Decisions - DSC10 Quiz4</title>
+<style>
+  :root { --bg: #fafaf7; --text: #1f2328; --muted: #57606a; --accent: #0969da; --accent-bg: #ddf4ff; --code-bg: #1e1e2e; --code-text: #cdd6f4; --warn-bg: #fff8c5; --warn-border: #d4a72c; --tip-bg: #ddf4ff; --tip-border: #54aeff; --danger-bg: #ffebe9; --danger-border: #cf222e; --ok-bg: #dafbe1; --ok-border: #1a7f37; --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781; --border: #d0d7de; --q-bg: #f6f8fa; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📕 Quiz4 总目录</a></span>
+  <span><a href="02-hypothesis-testing-fundamentals.html">← 上一节</a> <a href="04-tvd-categorical.html">下一节: TVD →</a></span>
+</nav>
+
+<main>
+  <h1>Section 3 · p-values &amp; Decisions</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 20（Hypothesis Testing &amp; Total Variation Distance 前半）｜
+    <strong>Quiz 4 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1</span>（几乎每年都有 p-value 决策题）｜
+    <strong>预计学习时间</strong>：1-1.5 小时
+  </p>
+
+  <div class="meta">
+    <strong>🎯 本节定位</strong>：Lec 19 教了 hypothesis test 的"流程"，本节给它<strong>定量决策标准</strong> —— p-value、cutoff 0.05/0.01、reject vs fail to reject。每个 Quiz 4 都会出至少一道 "p = 0.03 → 该怎么办" 的判断题，速答率必须 100%。
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a></li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 真题 &amp; 练习</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>一句话</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>p-value 定义</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>"在 null 假设下，看到 observed 或更极端的概率"，是 tail area</td>
+      </tr>
+      <tr>
+        <td>p-value 代码：<code>np.count_nonzero(sim &gt;= obs) / N</code></td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>用 <code>&gt;=</code> 或 <code>&lt;=</code>（含 observed 本身），别用严格大小</td>
+      </tr>
+      <tr>
+        <td>左尾 vs 右尾</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>看 alt 方向：大值偏 alt 用 <code>&gt;=</code>；小值偏 alt 用 <code>&lt;=</code></td>
+      </tr>
+      <tr>
+        <td>0.05 / 0.01 cutoff conventions</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>p &lt; 0.05 → "statistically significant"；p &lt; 0.01 → "highly significant"</td>
+      </tr>
+      <tr>
+        <td>Reject / Fail to reject</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td><strong>永不 "accept"</strong>；p &lt; cutoff → reject；p ≥ cutoff → fail to reject</td>
+      </tr>
+      <tr>
+        <td>p-value 解读陷阱</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>p-value <strong>不是</strong> "null 为真的概率"；也<strong>不是</strong> "data 出错的概率"</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3>1. p-value：让"罕见"量化</h3>
+
+  <div class="formula formula-big">
+    p-value = P( test stat 等于 observed 或更极端 | null 为真 )
+  </div>
+
+  <p>"<strong>更极端</strong>"的方向取决于 alt：</p>
+  <ul>
+    <li>如果 alt 让<strong>大值</strong>偏 alt（右尾）→ 更极端 = <em>大于等于</em> observed</li>
+    <li>如果 alt 让<strong>小值</strong>偏 alt（左尾）→ 更极端 = <em>小于等于</em> observed</li>
+  </ul>
+
+  <p>正式名字：<em>observed significance level</em>。</p>
+
+  <h3>2. 从 empirical distribution 算 p-value</h3>
+
+  <p>Simulate under null 得到 array <code>results</code>（长度 N），observed statistic 是 <code>obs</code>：</p>
+
+  <pre><code># 大值偏 alt（右尾）—— 比如 "A 比 B 大"
+p_value = np.count_nonzero(results &gt;= obs) / N
+
+# 小值偏 alt（左尾）—— 比如 "硬币偏 tails，heads 数量少"
+p_value = np.count_nonzero(results &lt;= obs) / N
+
+# 双边（带 abs 的 test stat）—— observed 也已经是 abs 后的，方向只有 "大"
+p_value = np.count_nonzero(results &gt;= obs) / N</code></pre>
+
+  <div class="warn">
+    ⚠️ <strong>用 <code>&gt;=</code> 或 <code>&lt;=</code>，不要用 <code>&gt;</code> 或 <code>&lt;</code></strong>。p-value 定义里包含 "等于 observed" 的情况 —— observed 本身也算"或更极端"。
+  </div>
+
+  <h3>3. 决策：p-value 和 cutoff 比</h3>
+
+  <table>
+    <thead><tr><th>条件</th><th>结论</th><th>常用措辞</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>p &lt; <strong>0.01</strong></td>
+        <td><strong>Reject</strong> the null（at both 0.01 and 0.05）</td>
+        <td>"<em>highly</em> statistically significant"</td>
+      </tr>
+      <tr>
+        <td>0.01 ≤ p &lt; <strong>0.05</strong></td>
+        <td>At 0.05: <strong>Reject</strong> ｜ At 0.01: <strong>Fail to reject</strong></td>
+        <td>"statistically significant" at 0.05 only</td>
+      </tr>
+      <tr>
+        <td>p ≥ <strong>0.05</strong></td>
+        <td><strong>Fail to reject</strong> the null（at both）</td>
+        <td>"not significant"</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="danger">
+    <strong>🔥 永远不要说 "accept the null"</strong>。Null hypothesis 可能<em>看起来 plausible</em>，但也可能有其他没考虑的解释。所以我们只能说 "fail to reject"。<br><br>
+    考试出现 "accept the null" 选项时，<strong>一定是错的</strong>，可以直接排除。
+  </div>
+
+  <h3>4. p-value 的精确解读</h3>
+
+  <div class="tip">
+    <strong>✅ 正确说法</strong>：
+    <ul>
+      <li>"在 null 假设为真的前提下，看到 observed 或更极端的概率是 p"</li>
+      <li>"If null is true, the probability of seeing a difference as or more extreme as observed is about p"</li>
+    </ul>
+  </div>
+
+  <div class="danger">
+    <strong>❌ 错误说法</strong>（考试常以选项形式出现）：
+    <ul>
+      <li>❌ "p-value 是 null 为真的概率"（hypothesis 不是 random variable，没有"为真的概率"）</li>
+      <li>❌ "p-value 是 alt 为真的概率"</li>
+      <li>❌ "p-value 是数据出错的概率"</li>
+      <li>❌ "p-value 是 1 减去 null 为真的概率"</li>
+      <li>❌ "If alt is true, probability of seeing observed is p"（条件颠倒了，应该是 if null is true）</li>
+      <li>❌ "p-value 为 0 说明代码错了"（不一定 —— 极罕见 observed 完全可能导致 simulation 中从未达到，p ≈ 0）</li>
+      <li>❌ "p-value 为 0.5 说明 simulation 错了"（也不一定 —— 0.5 就是中间值，说明 null 完全 plausible）</li>
+    </ul>
+  </div>
+
+  <h3>5. Left or right tail？</h3>
+
+  <p>方向决定用 <code>&gt;=</code> 还是 <code>&lt;=</code>。回顾 Section 2 的决策树：</p>
+
+  <table>
+    <thead><tr><th>Alt 形式</th><th>Test stat 通常是</th><th>"更极端" 方向</th><th>代码</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>A &gt; B</td>
+        <td>A − B（不带 abs）</td>
+        <td>右尾（大值偏 alt）</td>
+        <td><code>sim &gt;= obs</code></td>
+      </tr>
+      <tr>
+        <td>A &lt; B</td>
+        <td>A − B（不带 abs）</td>
+        <td>左尾（小值偏 alt）</td>
+        <td><code>sim &lt;= obs</code></td>
+      </tr>
+      <tr>
+        <td>different / not equal</td>
+        <td>|A − B|（带 abs）</td>
+        <td>右尾（abs 后小值偏 null，大值偏 alt）</td>
+        <td><code>sim &gt;= obs</code></td>
+      </tr>
+      <tr>
+        <td>"coin 偏 tails"（heads 少）</td>
+        <td>number of heads</td>
+        <td>左尾</td>
+        <td><code>sim &lt;= obs</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>6. 完整例子：硬币 188 heads 公平吗？（Lec 20）</h3>
+
+  <p>Found a coin, flipped 400 times, got 188 heads。问硬币公不公平。</p>
+
+  <ul>
+    <li><strong>Null</strong>: coin is fair (P(heads) = 0.5)</li>
+    <li><strong>Alt</strong>: coin is not fair（双边）</li>
+    <li><strong>Test stat</strong>: <code>|number of heads − 200|</code>（双边用 abs）</li>
+    <li><strong>Observed</strong>: |188 − 200| = 12</li>
+  </ul>
+
+  <pre><code>results = np.array([])
+for i in np.arange(10000):
+    one = abs(np.random.multinomial(400, [0.5, 0.5])[0] - 200)
+    results = np.append(results, one)
+
+# p-value：abs 后大值偏 alt → 右尾
+p_value = np.count_nonzero(results &gt;= 12) / 10000
+# ≈ 0.25 -ish</code></pre>
+
+  <p>得到 p ≈ 0.25 → <strong>fail to reject</strong> the null（&gt; 0.05）→ 硬币<em>看起来</em>是公平的。</p>
+
+  <p class="warn">⚠️ Lec 20 的 <em>另一种</em> 写法：用 <code>number of heads</code>（无 abs）作 test stat 是<em>错的</em>（因为双边，但 number of heads 单方向）—— Lec 19 已经讨论过。考试要识别这种"用错 test stat 类型"的写法。</p>
+
+  <h3>7. 5% Cutoff 的"双重解读"</h3>
+
+  <p>用 5% cutoff 的含义：</p>
+
+  <div class="formula">
+    <strong>如果 null 是真的</strong>，我们用这个流程会错误地 reject 它约 5% 的次数。
+  </div>
+
+  <p>也叫 <strong>significance level（α）</strong>。常见值：</p>
+  <ul>
+    <li><strong>α = 0.05</strong>：standard（5%）</li>
+    <li><strong>α = 0.01</strong>：highly significant（1%）</li>
+    <li>α = 0.10 也偶有用到</li>
+  </ul>
+
+  <p class="meta">💡 Cutoff 是<strong>历史习惯</strong>，并非数学必然。但 DSC 10 考试默认 0.05 (standard)；如果题目说 "highly significant"，就是 0.01。</p>
+
+  <h3>8. Determining a cutoff：lowest 5%（Lec 20）</h3>
+
+  <p>"Sufficiently rare" 的精确定义之一：observed statistic 落在 lowest 5%（左尾题）或 highest 5%（右尾题）。</p>
+
+  <p>用 percentile 求 cutoff 值：</p>
+
+  <pre><code># 左尾题（如硬币偏 tails，看 heads 少）
+np.percentile(results, 5)
+# 比如 184 → 如果 observed < 184，reject
+
+# 右尾题（如双边 |heads-200|）
+np.percentile(results, 95)
+# 比如 24 → 如果 observed > 24，reject</code></pre>
+
+  <h3>9. p-value 决策表（背在桌前）</h3>
+
+  <div class="tip">
+    <strong>万能决策表</strong>：
+    <ul>
+      <li>p &lt; 0.01 → reject at 0.01 ✓，reject at 0.05 ✓</li>
+      <li>0.01 ≤ p &lt; 0.05 → fail to reject at 0.01，reject at 0.05</li>
+      <li>p ≥ 0.05 → fail to reject at both</li>
+    </ul>
+  </div>
+
+  <h4>试一试</h4>
+
+  <table>
+    <thead><tr><th>p-value</th><th>at 0.01</th><th>at 0.05</th><th>"significant"?</th></tr></thead>
+    <tbody>
+      <tr><td>0.001</td><td>reject</td><td>reject</td><td>highly significant</td></tr>
+      <tr><td>0.04</td><td>fail to reject</td><td>reject</td><td>statistically significant</td></tr>
+      <tr><td>0.05</td><td>fail to reject</td><td>fail to reject</td><td>borderline，标准约定上算 not significant</td></tr>
+      <tr><td>0.14</td><td>fail to reject</td><td>fail to reject</td><td>not significant</td></tr>
+      <tr><td>0.5</td><td>fail to reject</td><td>fail to reject</td><td>not significant</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <h3>陷阱 1：⭐ "Accept the null"</h3>
+  <p>永远不对！只能 "fail to reject"。考题里看到 "accept" 选项，<strong>直接排除</strong>。</p>
+
+  <h3>陷阱 2：⭐ p-value 解读错误</h3>
+  <p>p-value <strong>不是</strong>："null 为真的概率"、"alt 为真的概率"、"data 出错的概率"。它<strong>是</strong>："给定 null 为真，看到 observed 或更极端的概率"。<br>
+  Wi25 Q5 P1.2 整道题就是这个考点的多选陷阱（5 个选项里几乎全都是错的解读）。</p>
+
+  <h3>陷阱 3：⭐ 左/右尾用错符号</h3>
+  <p>Test stat 是 <code>mean_A − mean_B</code>，alt 是 "A 比 B 小"（左尾）→ p-value 必须用 <code>sim &lt;= obs</code>。<br>
+  Test stat 是 <code>|...|</code> 或 <code>diff^2</code>（恒非负），观测值偏 alt 总是"大" → 用 <code>sim &gt;= obs</code>。</p>
+
+  <h3>陷阱 4：用 <code>&gt;</code> 而不是 <code>&gt;=</code></h3>
+  <p>包括 observed 本身（"as or more extreme as"）。考试代码题里 <code>&gt;</code> 经常是干扰选项。</p>
+
+  <h3>陷阱 5：p-value 0 不一定代表 bug</h3>
+  <p>如果 observed 极度极端（在 10000 次 simulation 中都没出现），就会得到 0.0。这恰好是 reject 最强的证据，不是代码错。<br>
+  Wi25 Q5 P1.2 选项 "p-value = 0 说明 permutation test 实现错了" —— <strong>错</strong>。</p>
+
+  <h3>陷阱 6：p-value 0.05 算 reject 吗？</h3>
+  <p>严格意义上 cutoff 是 <em>strictly less than</em> 0.05 才 reject。所以 p = 0.05 通常算 "fail to reject"。但课堂常用 "≤ 0.05 reject" 的说法 —— <strong>不会考边界情形</strong>，所以这点不用太紧张。考试给的 p-value 通常远离 0.05（如 0.001、0.03、0.14、0.5）。</p>
+
+  <h3>陷阱 7：连续 cutoff 测试</h3>
+  <p>"是否在 0.01 和 0.05 显著" 是常见双选题。要会同时判断：p = 0.03 → at 0.05 reject，at 0.01 fail to reject。<strong>不要</strong>选 "both reject" 或 "both fail to reject"。</p>
+
+  <h3>陷阱 8：reject ≠ "证明 alt 为真"</h3>
+  <p>Reject 只是说 null 看起来不合理；不等于 alt 一定对。Deflategate 例子尤其强调：reject 不能推 causation。</p>
+
+  <h2 id="problems">📝 真题 &amp; 练习</h2>
+
+  <h3>真题 1：Sp25 Q4 P1.2 ⭐⭐⭐（p=0.03 决策）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2025 Quiz 4, Problem 1.2 (Lec 20)</div>
+    <p>Null: 录取率 = 0.20；Alt: 录取率 &gt; 0.20。Test stat 是 number of offers (out of 50)。p-value = 0.03。结论？</p>
+    <ol type="A">
+      <li>Reject at both 0.01 and 0.05</li>
+      <li>Fail to reject at 0.01, reject at 0.05</li>
+      <li>Reject at 0.01, fail to reject at 0.05</li>
+      <li>Fail to reject at both</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：B</strong>。0.01 &lt; 0.03 &lt; 0.05，所以 0.05 reject、0.01 fail to reject。</p>
+      <p class="warn">陷阱：选项 C 是 "0.01 reject, 0.05 fail to reject" —— 方向反了，永远不会出现（cutoff 越小越严格）。</p>
+    </details>
+  </div>
+
+  <h3>真题 2：Sp24 Q5 P1.3 ⭐⭐⭐（p=0.04 多选）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2024 Quiz 5, Problem 1.3 (Lec 20)</div>
+    <p>Permutation test for road vs hybrid bikes，p = 0.04。多选下面正确的：</p>
+    <ol type="A">
+      <li>Reject at 0.01</li>
+      <li>Fail to reject at 0.01</li>
+      <li>Reject at 0.05</li>
+      <li>Fail to reject at 0.05</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：B 和 C</strong>。p = 0.04 在 0.01 和 0.05 之间。</p>
+    </details>
+  </div>
+
+  <h3>真题 3：Fa24 Q4 P4.2 ⭐⭐（p=0.14）</h3>
+  <div class="q-block">
+    <div class="q-source">Fall 2024 Quiz 4, Problem 4.2 (Lec 20)</div>
+    <p>p = 0.14，用 standard cutoff 0.05。哪个 hypothesis 更被 data 支持？</p>
+    <ol type="A">
+      <li>Null</li>
+      <li>Alternative</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：A. Null</strong>。p = 0.14 &gt; 0.05 → fail to reject → data 与 null consistent → null 更被支持。<br>
+      <span class="warn">⚠️ 注意："更被支持" ≠ "证明 null 为真"。考试措辞如果是 "we accept the null" 就要选错。</span></p>
+    </details>
+  </div>
+
+  <h3>真题 4：Wi25 Q5 P1.2 ⭐⭐⭐（p-value 解读多选 陷阱密集）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 5, Problem 1.2 (Lec 20)</div>
+    <p>Permutation test，关于 p-value 解读，多选正确的：</p>
+    <ol type="A">
+      <li>If p = 0.18, this means that if the <strong>alternative hypothesis</strong> is true, the probability of seeing a difference as or more extreme as observed is about 18%.</li>
+      <li>If p = 0.03, this means that if the <strong>null hypothesis</strong> is true, the probability of seeing a difference as or more extreme as observed is about 3%.</li>
+      <li>If p = 0, this means that we implemented our permutation test incorrectly.</li>
+      <li>If p = 0.5, this means that exactly half of the simulated test statistics were less extreme than our observed difference.</li>
+      <li>None of the above.</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：B 和 D 都对</strong>（官方）。</p>
+      <ul>
+        <li><strong>A 错</strong>：条件应该是"if null"，不是"if alt"。这是最常见的错误措辞。</li>
+        <li><strong>B 对</strong>：正确解读。"if null is true" + "or more extreme" 都满足。</li>
+        <li><strong>C 错</strong>：p = 0 是合法的，意味着 simulation 中从未达到 observed 的极端程度（说明 observed 非常极端）。不是代码错。</li>
+        <li><strong>D 对</strong>（⚠️ 易错）：p-value 定义为 <code>count(simulated &gt;= observed) / N</code>。p = 0.5 意味着<strong>恰好一半</strong> simulated stats &gt;= observed（即"as or more extreme"），因此<strong>恰好另一半</strong> simulated stats &lt; observed（即 less extreme than observed）。D 的措辞字面成立。</li>
+      </ul>
+      <p class="warn"><strong>陷阱</strong>：D 的字眼"<em>exactly</em> half"和"<em>less extreme</em>"乍看像是想坑你，但其实 p = 0.5 是数学上的精确分界点——刚好一半 ≥ observed、一半 &lt; observed，所以"恰好一半 less extreme" 完全准确。</p>
+      <p class="warn">这是 Quiz 4/5 最高频陷阱题之一。考前一定要在脑海里默念正确的 p-value 解读。</p>
+    </details>
+  </div>
+
+  <h3>真题 5：Wi25 Q4 P3.4 ⭐⭐（observed 0.04 信息不足）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2025 Quiz 4, Problem 3.4 (Lec 20)</div>
+    <p>已知 observed test statistic = 0.04（test stat 是 |0.8 − sample proportion|）。结论是什么？</p>
+    <ol type="A">
+      <li>Reject the null</li>
+      <li>Accept the null</li>
+      <li>Fail to reject the null</li>
+      <li>Not enough information</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <p><strong>答案：D. Not enough information</strong>。</p>
+      <ul>
+        <li>给的是 <em>observed test statistic</em>（0.04），不是 p-value。</li>
+        <li>要决策，必须把 0.04 和 simulated distribution 比较，算出 p-value。光看 0.04 本身无法决定 reject 与否（它可能落在 dist 的中间，也可能落在尾部）。</li>
+        <li>B "Accept" 一定错，可以排除。</li>
+      </ul>
+      <p class="warn">这道题专门考"observed statistic ≠ p-value"。别看到一个小数就当 p-value 用。</p>
+    </details>
+  </div>
+
+  <h3>练习 6：写 p-value 代码</h3>
+  <div class="q-block">
+    <div class="q-source">综合代码练习</div>
+    <p>对下面每个场景，写出正确的 p-value 代码（假设 sim 是长度 10000 的 simulated array，obs 是 observed scalar）：</p>
+    <ol>
+      <li>Alt: 硬币偏 tails，test stat = number of heads</li>
+      <li>Alt: 红 candy 比绿多，test stat = n_red − n_green</li>
+      <li>Alt: 硬币不公平，test stat = |heads − 200|</li>
+      <li>Alt: Patriots 比 Colts pressure drop 大，test stat = mean_Patriots − mean_Colts</li>
+      <li>Alt: Jeffrey 比 Kate 严，test stat = mean_Kate − mean_Jeffrey</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <ol>
+        <li><code>np.count_nonzero(sim &lt;= obs) / 10000</code>（左尾：heads 少偏 alt）</li>
+        <li><code>np.count_nonzero(sim &gt;= obs) / 10000</code>（右尾）</li>
+        <li><code>np.count_nonzero(sim &gt;= obs) / 10000</code>（abs 后看大值，右尾）</li>
+        <li><code>np.count_nonzero(sim &gt;= obs) / 10000</code>（右尾）</li>
+        <li><code>np.count_nonzero(sim &gt;= obs) / 10000</code>（Kate − Jeffrey 大 → Jeffrey 严，右尾）</li>
+      </ol>
+    </details>
+  </div>
+
+  <h3>练习 7：解读 p-value 是非题</h3>
+  <div class="q-block">
+    <div class="q-source">综合判断</div>
+    <p>下面每个 statement 判断 T/F：</p>
+    <ol>
+      <li>p-value 等于 null 为真的概率</li>
+      <li>p-value 越小，越倾向 reject null</li>
+      <li>若 p = 0.001，可以说 null 一定是错的</li>
+      <li>p-value = 0.05 时，结论是 "fail to reject"（按 standard cutoff）</li>
+      <li>"Fail to reject" 等价于 "accept the null"</li>
+      <li>p-value 计算用 <code>&gt;</code> 而不是 <code>&gt;=</code> 也对</li>
+    </ol>
+    <details>
+      <summary>显示答案</summary>
+      <ol>
+        <li><strong>F</strong>。p-value 是"在 null 为真的前提下，看到 observed 或更极端的概率"。Null 不是 random variable。</li>
+        <li><strong>T</strong></li>
+        <li><strong>F</strong>。Reject 不等于"证明 null 错"，只是"data 与 null 不一致，需要解释"</li>
+        <li><strong>T</strong>（严格 cutoff：p &lt; 0.05 才 reject）。但 DSC 10 实际不会考这个边界 case</li>
+        <li><strong>F</strong>。永远不要 "accept"</li>
+        <li><strong>F</strong>。必须用 <code>&gt;=</code>（包括 observed 本身）</li>
+      </ol>
+    </details>
+  </div>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>口头说出 p-value 的标准定义（"under the null, the probability of seeing observed or more extreme"）</span></label>
+    <label><input type="checkbox"><span>解释为什么用 <code>&gt;=</code> / <code>&lt;=</code>（包含 observed 本身）</span></label>
+    <label><input type="checkbox"><span>根据 alt 决定 p-value 该看哪一尾</span></label>
+    <label><input type="checkbox"><span>背下来 3 行决策表（&lt; 0.01 / 0.01-0.05 / ≥ 0.05）</span></label>
+    <label><input type="checkbox"><span>解释为什么"永远不 accept the null"</span></label>
+    <label><input type="checkbox"><span>讲清楚 p-value <strong>不是</strong>"null 为真的概率"</span></label>
+    <label><input type="checkbox"><span>解释为什么 p = 0 不是 bug</span></label>
+    <label><input type="checkbox"><span>区分 "observed statistic" 和 "p-value" —— 不要混淆</span></label>
+    <label><input type="checkbox"><span>不看答案做 Sp25 Q4 P1.2、Sp24 Q5 P1.3、Fa24 Q4 P4.2（都要秒答）</span></label>
+    <label><input type="checkbox"><span>不看答案做 Wi25 Q5 P1.2（p-value 解读多选）—— 能挑出唯一正确选项 B</span></label>
+    <label><input type="checkbox"><span>用 <code>np.percentile</code> 找 5% cutoff（左尾用 5，右尾用 95）</span></label>
+  </div>
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="02-hypothesis-testing-fundamentals.html">← 上一节</a></span>
+  <span><a href="index.html">📕 返回目录</a></span>
+  <span><a href="04-tvd-categorical.html">下一节: TVD →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

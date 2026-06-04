@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 02 · HW 6 — Hypothesis &amp; Permutation Testing · DSC10</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --ok-bg: #dafbe1;
+    --ok-border: #1a7f37;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; flex-wrap: wrap; gap: 8px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color: var(--muted); cursor: not-allowed; text-decoration: none; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 10px 14px; margin: 12px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; margin: 22px 0; }
+  .q-id { display: inline-block; background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; padding: 2px 10px; border-radius: 4px; margin-right: 10px; letter-spacing: 0.5px; }
+  .q-title { display: inline; font-size: 16px; font-weight: 600; }
+  .q-stmt { color: var(--muted); font-size: 14px; margin: 10px 0; border-left: 3px solid #d0d7de; padding-left: 10px; font-style: italic; }
+  .think, .why, .pitfall-inline { margin: 12px 0; font-size: 14.5px; }
+  .think strong { color: #6f42c1; }
+  .why strong { color: #1f883d; }
+  .pitfall-inline strong { color: #cf222e; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .crosslink { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin: 20px 0; font-size: 14px; }
+  .crosslink h4 { margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 600; }
+  .crosslink ul { margin: 4px 0; padding-left: 20px; }
+  .crosslink a { color: var(--accent); text-decoration: none; }
+  .crosslink a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+  th { background: #f6f8fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="01-lab7-regression.html">⬅ 上一份：Lab 7</a> | <a href="03-lab6-hypothesis-fundamentals.html">下一份 ➡：Lab 6</a></span>
+</nav>
+
+<main>
+  <h1>Practice 02 · HW 6 — Hypothesis &amp; Permutation Testing</h1>
+  <p class="meta">
+    <strong>原始截止</strong>：Monday, May 25th 2026, 11:59 PM ｜
+    <strong>涵盖讲义</strong>：CIT 11（hypothesis testing）+ CIT 12（permutation testing）+ CIT 13.4（CI as hypothesis test） ｜
+    <strong>对应模块</strong>：Quiz 4 / Final ｜
+    <strong>主题</strong>：四类假设检验全家桶（one-sided、TVD、permutation、CI 法）｜
+    <strong>预计时长</strong>：2.5–3 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#overview">📋 作业概览 + 知识点回链</a></li>
+      <li><a href="#sec1">📚 Section 1 — Secret Smiski（Q1.1–1.6）单侧 p 值经典</a></li>
+      <li><a href="#sec2">📚 Section 2 — Pokémon TCGP（Q2.1–2.5）多类别 TVD</a></li>
+      <li><a href="#sec3">📚 Section 3 — Chocolate（Q3.1–3.9）permutation 经典模板</a></li>
+      <li><a href="#sec4">📚 Section 4 — Battery Life（Q4.1–4.5）CI 法 + bootstrap 两样本</a></li>
+      <li><a href="#pitfalls">⚠️ 本作业典型陷阱</a></li>
+      <li><a href="#templates">🧰 四类检验代码模板速查</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="overview">📋 作业概览</h2>
+
+  <p>HW 6 是本学期最后一份 HW，把 hypothesis testing 的四种<strong>不同</strong>玩法一次性全考一遍：</p>
+  <table>
+    <tr><th>题</th><th>检验类型</th><th>统计量</th><th>怎么 simulate under H<sub>0</sub></th><th>p 值方向</th></tr>
+    <tr><td>Section 1</td><td>已知概率 p 的单侧检验</td><td><code>obs_prop − p₀</code></td><td><code>np.random.multinomial</code></td><td>右尾（&ge;）</td></tr>
+    <tr><td>Section 2</td><td>已知 categorical 分布的拟合度</td><td>TVD</td><td><code>np.random.multinomial</code></td><td>右尾（&ge;）</td></tr>
+    <tr><td>Section 3</td><td>两样本均值是否同分布</td><td>mean_A − mean_B</td><td>shuffle group labels</td><td>左尾（&le;）<em>视方向</em></td></tr>
+    <tr><td>Section 4</td><td>两样本均值差是否 = 0</td><td>mean_A − mean_B</td><td><strong>不模拟 H<sub>0</sub></strong>，而是 bootstrap CI → 看 0 在否</td><td>CI 内/外</td></tr>
+  </table>
+
+  <p><strong>Tier 速览</strong>（HW 6 在 Quiz 4 / Final 的高频度）：</p>
+  <ul>
+    <li><span class="tier tier-1">⭐⭐⭐</span> p-value 与结论：fail to reject ≠ accept；<em>永远</em>不要写 "We accept"。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> 单边 vs 双边 / TVD 用哪个尾巴 / permutation 哪个尾巴——选错就 p 算反。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> CI 法做 hypothesis test（Q4.4）：95% CI 不含原假设值 → 在 0.05 水平 reject。</li>
+    <li><span class="tier tier-2">⭐⭐</span> Permutation test 的对称性（Q3.8）：洗 Rating 还是 Sweetness 结果一样。</li>
+    <li><span class="tier tier-2">⭐⭐</span> 单位换算不改变结论（Q4.5）。</li>
+  </ul>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链 — 想深入某个概念：</h4>
+    <ul>
+      <li>Null/alt、test statistic 选择、simulate under null → <a href="../quiz4/02-hypothesis-testing-fundamentals.html#concepts">quiz4/02-hypothesis-testing-fundamentals</a></li>
+      <li>p-value 定义、0.05 / 0.01、reject 三种结论用语 → <a href="../quiz4/03-pvalues-decisions.html#concepts">quiz4/03-pvalues-decisions</a></li>
+      <li>TVD 公式（÷ 2）、只用于 categorical → <a href="../quiz4/04-tvd-categorical.html#concepts">quiz4/04-tvd-categorical</a></li>
+      <li>CI 法做 hypothesis test → <a href="../quiz4/05-ci-as-hypothesis-test.html#concepts">quiz4/05-ci-as-hypothesis-test</a></li>
+      <li>Permutation test 的 shuffle 机制 → <a href="../quiz4/06-permutation-testing.html#concepts">quiz4/06-permutation-testing</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec1">📚 Section 1 — Secret Smiski（Q1.1–1.6）</h2>
+
+  <p><strong>背景</strong>：每个 Smiski 是 secret 的概率官方说是 1/144。DSC 10 tutors 收集了 903 个，发现 10 个是 secret（observed 比例 ≈ 10/903 ≈ 0.01107，比 1/144 ≈ 0.00694 高）。问：真实概率是不是<strong>更高</strong>？</p>
+
+  <div class="tip">
+    <strong>📐 假设</strong>：H<sub>0</sub>: p = 1/144 ｜ H<sub>A</sub>: p &gt; 1/144（单侧！）<br>
+    <strong>统计量</strong>：sample proportion − 1/144（保留方向，越大越支持 H<sub>A</sub>）<br>
+    <strong>Simulate under H<sub>0</sub></strong>：<code>np.random.multinomial(903, [1/144, 143/144])</code>
+  </div>
+
+  <!-- Q1.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.1</span><span class="q-title"><code>one_simulation()</code></span>
+    <p class="q-stmt">"Should randomly generate 903 Smiskis under the assumptions of the null hypothesis and return the <strong>proportion</strong> of Smiskis that are secret. Use <code>np.random.multinomial</code>, no for-loop."</p>
+    <p class="think"><strong>💭 思路</strong>：<code>np.random.multinomial(n, [p₁, p₂])</code> 返回长度为 2 的 array，是每类的<u>计数</u>。第 0 位是 secret 数量，除以 903 就是比例。</p>
+<pre><code>def one_simulation():
+    return np.random.multinomial(903, [1/144, 143/144])[0] / 903</code></pre>
+    <p class="why"><strong>💡 为什么 multinomial 不要 for-loop</strong>：<code>multinomial(903, p)</code> 一次抽 903 个独立伯努利，比"for 903 次 random.choice"快几十倍。这是 babypandas 课程里"避免显式 for 循环"理念的体现。</p>
+    <p class="why"><strong>💡 返回是 array 不是 int</strong>：<code>multinomial</code> 永远返回 array（即使只有两类），所以要 <code>[0]</code> 取第一类。返回 <code>[0]/903</code> 是 Python float，是题目想要的比例。</p>
+  </div>
+
+  <!-- Q1.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.2</span><span class="q-title">观测统计量 <code>smiski_observed</code></span>
+    <p class="q-stmt">"Calculate the observed value of the test statistic. test statistic = proportion of secret Smiskis in sample − 1/144."</p>
+<pre><code>smiski_observed = 10 / 903 - 1 / 144</code></pre>
+    <div class="ok"><strong>✅ 值</strong>：≈ 0.01107 − 0.00694 = <strong>0.00413</strong>（autograder 提示 "very small number"，&lt; 0.01）。</div>
+    <p class="why"><strong>💡 为什么<u>带</u>方向（不取绝对值）</strong>：H<sub>A</sub> 是 "p &gt; 1/144"，单侧——只有"sample 比例偏高"才支持 H<sub>A</sub>。带方向保留了"高/低"信息，所以 p 值用右尾。如果题目改成 "p ≠ 1/144"（双侧），就用 <code>|obs − 1/144|</code>，p 值用右尾的<u>绝对值</u>。</p>
+  </div>
+
+  <!-- Q1.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.3</span><span class="q-title">10,000 次模拟 → <code>proportion_diffs</code></span>
+<pre><code>proportion_diffs = np.array([])
+for i in np.arange(10000):
+    proportion_diffs = np.append(proportion_diffs, one_simulation() - 1/144)</code></pre>
+    <p class="why"><strong>💡 为什么这里要 for 循环</strong>：每次 <code>one_simulation()</code> 是一次<u>独立</u>实验，10,000 次需要 10,000 个<u>不同</u>的随机结果。multinomial 本身只一次抽 903 个；要 10,000 个 trial 就是 10,000 次 multinomial。这跟"避免 for"不矛盾——避免的是<u>在数据中</u>用 for 遍历行，不是避免 simulation 的 for。</p>
+    <div class="ok"><strong>✅ 测试</strong>：<code>isinstance(proportion_diffs, np.ndarray) and len(proportion_diffs) == 10000</code></div>
+  </div>
+
+  <!-- Q1.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.4</span><span class="q-title">p 值 <code>smiski_p</code></span>
+    <p class="q-stmt">"Do large values of our test statistic favor the alternative hypothesis, or do small values?"</p>
+    <p class="think"><strong>💭 思路</strong>：H<sub>A</sub>: p &gt; 1/144 → <strong>大</strong>值（sample 比例 &gt; 1/144 → 差为正）支持 H<sub>A</sub>。p 值 = 模拟中 ≥ observed 的比例 →<strong>右尾</strong>。</p>
+<pre><code>smiski_p = np.count_nonzero(proportion_diffs &gt;= smiski_observed) / 10000</code></pre>
+    <p class="why"><strong>💡 经典口诀</strong>："<u>多大算太大</u>" 看 H<sub>A</sub> 方向。H<sub>A</sub> 说"实际更高" → 越大越奇怪 → 右尾（&ge;）。如果 H<sub>A</sub> 说"实际更低" → 左尾（&le;）。</p>
+  </div>
+
+  <!-- Q1.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.5</span><span class="q-title">结论 <code>smiski_conclusion</code></span>
+    <p class="q-stmt">在 0.05 cutoff 下选 1/2/3/4。</p>
+    <p class="think"><strong>💭 思路</strong>：H<sub>0</sub> 下期望 secret 数 = 903 × 1/144 ≈ 6.27，SD ≈ 2.50，observed = 10 个 → z ≈ 1.49 → 单边 p ≈ 0.068。<strong>p &gt; 0.05 → fail to reject</strong>。</p>
+<pre><code>smiski_conclusion = 4</code></pre>
+    <div class="warn"><strong>⚠️ 用语必背</strong>：
+      <ul>
+        <li>p &lt; cutoff → <strong>"reject the null"</strong> + "data is inconsistent with the model"。<u>不要</u>说 "accept the alternative"。</li>
+        <li>p ≥ cutoff → <strong>"fail to reject the null"</strong> + "<u>not enough evidence</u> to say data is inconsistent"。<u>永远不要</u>说 "We accept the null"（选项 3 是陷阱）。</li>
+      </ul>
+      所以选项 4 是唯一对的；2 错在 "reject"；1 错在 "draw a conclusion" 太弱；3 错在 "accept"。
+    </div>
+    <div class="tip">见 <a href="../quiz4/03-pvalues-decisions.html#concepts">quiz4/03-pvalues-decisions §concepts</a> 的"三种结论"。</div>
+  </div>
+
+  <!-- Q1.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.6</span><span class="q-title">哪些统计量<u>不</u>合适？<code>bad_choices</code></span>
+    <p class="q-stmt">"From the options below, choose the test statistics that would <strong>not</strong> have worked. Hint: we want a statistic that helps us determine whether we got secret Smiskis <strong>more</strong> often than expected."</p>
+<pre><code>bad_choices = [2, 3]</code></pre>
+    <p class="why"><strong>💡 为什么 2、3 不行</strong>：两者都是<strong>绝对值</strong>差（|10 − count|、|1/144 − prop|）。绝对值<u>丢失方向</u>——"高很多"和"低很多"会得到同样大的统计量，无法区分 "secret 更多" vs "secret 更少"。题目想测<u>单侧</u>"more often"，必须保留方向。</p>
+    <p class="why"><strong>💡 为什么 1、4、5 都行</strong>：
+      <ul>
+        <li>1：number of secret（903 张中的 secret 数）—— 越大越支持 H<sub>A</sub>（右尾）。</li>
+        <li>4：1/144 − proportion —— 越<u>负</u>越支持 H<sub>A</sub>（左尾）。p 值方向反一下即可。</li>
+        <li>5：proportion of secret —— 越大越支持 H<sub>A</sub>（右尾）。</li>
+      </ul>
+      关键是<u>单调</u>——同一方向越极端越可疑。绝对差不是单调的。
+    </p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec2">📚 Section 2 — Gotta Catch 'Em All / Pokémon TCGP（Q2.1–2.5）</h2>
+
+  <p><strong>背景</strong>：Eric 提出 8 类卡牌的概率分布（proposed_dist）。1000 张抽样得到 observed_dist。问：observed 是不是真的从 proposed 分布抽出来的？</p>
+
+  <div class="tip">
+    <strong>📐 假设</strong>：H<sub>0</sub>: Pokémon TCGP 牌从 proposed_dist 抽 ｜ H<sub>A</sub>: 不是<br>
+    <strong>统计量</strong>：TVD = 0.5 × Σ|p<sub>i</sub> − q<sub>i</sub>|<br>
+    <strong>Simulate under H<sub>0</sub></strong>：从 proposed_dist 抽 1000 张，算与 proposed 的 TVD<br>
+    <strong>p 值</strong>：右尾（&ge;），因为 TVD ≥ 0 且越大越偏
+  </div>
+
+  <!-- Q2.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.1</span><span class="q-title">哪个<u>不</u>合理 <code>unreasonable_test_statistic</code></span>
+    <p class="q-stmt">三个选项：1=各类绝对差之和；2=两 distribution 概率之和的绝对差；3=最大绝对差。</p>
+<pre><code>unreasonable_test_statistic = 2</code></pre>
+    <p class="why"><strong>💡 为什么选项 2 是傻的</strong>：两个 probability distribution，每个内部加起来都 = 1（题干都强调 sum = 1）。所以 |Σproposed − Σobserved| = |1 − 1| = <u>恒为 0</u>。没区分能力。</p>
+    <p class="why"><strong>💡 1 和 3 都合理</strong>：1 是 2×TVD（差个常数因子）；3 是 L<sub>∞</sub> 距离。都能反映"偏离 proposed 多远"。</p>
+  </div>
+
+  <!-- Q2.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.2</span><span class="q-title"><code>total_variation_distance</code> &amp; <code>observed_tvd</code></span>
+<pre><code>def total_variation_distance(first_distrib, second_distrib):
+    '''Computes the total variation distance between two distributions.'''
+    return np.sum(np.abs(first_distrib - second_distrib)) / 2
+
+observed_tvd = total_variation_distance(proposed_dist, observed_dist)</code></pre>
+    <p class="why"><strong>💡 为什么 ÷ 2</strong>：两个 distribution 的<u>正偏差</u>和<u>负偏差</u>大小相等（都从 1 重新分配），所以 Σ|差| 把每个错配的概率算了<u>两次</u>——一次在它本来该去的类，一次在它实际去的类。÷ 2 才是"总偏离量"。</p>
+    <div class="ok"><strong>✅ 反推</strong>：差值 array ≈ [−0.014, −0.024, −0.004, −0.005, 0.002, 0.012, 0.008, 0.025]，|差|和 = 0.094 → <strong>TVD = 0.047</strong>。autograder 验：<code>int(0.047 × 10⁷ % 8³) == 496</code> ✓</div>
+    <div class="warn"><strong>⚠️ TVD 必须 ≤ 1 且 ≥ 0</strong>。如果你的结果是 0.094（忘了 ÷ 2），autograder 会过 <code>0 ≤ tvd ≤ 1</code> 但过不了具体数值检查。</div>
+  </div>
+
+  <!-- Q2.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.3</span><span class="q-title">5000 次模拟 TVDs</span>
+<pre><code>simulated_tvds = np.array([])
+for i in np.arange(5000):
+    simulated = np.random.multinomial(1000, proposed_dist) / 1000
+    simulated_tvds = np.append(simulated_tvds,
+                               total_variation_distance(proposed_dist, simulated))</code></pre>
+    <p class="why"><strong>💡 为什么 ÷ 1000</strong>：multinomial 返回<u>计数</u>，TVD 比的是<u>分布</u>（概率），所以要除以 n=1000 转回比例。如果直接比 counts，TVD 会膨胀 1000 倍。</p>
+  </div>
+
+  <!-- Q2.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.4</span><span class="q-title">p 值 <code>pokemon_p</code></span>
+<pre><code>pokemon_p = np.count_nonzero(simulated_tvds &gt;= observed_tvd) / 5000</code></pre>
+    <p class="why"><strong>💡 为什么 TVD 永远用右尾</strong>：TVD ≥ 0 是设计上的下界，越偏离越大。所以"模拟中比 observed 还大的比例"才是 p 值。永远不会有左尾 TVD test。</p>
+  </div>
+
+  <!-- Q2.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.5</span><span class="q-title">结论 <code>pokemon_conclusion</code>（cutoff 0.01！）</span>
+    <p class="think"><strong>💭 思路</strong>：观察 observed_tvd ≈ 0.047；H<sub>0</sub> 下 TVD 期望 ≈ 0.032，SD ≈ 0.009，z ≈ 1.7 → p ≈ 0.04–0.05。<strong>p &gt; 0.01 → fail to reject</strong>。</p>
+<pre><code>pokemon_conclusion = 4</code></pre>
+    <div class="warn"><strong>⚠️ cutoff 是 0.01 不是 0.05</strong>！如果按 0.05 的直觉就会选 3（reject）。仔细看题。</div>
+    <div class="warn"><strong>⚠️ 实际跑出来 p 值有 noise</strong>：5000 次模拟有随机性，你的 p 可能 0.03 也可能 0.06。如果偏巧 &lt; 0.01，conclusion 改成 3（reject）。建议跑两次取众数。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec3">📚 Section 3 — Chocolate（Q3.1–3.9）— Permutation 测试经典模板</h2>
+
+  <p><strong>背景</strong>：2693 块巧克力，每块有 Rating（1–5）和 Characteristics 文本。我们把含 "sweet"（独立词）的标 Sweet，其余 Not Sweet。问：Sweet 的 Rating 是不是比 Not Sweet 低？</p>
+
+  <div class="tip">
+    <strong>📐 假设</strong>：H<sub>0</sub>: 两组 Rating 来自<u>同一</u>分布 ｜ H<sub>A</sub>: Sweet 的 Rating 平均更低<br>
+    <strong>统计量</strong>：mean(Sweet) − mean(Not Sweet)<br>
+    <strong>Simulate under H<sub>0</sub></strong>：洗 Sweetness 列（permutation）<br>
+    <strong>p 值</strong>：左尾（&le;），因为 H<sub>A</sub> 说 Sweet 更低 → 差越<u>负</u>越极端
+  </div>
+
+  <!-- Q3.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.1</span><span class="q-title"><code>label_sweet</code>：识别独立 "sweet" 词</span>
+    <p class="q-stmt">"<code>'sweet'</code> appears in the string of characteristics, but <strong>not</strong> if it appears only as part of a longer word, such as <code>'bittersweet'</code>."</p>
+<pre><code>def label_sweet(characteristics):
+    for word in characteristics.replace(',', ' ').split():
+        if word == 'sweet':
+            return 'Sweet'
+    return 'Not Sweet'</code></pre>
+    <p class="why"><strong>💡 为什么先替换逗号</strong>：原始格式是逗号 + 空格分隔（如 <code>"milk brownie, macadamia, chewy"</code>）。<code>split()</code> 默认按空白切，"chewy," 会带个逗号——比较时 <code>"chewy," == "sweet"</code> 永远 False。先把逗号变空格，再 split 就干净了。</p>
+    <p class="why"><strong>💡 为什么不能用 <code>'sweet' in characteristics</code></strong>：那会把 <code>'bittersweet'</code> 也算上（子串匹配）。题目要求<u>独立词</u>——必须按 token 比较。</p>
+    <p class="why"><strong>💡 测试样例</strong>：<code>label_sweet('sweet, woody')</code> → 'Sweet'；<code>label_sweet('creamy, too sweet, sour')</code> → 'Sweet'；<code>label_sweet('nutty, bittersweet, chalky')</code> → 'Not Sweet'。</p>
+  </div>
+
+  <!-- Q3.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.2</span><span class="q-title"><code>chocolate</code> DataFrame</span>
+<pre><code>chocolate = choco.assign(
+    Sweetness = choco.get('Characteristics').apply(label_sweet)
+).get(['Rating', 'Sweetness'])</code></pre>
+    <p class="why"><strong>💡 链式</strong>：先 <code>.assign</code> 新增 Sweetness 列（在 choco 全部 9 列基础上），再 <code>.get([...])</code> 只取需要的两列。<u>不要</u>先 <code>.get(['Characteristics'])</code> 再 assign，那样会丢 Rating。</p>
+    <div class="ok"><strong>✅ 期望</strong>：shape (2693, 2)，列 {'Sweet', 'Not Sweet'} 各 339 / 2354 行。</div>
+  </div>
+
+  <!-- Q3.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.3</span><span class="q-title"><code>observed_difference</code></span>
+<pre><code>sweet_mean     = chocolate[chocolate.get('Sweetness') == 'Sweet'    ].get('Rating').mean()
+not_sweet_mean = chocolate[chocolate.get('Sweetness') == 'Not Sweet'].get('Rating').mean()
+observed_difference = sweet_mean - not_sweet_mean</code></pre>
+    <div class="ok"><strong>✅ 反推</strong>：autograder 验 <code>int(obs × 10⁶ % 10⁴) == 8645</code> 且 <code>obs &lt; 0</code> → <strong>observed_difference ≈ −0.171355</strong>（Sweet 比 Not Sweet 平均评分低 0.17）。</div>
+  </div>
+
+  <!-- Q3.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.4</span><span class="q-title"><code>interpretation</code></span>
+    <p class="q-stmt">6 个选项中选对的，看你能不能<u>读</u> observed_difference ≈ −0.17 的实际含义。</p>
+<pre><code>interpretation = 6</code></pre>
+    <p class="why"><strong>💡 关键</strong>：单位是 <strong>rating points</strong>（评分点），不是 <strong>percent</strong>！1、2、4、5 全是 "percent" 错；3 方向反了（说 sweet 高，实际低）；只有 6 正确："sweet bars 比 non-sweet 低 0.16 个 rating points"。</p>
+  </div>
+
+  <!-- Q3.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.5</span><span class="q-title">Permutation simulation → <code>differences</code></span>
+<pre><code>differences = np.array([])
+for i in np.arange(1000):
+    shuffled_sweetness = np.random.permutation(chocolate.get('Sweetness'))
+    shuffled = chocolate.assign(Sweetness = shuffled_sweetness)
+    s_m  = shuffled[shuffled.get('Sweetness') == 'Sweet'    ].get('Rating').mean()
+    ns_m = shuffled[shuffled.get('Sweetness') == 'Not Sweet'].get('Rating').mean()
+    differences = np.append(differences, s_m - ns_m)</code></pre>
+    <p class="why"><strong>💡 为什么洗 Sweetness 就模拟了 H<sub>0</sub></strong>：H<sub>0</sub> 说两组评分<u>来自同分布</u>——意味着"贴上 Sweet 还是 Not Sweet 的标签"对评分没影响。洗标签后，每次 shuffled 的 group 分配是<u>随机</u>的——这正是 H<sub>0</sub> 下"标签不重要"的可视化。</p>
+    <p class="why"><strong>💡 注意：保持 shuffled 列长度 = 339 + 2354 不变</strong>。<code>np.random.permutation</code> 只重排顺序，不增不减，所以 Sweet 还是 339 个、Not Sweet 还是 2354 个——只是配对的 Rating 变了。</p>
+  </div>
+
+  <!-- Q3.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.6</span><span class="q-title"><code>chocolate_p</code></span>
+    <p class="q-stmt">"Whether to use <code>&lt;=</code> or <code>&gt;=</code>: think about whether larger values or smaller values of our test statistic favor the alternative hypothesis."</p>
+<pre><code>chocolate_p = np.count_nonzero(differences &lt;= observed_difference) / 1000</code></pre>
+    <p class="why"><strong>💡 为什么 <code>&lt;=</code>（左尾）</strong>：H<sub>A</sub> 说 Sweet 的 Rating <u>更低</u> → 差 (sweet − not sweet) 越<u>负</u>越极端。observed = −0.17。模拟中 ≤ −0.17 的比例 = p 值。</p>
+    <div class="warn"><strong>⚠️ 经典陷阱</strong>：把 <code>&lt;=</code> 写成 <code>&gt;=</code> → p 值会变成 1 − p。如果不确定方向，把 H<sub>A</sub> 抄一遍："Sweet 的 mean 更<u>低</u>" → 差更<u>负</u> → 用 <code>&lt;=</code>。</div>
+  </div>
+
+  <!-- Q3.7 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.7</span><span class="q-title"><code>chocolate_conclusion</code> &amp; <code>sweeter_is_worse</code></span>
+    <p class="q-stmt">从 6 个选项里选所有真的（list 形式）+ 设 sweeter_is_worse 为 True/False。</p>
+<pre><code>chocolate_conclusion = [2, 5]
+sweeter_is_worse     = True</code></pre>
+    <p class="why"><strong>💡 为什么 reject 两个 level 都过</strong>：观察差 −0.17，2693 行的样本足够大，置换分布的 SD 很小（绝大多数 shuffled 的 mean 差都接近 0）。p 值往往 ≈ 0 或非常小，所以 0.01 和 0.05 两个 cutoff 都 reject。<br>
+      选项 1、4 错在 "accept"（永远不用！）；选项 3、6 错在 "fail to reject"。</p>
+  </div>
+
+  <!-- Q3.8 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.8</span><span class="q-title">如果洗 Rating 而不是 Sweetness？<code>shuffled_rating</code></span>
+<pre><code>shuffled_rating = 4</code></pre>
+    <p class="why"><strong>💡 Permutation test 的对称性</strong>：洗 A 列保 B 列 ⟺ 洗 B 列保 A 列。本质上都是"把 A、B 之间的<u>配对</u>打乱"。所以洗 Rating 列的结果<u>跟洗 Sweetness</u>分布一样，p 值一样，结论一样。<u>这是 Quiz 4 常考的概念题。</u></p>
+    <p class="why"><strong>💡 反驳其他选项</strong>：
+      <ul>
+        <li>1（p 变成 1 − p）：错，是同一个 test。</li>
+        <li>2（要改 null）：错，null 没变。</li>
+        <li>3（要改 test stat）：错，统计量定义可以不变。</li>
+        <li>5（Rating 是数字不能 shuffle）：错，<code>np.random.permutation</code> 可以洗任何 array。</li>
+      </ul>
+    </p>
+  </div>
+
+  <!-- Q3.9 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.9</span><span class="q-title"><code>why_shuffle</code></span>
+<pre><code>why_shuffle = 3</code></pre>
+    <p class="why"><strong>💡 Shuffle 的根本目的</strong>："generate new data under the null hypothesis"。H<sub>0</sub> 说两组来自同分布——洗标签后的虚拟世界就是 H<sub>0</sub> 真的成立的世界。我们看实际 observed 在这个虚拟世界里有多奇怪。</p>
+    <p class="why"><strong>💡 反驳</strong>：选项 1（mitigates noise）—— shuffle 增加 randomness 不是减；2（shuffling = bootstrapping）—— 不！shuffle 是<u>不放回</u>重排，bootstrap 是<u>有放回</u>采样；4（under the alternative）—— 完全反了，shuffle 是 under <em>null</em>。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec4">📚 Section 4 — Battery Life（Q4.1–4.5）— CI 法做 hypothesis test</h2>
+
+  <p><strong>背景</strong>：80 条耳机电池数据（40 AirPods + 40 Galaxy Buds）。问：两个 brand 的平均电池寿命有没有差异？</p>
+
+  <div class="tip">
+    <strong>📐 假设</strong>：H<sub>0</sub>: μ<sub>Galaxy</sub> − μ<sub>AirPods</sub> = 0 ｜ H<sub>A</sub>: ≠ 0（<u>双侧</u>！）<br>
+    <strong>方法</strong>：<u>不</u>做 permutation 模拟。而是 bootstrap 估计差值的 95% CI，看 0 是否在 CI 内。
+  </div>
+
+  <!-- Q4.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.1</span><span class="q-title">取两组 &amp; 算 observed 差</span>
+<pre><code>galaxy   = battery_life_data[battery_life_data.get('Brand') == 'Samsung Galaxy Buds Pro']
+airpods  = battery_life_data[battery_life_data.get('Brand') == 'Apple AirPods']
+galaxy_mean  = galaxy.get('BatteryLife').mean()
+airpods_mean = airpods.get('BatteryLife').mean()
+observed_diff_mean = galaxy_mean - airpods_mean</code></pre>
+    <div class="ok"><strong>✅ autograder 反推</strong>：<code>observed_diff_mean &gt; 0</code> 且 <code>int(obs × 100 % 100) == 79</code> → Galaxy 比 AirPods 平均多 <strong>X.79 分钟</strong>。结合题干你看到的 4h41m vs 4h18m（差 23 分钟），所以大约 22–24 分钟。</div>
+  </div>
+
+  <!-- Q4.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.2</span><span class="q-title">Bootstrap → <code>difference_means</code>（1000 次）</span>
+    <p class="q-stmt">"Generate your Galaxy Buds resamples by sampling from <code>galaxy</code>, and your AirPods resamples by sampling from <code>airpods</code>. <strong>Do not</strong> use the combined dataset."</p>
+<pre><code>difference_means = np.array([])
+for i in np.arange(1000):
+    g_sample = galaxy.sample(galaxy.shape[0],   replace=True)
+    a_sample = airpods.sample(airpods.shape[0], replace=True)
+    diff = g_sample.get('BatteryLife').mean() - a_sample.get('BatteryLife').mean()
+    difference_means = np.append(difference_means, diff)</code></pre>
+    <p class="why"><strong>💡 为什么<u>分开</u>采样</strong>：每个 sample 必须保留<u>原样本结构</u>（40 Galaxy + 40 AirPods），否则 g_sample 可能采到 38 个 Galaxy + 2 个 AirPods，平均差就<u>失真</u>。要保证"两个 brand 的 sample 大小固定"，必须分别从 galaxy / airpods 子集 resample。</p>
+    <div class="warn"><strong>⚠️ Lab/HW 经典陷阱</strong>：从合并 <code>battery_life_data</code> 抽 80 个 → 每次抽到的两 brand 数量随机变化 → bootstrap 的 SE 不是"两 brand 各 40 时的"SE。题目<u>加粗</u>强调 "Do not use the combined dataset"。</div>
+    <p class="why"><strong>💡 为什么这<u>不</u>是 permutation test</strong>：permutation 是 shuffle group labels（保留 80 个但乱配 brand）来模拟 H<sub>0</sub>；bootstrap 是从原 sample 有放回采样来估计真实差值的<u>不确定度</u>。这里走第二条路，最终用 CI 是否含 0 来判 H<sub>0</sub>。</p>
+  </div>
+
+  <!-- Q4.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.3</span><span class="q-title">95% CI</span>
+<pre><code>left_endpoint  = np.percentile(difference_means, 2.5)
+right_endpoint = np.percentile(difference_means, 97.5)</code></pre>
+    <p class="why"><strong>💡 公式</strong>：c% CI 的左右 percentile = (100−c)/2 和 (100+c)/2。95% → 2.5 / 97.5。90% → 5 / 95。这是必背 8 件套之一（见 Quiz 3 笔记）。</p>
+  </div>
+
+  <!-- Q4.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.4</span><span class="q-title">CI 法判 H<sub>0</sub> → <code>reject_null</code></span>
+<pre><code>reject_null = True</code></pre>
+    <p class="why"><strong>💡 CI 法核心规则</strong>：<u>双侧</u> H<sub>0</sub>: μ = c。如果 c <strong>不在</strong> 95% CI 内 → 在 0.05 水平 <strong>reject</strong> H<sub>0</sub>；如果 c <strong>在</strong> CI 内 → fail to reject。这里 c = 0。Galaxy − AirPods 平均 ≈ +23 分钟，bootstrap 几乎所有 sample 都正，CI 大概是 [+15, +30] 之类，0 不在 CI 内 → reject。</p>
+    <div class="tip">见 <a href="../quiz4/05-ci-as-hypothesis-test.html#concepts">quiz4/05-ci-as-hypothesis-test §concepts</a> 的对称关系："(100−p)% CI 配 p% 显著性"。95% CI ↔ 0.05 significance。</div>
+  </div>
+
+  <!-- Q4.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.5</span><span class="q-title">单位换算 → <code>same_conclusion</code></span>
+    <p class="q-stmt">"What if all the people who responded had provided their battery lives in <strong>hours</strong> instead of minutes?"</p>
+<pre><code>same_conclusion = True</code></pre>
+    <p class="why"><strong>💡 为什么不变</strong>：所有数据 × 1/60 → 所有 mean × 1/60 → CI 端点 × 1/60。CI 整体被缩放，但<u>0 的位置不变</u>（0 × 1/60 = 0）。所以"0 在 CI 内吗？"这个判断<u>不变</u>，结论<u>不变</u>。</p>
+    <p class="why"><strong>💡 推广</strong>：任何 <em>线性</em> 单位换算（cm↔m、°C↔K、min↔hour）都不影响 hypothesis test 结论。这跟"线性变换不改变 r、不改变 p 值"是同一类性质。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="pitfalls">⚠️ 本作业典型陷阱（横切多题）</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：用语红线 —— 永远不要写 "We accept"</strong><br>
+    Quiz 4 / Final 高频送分题：H<sub>0</sub> 永远不被 "accept"，只能 "reject" 或 "fail to reject"。HW 6 的 Q1.5、Q2.5、Q3.7 选项里全埋了 "accept" 陷阱。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：单侧 vs 双侧 / 用哪个尾巴算 p 值</strong>
+    <ul>
+      <li>Q1.4（Smiski）H<sub>A</sub>: p &gt; 1/144 → 右尾 <code>&gt;=</code>。</li>
+      <li>Q2.4（Pokémon TVD）TVD 永远右尾 <code>&gt;=</code>（TVD 已经是非负的"偏离度"）。</li>
+      <li>Q3.6（Chocolate）H<sub>A</sub>: Sweet 更低 → 差更负 → 左尾 <code>&lt;=</code>。</li>
+      <li>Q4.4（Battery）双侧 H<sub>A</sub>: ≠ 0 → CI 法判 0 是否在 CI 内。</li>
+    </ul>
+    <strong>记忆法</strong>：把统计量看成"越远离 H<sub>0</sub> 越极端"——找出 H<sub>A</sub> 方向，写到 H<sub>A</sub> 那边的尾巴去。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：TVD 必须 ÷ 2</strong><br>
+    Q2.2 公式 = Σ|p − q| / 2。少 ÷ 2 → TVD = 0.094 而不是 0.047。autograder 会用 <code>int(tvd × 10⁷ % 8³) == 496</code> 检测到。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：Permutation 是<u>不放回</u>重排，Bootstrap 是<u>有放回</u>采样</strong><br>
+    Q3.5 用 <code>np.random.permutation</code>（每个元素出现 <u>恰好</u> 1 次，只是顺序变）；Q4.2 用 <code>.sample(n, replace=True)</code>（有的多次有的不出现）。Q3.9 选项 2 故意混淆这两者，错。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：Bootstrap 两样本要<u>分开</u>采</strong><br>
+    Q4.2 强调"don't use combined dataset"。两组各 40 必须保留——分别 <code>galaxy.sample(40, replace=True)</code> 和 <code>airpods.sample(40, replace=True)</code>。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：CI 法的对应关系</strong><br>
+    <strong>95% CI ↔ 0.05 significance（双侧）</strong>；99% CI ↔ 0.01。如果题目说 "0.05 significance"，你需要的是 <strong>95%</strong> CI，不是 99%。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7：cutoff 是题目<u>说的</u>那个</strong><br>
+    Q1.5 cutoff = 0.05；Q2.5 cutoff = <strong>0.01</strong>。题目从不同 cutoff 切，结论可能完全相反。看清题目。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 8：interpretation 单位—— rating point 不是 percent</strong><br>
+    Q3.4 是干扰项最大的题。差值 −0.171 意思是"评分点低 0.17"，<u>不是</u>"百分比"。选项 1、2、4、5 全是 percent，<u>全错</u>。
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="templates">🧰 四类检验代码模板速查</h2>
+
+  <h3>模板 A — 已知 p₀ 的单侧 proportion 检验（Smiski 型）</h3>
+<pre><code>def one_simulation():
+    return np.random.multinomial(n, [p0, 1-p0])[0] / n
+
+stats = np.array([one_simulation() - p0 for _ in np.arange(reps)])
+# 或 for-loop + np.append
+p_value = np.count_nonzero(stats &gt;= observed_diff) / reps   # H_A: p &gt; p0</code></pre>
+
+  <h3>模板 B — Categorical TVD 拟合度检验（Pokémon 型）</h3>
+<pre><code>def tvd(a, b): return np.sum(np.abs(a - b)) / 2
+
+simulated_tvds = np.array([])
+for _ in np.arange(reps):
+    sim = np.random.multinomial(n, proposed_dist) / n
+    simulated_tvds = np.append(simulated_tvds, tvd(proposed_dist, sim))
+
+p_value = np.count_nonzero(simulated_tvds &gt;= observed_tvd) / reps   # TVD 永远右尾</code></pre>
+
+  <h3>模板 C — Permutation 两均值检验（Chocolate 型）</h3>
+<pre><code>diffs = np.array([])
+for _ in np.arange(reps):
+    shuf = np.random.permutation(df.get('group'))
+    tmp  = df.assign(group = shuf)
+    mA = tmp[tmp.get('group') == 'A'].get('value').mean()
+    mB = tmp[tmp.get('group') == 'B'].get('value').mean()
+    diffs = np.append(diffs, mA - mB)
+
+# H_A: A &lt; B → 左尾；H_A: A &gt; B → 右尾；H_A: A ≠ B → 双侧（用 |·|）
+p_value = np.count_nonzero(diffs &lt;= observed_diff) / reps</code></pre>
+
+  <h3>模板 D — Bootstrap CI 法（Battery 型）</h3>
+<pre><code>diffs = np.array([])
+for _ in np.arange(reps):
+    sA = groupA.sample(groupA.shape[0], replace=True)
+    sB = groupB.sample(groupB.shape[0], replace=True)
+    diffs = np.append(diffs, sA.get('val').mean() - sB.get('val').mean())
+
+left, right = np.percentile(diffs, [2.5, 97.5])   # 95% CI
+reject_null = not (left &lt;= 0 &lt;= right)            # 0 在 CI 内 → fail to reject</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① 给定"H<sub>A</sub>: 实际比例 &gt; p₀"，p 值用什么尾巴（&gt;= 还是 &lt;=）？为什么？</span></label>
+    <label><input type="checkbox"><span>② TVD 公式是什么？为什么 ÷ 2？为什么 TVD test 永远用右尾？</span></label>
+    <label><input type="checkbox"><span>③ Q1.6 的 bad_choices 为什么是 [2, 3]？绝对差为什么不适合单侧检验？</span></label>
+    <label><input type="checkbox"><span>④ Q2.1 为什么选项 2（"两 distribution 之和的绝对差"）永远是 0？</span></label>
+    <label><input type="checkbox"><span>⑤ Permutation test 中 shuffle 的目的是什么？为什么洗 A 列保 B 列 ≡ 洗 B 列保 A 列（Q3.8）？</span></label>
+    <label><input type="checkbox"><span>⑥ Q3.4 为什么 observed_difference 的单位是 "rating points" 不是 "percent"？</span></label>
+    <label><input type="checkbox"><span>⑦ Bootstrap 与 permutation 的两个本质区别是什么？</span></label>
+    <label><input type="checkbox"><span>⑧ 为什么 Q4.2 必须分别从 galaxy / airpods 子集采样，不能从 battery_life_data 整体采？</span></label>
+    <label><input type="checkbox"><span>⑨ CI 法做 hypothesis test：95% CI 对应什么 significance level？规则是什么？</span></label>
+    <label><input type="checkbox"><span>⑩ Q4.5 把分钟换成小时，为什么结论不变？这跟"线性变换"有什么关系？</span></label>
+    <label><input type="checkbox"><span>⑪ 三种结论表达：reject / fail to reject / accept —— 哪两个能用、哪个永远不能用？为什么？</span></label>
+    <label><input type="checkbox"><span>⑫ <code>label_sweet</code> 为什么不能用 <code>'sweet' in characteristics</code>？怎么处理 <code>'bittersweet'</code>？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="01-lab7-regression.html">⬅ 上一份：Lab 7</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="03-lab6-hypothesis-fundamentals.html">下一份 ➡：Lab 6</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

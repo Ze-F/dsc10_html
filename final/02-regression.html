@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 2 · Regression &amp; Least Squares - DSC10 Final</title>
+<style>
+  :root {
+    --bg: #fafaf7; --text: #1f2328; --muted: #57606a;
+    --accent: #0969da; --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e; --code-text: #cdd6f4;
+    --warn-bg: #fff8c5; --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff; --tip-border: #54aeff;
+    --danger-bg: #ffebe9; --danger-border: #cf222e;
+    --ok-bg: #dafbe1; --ok-border: #1a7f37;
+    --tier-1: #cf222e; --tier-2: #bf8700; --tier-3: #6e7781;
+    --border: #d0d7de; --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.7; font-size: 16px; }
+  .nav-top, .nav-bottom { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 { font-size: 28px; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin-top: 48px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 18px; margin-top: 28px; color: var(--text); }
+  h4 { font-size: 16px; margin-top: 20px; color: var(--muted); }
+  p, ul, ol { margin: 12px 0; }
+  ul, ol { padding-left: 28px; }
+  li { margin: 4px 0; }
+  code { font-family: "Menlo", "Monaco", "Consolas", monospace; background: #eef0f2; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #cf222e; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 14px; }
+  .tier { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .meta { background: #f6f8fa; border-left: 4px solid var(--accent); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 12px 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  details { background: var(--q-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  details[open] { background: #fff; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); user-select: none; }
+  details summary:hover { text-decoration: underline; }
+  details > *:not(summary) { margin-top: 12px; }
+  .q-block { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .q-source { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .checklist { background: #f0f9ff; border: 1px solid #54aeff; border-radius: 8px; padding: 16px 20px; }
+  .checklist label { display: block; margin: 8px 0; cursor: pointer; user-select: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--muted); }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 24px 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .highlight { background: #fff8c5; padding: 0 4px; border-radius: 3px; }
+  .formula { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 14px 20px; margin: 14px 0; font-family: "Menlo", "Monaco", monospace; font-size: 15px; text-align: center; }
+  .formula-big { font-size: 17px; padding: 18px 20px; font-weight: 600; background: #fff8c5; border-left-color: #d4a72c; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📗 Final 总目录</a></span>
+  <span><a href="01-correlation.html">← 上一节</a> <a href="03-residuals.html">下一节: Residuals →</a></span>
+</nav>
+
+<main>
+  <h1>Section 2 · Regression &amp; Least Squares</h1>
+  <p class="meta">
+    <strong>覆盖讲义</strong>：Lec 24（Regression and Least Squares）｜
+    <strong>Final 出现率</strong>：<span class="tier tier-1">⭐⭐⭐ Tier 1</span>（17 套历年 Final 几乎每套都考 regression 至少 1 大题，slope/intercept 推导 + 单位换算 是绝对重头戏）｜
+    <strong>预计学习时间</strong>：2-2.5 小时
+  </p>
+
+  <div class="meta">
+    <strong>📌 这一节定位</strong>：Section 1 把 correlation r 和 regression line in <em>standard units</em> 讲完了。本节<strong>把 regression line 拉回 original units</strong>，推 slope/intercept 公式、写出代码、做预测；引入 <strong>outliers 对 r 的剧烈影响</strong>、<strong>errors / RMSE</strong>，并解释为什么"我们之前定义的 regression line 就是 least squares 解"（line of best fit / 最小化 RMSE 的那条线）。
+  </div>
+
+  <div class="toc">
+    <strong>本节目录</strong>
+    <ul>
+      <li><a href="#overview">📋 考点速览</a></li>
+      <li><a href="#concepts">📚 知识点</a>
+        <ul>
+          <li><a href="#recap">复习：regression line in SU</a></li>
+          <li><a href="#orig-units">Regression line in original units（推导）</a></li>
+          <li><a href="#formulas">Slope &amp; intercept 公式 + 代码</a></li>
+          <li><a href="#predict">用 regression line 做预测</a></li>
+          <li><a href="#unit-transforms">单位 / 线性变换对 slope &amp; intercept 的影响</a></li>
+          <li><a href="#outliers">Outliers 的剧烈影响</a></li>
+          <li><a href="#errors">Errors &amp; residuals</a></li>
+          <li><a href="#rmse">RMSE：定义 + 代码</a></li>
+          <li><a href="#least-squares">Least squares：regression line 就是"最佳"线</a></li>
+          <li><a href="#quality">Quality of fit：什么时候 regression 才有意义</a></li>
+        </ul>
+      </li>
+      <li><a href="#pitfalls">⚠️ 常见陷阱与考点</a></li>
+      <li><a href="#problems">📝 往年真题</a></li>
+      <li><a href="#checklist">✅ 自我讲解 checklist</a></li>
+    </ul>
+  </div>
+
+  <h2 id="overview">📋 考点速览</h2>
+
+  <table>
+    <thead><tr><th>考点</th><th>Tier</th><th>形式</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Slope &amp; intercept 公式</strong>：m = r·SD_y/SD_x；b = mean_y − m·mean_x</td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>代码、手算、反推（高频）</td>
+      </tr>
+      <tr>
+        <td><strong>从 (mean, SD, prediction) 反推 r 或 SD</strong></td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>Su24 Q9 / Fa22 Q6 套路</td>
+      </tr>
+      <tr>
+        <td><strong>线性变换对 slope / intercept / r 的影响</strong></td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>Wi24 Q3 / Sp24 Q14 / Wi26 Q11 / Su24 Q9.3 反复考</td>
+      </tr>
+      <tr>
+        <td><strong>"Regression line 永远过 (mean_x, mean_y)"</strong></td>
+        <td><span class="tier tier-1">⭐⭐⭐</span></td>
+        <td>多选 / 反推（Wi23 Q7 P3.4 outlier 题用到）</td>
+      </tr>
+      <tr>
+        <td><strong>Outlier 对 r 与 regression line 的剧烈影响</strong></td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>Wi23 Q7 P3.4 经典</td>
+      </tr>
+      <tr>
+        <td><strong>RMSE 定义 + 代码</strong></td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>代码 / T/F</td>
+      </tr>
+      <tr>
+        <td><strong>Regression line is the least squares line</strong>（最小化 RMSE 的那条）</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>T/F（Wi26 Q11(a) 直接考）</td>
+      </tr>
+      <tr>
+        <td>Slope in original units 没有 [-1, 1] 限制</td>
+        <td><span class="tier tier-3">⭐</span></td>
+        <td>T/F</td>
+      </tr>
+      <tr>
+        <td>选数据科学工具（regression vs hypothesis vs permutation）</td>
+        <td><span class="tier tier-2">⭐⭐</span></td>
+        <td>分类题（Wi23 Q7 P11-13）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="concepts">📚 知识点</h2>
+
+  <h3 id="recap">复习：Regression line in standard units</h3>
+
+  <p>Section 1 已建立：当 x、y 都在 standard units 时，</p>
+
+  <div class="formula formula-big">
+    predicted y<sub>(su)</sub> &nbsp;=&nbsp; r · x<sub>(su)</sub>
+  </div>
+
+  <ul>
+    <li>这条线<strong>过原点 (0, 0)</strong>，<strong>斜率 = r</strong>，且 |r| ≤ 1。</li>
+    <li>用起来不方便：每次预测都要先把 x 转 SU，预测出 y_su 后再转回原单位。</li>
+  </ul>
+
+  <p>本节目标：<strong>把这条线表达成 original units 下的 y = m·x + b 形式</strong>，这样直接代入原单位的 x 就能得到原单位的 predicted y。</p>
+
+  <h3 id="orig-units">Regression line in original units（推导）</h3>
+
+  <p>从 SU 形式出发：</p>
+  <div class="formula">
+    ( predicted y − mean of y ) / SD of y &nbsp;=&nbsp; r · ( x − mean of x ) / SD of x
+  </div>
+
+  <p>把左边乘 <code>SD of y</code>、加 <code>mean of y</code>：</p>
+  <div class="formula">
+    predicted y &nbsp;=&nbsp; r · (SD<sub>y</sub> / SD<sub>x</sub>) · (x − mean<sub>x</sub>) + mean<sub>y</sub>
+  </div>
+
+  <p>展开成 <code>predicted y = m·x + b</code>：</p>
+
+  <div class="formula formula-big">
+    m &nbsp;=&nbsp; r · ( SD of y / SD of x )<br>
+    b &nbsp;=&nbsp; mean of y − m · mean of x
+  </div>
+
+  <p class="ok">
+    <strong>这两条公式是 Final 最高频的考点</strong>。题目给"<em>5 个数</em>"（r、mean_x、mean_y、SD_x、SD_y）就能让你算 m 和 b 然后做任意预测；或者反过来给你 m、b 和部分参数让你反推 r 或某个 SD。
+  </p>
+
+  <h3 id="formulas">Slope &amp; intercept 公式 + 代码</h3>
+
+  <pre><code>def slope(df, x, y):
+    """斜率 m = r · SD_y / SD_x"""
+    r = calculate_r(df, x, y)
+    return r * np.std(df.get(y)) / np.std(df.get(x))
+
+def intercept(df, x, y):
+    """截距 b = mean_y − m · mean_x"""
+    return df.get(y).mean() - slope(df, x, y) * df.get(x).mean()</code></pre>
+
+  <h4>一个关键不变量：regression line <strong>必过 (mean_x, mean_y)</strong></h4>
+  <p>验证：代入 x = mean_x → predicted y = m·mean_x + b = m·mean_x + (mean_y − m·mean_x) = <strong>mean_y</strong>。✓</p>
+
+  <p class="warn">
+    <strong>⚠️ 这条性质 Wi23 Q7 P3.4 直接考</strong>：题目说"原数据集 regression line 过 (500, 15)"——直接告诉你 mean_x = 500、mean_y = 15。这是反推 outlier 位置的关键线索。
+  </p>
+
+  <h3 id="predict">用 regression line 做预测</h3>
+
+  <pre><code>m = slope(mom_son, 'mom', 'son')        # 0.365
+b = intercept(mom_son, 'mom', 'son')    # 45.858
+
+def predict_son(mom):
+    return m * mom + b
+
+predict_son(62)   # 68.49 inches
+predict_son(73)   # 72.51 inches</code></pre>
+
+  <p>Galton's data: <code>predicted son's height = 0.365 · mother's height + 45.858</code></p>
+
+  <h4>SU 公式 vs Original-Units 公式：什么时候用哪个？</h4>
+  <table>
+    <thead><tr><th>题目给的</th><th>用哪个公式</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>r + 一对 SU 值（例如 "x 在 average 上方 2 个 SD"）</td>
+        <td>SU 公式 <code>y_su = r · x_su</code>，最直接</td>
+      </tr>
+      <tr>
+        <td>r + 4 个原单位参数（mean_x, mean_y, SD_x, SD_y）+ 一个原单位 x</td>
+        <td>SU 公式 转 SU → 算 y_su → 转回 y。或者用 original-units 公式算 m、b 再代</td>
+      </tr>
+      <tr>
+        <td>题目里说"预测的 y 等于 ..."（含字母变量）</td>
+        <td>用 SU 公式反推 r 最快</td>
+      </tr>
+      <tr>
+        <td>给了一段代码做了一次 predict</td>
+        <td>看代码里用的 m、b → 反推 r 或 SD</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="unit-transforms">单位 / 线性变换对 slope &amp; intercept 的影响</h3>
+
+  <p><strong>Final 最高频的"什么变什么不变"题</strong>。背熟下面这个表（用 m = r · SD_y / SD_x 和 b = mean_y − m·mean_x 推一下，所有结论都能现场推出来）：</p>
+
+  <table>
+    <thead><tr><th>变换</th><th>r</th><th>m (slope)</th><th>b (intercept)</th><th>解释</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>x → x + c<br>(只给 x 加常数)</td>
+        <td>不变</td>
+        <td>不变</td>
+        <td>−m·c</td>
+        <td>scatter plot 平移不改变形状或斜率；intercept 跟着平移（mean_x 变了）</td>
+      </tr>
+      <tr>
+        <td>y → y + c</td>
+        <td>不变</td>
+        <td>不变</td>
+        <td>+c</td>
+        <td>整体抬升 c，斜率没变，截距 +c</td>
+      </tr>
+      <tr>
+        <td>x → c · x<br>(c &gt; 0)</td>
+        <td>不变</td>
+        <td>÷ c</td>
+        <td>不变</td>
+        <td>SD_x → c·SD_x，分母变 c 倍；mean_x 也变 c 倍，跟新 m 乘起来还是原来的</td>
+      </tr>
+      <tr>
+        <td>y → c · y<br>(c &gt; 0)</td>
+        <td>不变</td>
+        <td>× c</td>
+        <td>× c</td>
+        <td>SD_y → c·SD_y → m 变 c 倍；mean_y 也变 c 倍 → b 变 c 倍</td>
+      </tr>
+      <tr>
+        <td>同时 x → c·x、y → c·y<br>(同一常数)</td>
+        <td>不变</td>
+        <td><strong>不变</strong></td>
+        <td>× c</td>
+        <td>m: c 上下抵消；b: mean_y → c·mean_y，m 不变，mean_x → c·mean_x → b = c·b</td>
+      </tr>
+      <tr>
+        <td>x → (x − mean_x) / SD_x<br>(只把 x 标准化)</td>
+        <td>不变</td>
+        <td>× SD_x<br>(变成 r · SD_y)</td>
+        <td>变（新 mean_x = 0 → 新 b = mean_y）</td>
+        <td>分母变成 1；新 b 就是 mean_y</td>
+      </tr>
+      <tr>
+        <td>x 和 y 都标准化</td>
+        <td>不变</td>
+        <td>= r</td>
+        <td>= 0</td>
+        <td>这就是 SU 形式（过原点，slope = r）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="warn">
+    <strong>记忆口诀</strong>：
+    <ul>
+      <li><strong>"对 x、y 同时加常数"</strong>：slope 不变，intercept 跟着调整。</li>
+      <li><strong>"只放缩 y"</strong>：slope 和 intercept 都按 y 的缩放因子放大。</li>
+      <li><strong>"只放缩 x"</strong>：slope 按 x 缩放因子的倒数（÷ c），intercept 不变。</li>
+      <li><strong>"x、y 同步放缩"</strong>：slope 不变（抵消），intercept × c。</li>
+      <li><strong>r 永远对线性变换不变</strong>。✓</li>
+    </ul>
+  </p>
+
+  <h3 id="outliers">Outliers 的剧烈影响</h3>
+
+  <p>课程里的<strong>戏剧性例子</strong>：8 个干净的数据点 + 1 个 outlier，<strong>单个 outlier 把 r 从 0.985 拉到 −0.03</strong>，regression line 从陡升变成几乎水平：</p>
+
+  <table>
+    <thead><tr><th>数据</th><th>r</th><th>regression line</th></tr></thead>
+    <tbody>
+      <tr><td>8 干净点 + 1 outlier（位置在左上角）</td><td><strong>−0.03</strong></td><td>y = −0.05x + 67.82（几乎水平）</td></tr>
+      <tr><td>移除 outlier 后</td><td><strong>0.985</strong></td><td>y = 0.98x + 3.04（陡升 + 极贴线）</td></tr>
+    </tbody>
+  </table>
+
+  <p class="danger">
+    <strong>🚨 这是 regression 分析的<em>核心警告</em></strong>：永远<strong>先画 scatter plot</strong>看 outliers。一两个极端值就能让 r 和 regression line 完全失真。<br>
+    Final 考题措辞举例："removing the outlier"、"if we added a point at ..."、"the regression line passes through (mean_x, mean_y) and ..."——都在暗示 outlier 的杠杆作用。
+  </p>
+
+  <h4>Outlier 的"杠杆点"性质</h4>
+  <p>因为 regression line 必过 <code>(mean_x, mean_y)</code>，所以加 / 减一个数据点：</p>
+  <ul>
+    <li>会改变 mean_x、mean_y（pivot 点本身移动）</li>
+    <li>会改变 SD_x、SD_y（spread 增大或减小）</li>
+    <li>会改变 r（pivot 周围的"贴线度"变了）</li>
+    <li>→ slope 和 intercept <strong>都</strong>跟着变</li>
+  </ul>
+
+  <h3 id="errors">Errors &amp; residuals</h3>
+
+  <div class="formula formula-big">
+    error &nbsp;=&nbsp; actual y − predicted y
+  </div>
+
+  <p>对每个数据点 <code>(x_i, y_i)</code>：</p>
+  <ul>
+    <li><strong>actual y</strong> = y_i（真实观测值）</li>
+    <li><strong>predicted y</strong> = m · x_i + b（regression line 给的预测）</li>
+    <li><strong>error / residual</strong> = y_i − (m · x_i + b)</li>
+  </ul>
+
+  <p>使用 <strong>regression line</strong> 时，error 也叫 <strong>residual</strong>（残差）。两个词在<em>regression 语境下</em>是同义词。</p>
+
+  <h4>error 的两个关键性质（对 regression line）</h4>
+  <ul>
+    <li><strong>errors 的均值 = 0</strong>（理论上精确为 0，浮点上是 1e-15 量级）。直觉：regression line 过 (mean_x, mean_y)，误差正负互相抵消。</li>
+    <li>"好"的 regression line：errors 应该<strong>小</strong>且<strong>没有 pattern</strong>（具体见 Section 3 / Lec 25 residual plot）。</li>
+  </ul>
+
+  <h3 id="rmse">RMSE：定义 + 代码</h3>
+
+  <p>要量化"errors 多大"——课程用 <strong>Root Mean Squared Error (RMSE)</strong>：</p>
+
+  <div class="formula formula-big">
+    RMSE &nbsp;=&nbsp; √( mean of ( errors )² )
+  </div>
+
+  <p>三步算法：</p>
+  <ol>
+    <li>每个 error <strong>平方</strong>（避免正负抵消）</li>
+    <li>取所有平方误差的<strong>均值</strong></li>
+    <li>开<strong>方根</strong>，恢复 y 的单位</li>
+  </ol>
+
+  <pre><code># 算 regression line 的 RMSE
+predicted_y = m * without_outlier.get('x') + b
+errors = without_outlier.get('y') - predicted_y
+rmse = np.sqrt((errors ** 2).mean())   # ≈ 2.20</code></pre>
+
+  <p>给定任意 (slope, intercept)，可以算它的 RMSE：</p>
+  <pre><code>def rmse(slope, intercept):
+    true = without_outlier.get('y')
+    predicted = slope * without_outlier.get('x') + intercept
+    return np.sqrt(((true - predicted) ** 2).mean())</code></pre>
+
+  <p class="tip">
+    <strong>RMSE 与 SD 的相似性</strong>：SD 是"数据偏离 <em>mean</em>"的平均距离；RMSE 是"数据偏离 <em>regression line</em>"的平均距离。同样的"平方→均值→开方"模板。
+  </p>
+
+  <h3 id="least-squares">Least squares：regression line 就是"最佳"线</h3>
+
+  <p>问题：有无限多 (slope, intercept) 组合 → 无限多 RMSE。哪一组 RMSE 最小？</p>
+
+  <pre><code>from scipy.optimize import minimize   # 课程封装的 minimize
+
+# 最小化 rmse(slope, intercept) 的输入
+smallest_rmse_line = minimize(rmse)
+# array([0.98, 3.04])</code></pre>
+
+  <p>这两个数字看着眼熟吗？</p>
+
+  <pre><code>slope(without_outlier, 'x', 'y'), intercept(without_outlier, 'x', 'y')
+# (0.9759..., 3.0423...)</code></pre>
+
+  <div class="ok">
+    <strong>🎯 课程核心结论</strong>：用 <code>m = r · SD_y / SD_x</code> 和 <code>b = mean_y − m·mean_x</code> 算出的 regression line，<strong>就是</strong>所有可能的 line 中 <strong>RMSE 最小</strong>的那条。
+  </div>
+
+  <h4>等价名字（考试可能换着叫，认清）</h4>
+  <ul>
+    <li><strong>Regression line</strong></li>
+    <li><strong>Line of best fit</strong>（最佳拟合线）</li>
+    <li><strong>Least squares line</strong>（最小二乘法线）</li>
+  </ul>
+  <p>找这条 slope / intercept 的方法叫 <strong>method of least squares</strong>（最小二乘法）。</p>
+
+  <p class="warn">
+    <strong>⚠️ Wi26 Final Q11 (a) 的陷阱</strong>：选项 "Some other line could have a lower average squared residual than this line" —— <strong>错</strong>。Regression line 的<em>定义</em>就是 minimize squared error，没有其它直线能做到更低。
+  </p>
+
+  <h3 id="quality">Quality of fit：什么时候 regression 才有意义？</h3>
+
+  <p>关键警告：<strong>slope / intercept 公式对<em>任何</em>数据都能算出来</strong>，但 regression line 本身只在数据"<strong>大致 linear</strong>"时才<em>有意义</em>。</p>
+
+  <h4>反例：非线性数据</h4>
+  <p>对一个抛物线状数据集，强行算 regression line：</p>
+  <ul>
+    <li>slope ≈ 0.14、intercept ≈ 13.10</li>
+    <li>这条线看起来几乎水平 + 远离绝大部分数据点</li>
+    <li>"line of best fit" 没错（在<em>所有直线</em>里它确实最优），但<strong>直线根本不适合这个数据</strong>——应该用更复杂的非线性模型</li>
+  </ul>
+
+  <p class="warn">
+    <strong>判断"该不该用 regression line"的三件套</strong>：
+    <ul>
+      <li>(1) 看 scatter plot 形状是不是 roughly linear</li>
+      <li>(2) 看 |r| 是否接近 1（弱关联 → regression 的预测也弱）</li>
+      <li>(3) <strong>看 residual plot</strong>（Lec 25 / Section 3）—— curvature 暴露非线性</li>
+    </ul>
+  </p>
+
+  <hr>
+
+  <h2 id="pitfalls">⚠️ 常见陷阱与考点</h2>
+
+  <h3>陷阱 1：slope 公式方向写反</h3>
+  <p>正确：<code>m = r · SD_y / SD_x</code>。<br>
+  <strong>错</strong>：<code>m = r · SD_x / SD_y</code>（很多人记混）。<br>
+  记忆法：predicted <em>y</em> 在分子上 → SD<em>_y</em> 在分子上。"y 的变化幅度 / x 的变化幅度" 就是 slope。</p>
+
+  <h3>陷阱 2：intercept 公式记混</h3>
+  <p>正确：<code>b = mean_y − m · mean_x</code>。<br>
+  这是 "regression line 必过 (mean_x, mean_y)" 的代数等价。<br>
+  记忆法：把 (mean_x, mean_y) 代回 y = m·x + b → mean_y = m·mean_x + b → b = mean_y − m·mean_x。</p>
+
+  <h3>陷阱 3：slope in original units 没有 [-1, 1] 限制</h3>
+  <p>只有 <strong>SU 形式</strong>下 slope = r 才在 [-1, 1]。original units 下 slope 可以是任意实数。<br>
+  考题原话："The slope of the regression line, when both variables are measured in <strong>original units</strong>, is never more than 1." → <strong>False</strong>。<br>
+  反例：x 增 1，y 增 20 → slope = 20。</p>
+
+  <h3>陷阱 4：r &gt; 0 时 slope &gt; 0；r &lt; 0 时 slope &lt; 0（永远）</h3>
+  <p>这是<strong>对的</strong>，因为 SD 永远 ≥ 0，<code>m = r · SD_y / SD_x</code> 的符号 = r 的符号。<br>
+  Wi23 Q8 P14.1 直接考：知道 prediction 是 positive 在 SU 上 + x_su 也是 positive → r &gt; 0。</p>
+
+  <h3>陷阱 5：知道 (slope, intercept) 反推 r、mean、SD</h3>
+  <p>给 m、b 和部分 (mean_x, mean_y, SD_x, SD_y, r) → 用 <code>m = r · SD_y / SD_x</code> 和 <code>b = mean_y − m·mean_x</code> 两条公式联立求解。<br>
+  <strong>注意</strong>：这两条公式有 5 个未知数 (r、mean_x、mean_y、SD_x、SD_y)，要求出全部需要至少 3 个额外约束。考题一般会给你足够信息。</p>
+
+  <h3>陷阱 6：bootstrap regression line ≠ bootstrap prediction</h3>
+  <p>"95% bootstrapped slopes 在 [a, b]、95% bootstrapped intercepts 在 [c, d]" <strong>不</strong>等于 "95% predicted prices for x = 500 在 [500a + c, 500b + d]"。<br>
+  原因：slope 和 intercept 的 bootstrap 分布<strong>不独立</strong>——同一次 resample 同时决定一组 (m, b)；不能把 slope CI 的端点和 intercept CI 的端点<strong>独立组合</strong>。<br>
+  对每个 x 算 prediction CI 的正确做法：<strong>对每次 bootstrap 算出 (m_i, b_i)，再算 predicted y_i = m_i · x + b_i，对这些 predicted y 取百分位数</strong>。</p>
+
+  <h3>陷阱 7：dataset 重复行影响 regression</h3>
+  <p>"原 dataset 每个 unique book 一行；如果改成每 copy 一行（有多本相同书）" → regression line 会变吗？<strong>会变</strong>。因为重复行影响 mean、SD、r（高频出现的书的影响被放大）。<br>
+  这是 Wi23 Q7 P3.5 直接考。</p>
+
+  <h3>陷阱 8："y-intercept must be positive since all y values are positive" → False</h3>
+  <p>常见错觉：所有数据点 y &gt; 0，所以 line 在 y 轴上的截距也 &gt; 0。<br>
+  <strong>反例</strong>：数据点都在 x &gt; 0 区域且 y &gt; 0，但 regression line<em>向左延伸到 x = 0</em>时 y 可以是负的。intercept 只是数学上 line 在 x = 0 的值，<strong>跟数据范围无关</strong>。<br>
+  Wi24 Quiz 6 Q2 P16.4 直接考这个。</p>
+
+  <hr>
+
+  <h2 id="problems">📝 往年真题</h2>
+
+  <p class="meta">题目来源：<code>practice.dsc10.com/lectures/lec24/</code> 收录的真题（按知识点标签聚合）+ 近期 Final。</p>
+
+  <h3>真题 1：Wi23 Final Q7 P3.1 ⭐⭐⭐（regression line 多选 · 综合）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2023 Final · Problem 3.1（Bill's Book Bonanza · 4 个 T/F）</div>
+    <p>书店 regression line 过 <strong>(500, 15)</strong>（mean pages = 500，mean price = $15）。其它参数：<code>r = 0.6</code>，SD pages = 200，SD price = 4。下面哪些<strong>必为真</strong>？多选。</p>
+    <ol type="A">
+      <li>It goes through the point (500, 15).</li>
+      <li>It goes through the point (200, 4).</li>
+      <li>Its slope is equal to 0.6.</li>
+      <li>Its y-intercept is equal to 9.</li>
+      <li>Its RMSE is larger than the RMSE of some other line through this data.</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：A 和 D</strong>（官方：Options 1 and 4）</p>
+      <ul>
+        <li>(A) ✅ regression line 必过 <code>(mean_x, mean_y) = (500, 15)</code>。这是定义。</li>
+        <li>(B) ❌ 没有理由必过 (SD_x, SD_y)。</li>
+        <li>(C) ❌ slope = r · SD_y / SD_x = 0.6 · 4 / 200 = <strong>0.012</strong>，不是 0.6。slope ≠ r（除非 SD 比例为 1）。</li>
+        <li>(D) ✅ b = mean_y − m·mean_x = 15 − 0.012·500 = 15 − 6 = <strong>9</strong>。</li>
+        <li>(E) ❌ regression line<em>就是</em> RMSE 最小的线。没有更小的 RMSE。</li>
+      </ul>
+      <p class="tip"><strong>套路总结</strong>：给 r、mean_x、mean_y、SD_x、SD_y 五个数 → 立刻算 m = r·SD_y/SD_x，然后 b = mean_y − m·mean_x。再把任意 x 代进 m·x + b 做预测。</p>
+    </details>
+  </div>
+
+  <h3>真题 2：Wi23 Final Q7 P3.2 ⭐⭐（用 slope 算 Δy）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2023 Final · Problem 3.2（书店 · 同样参数）</div>
+    <p>"The Martian" 比 "The Simple Wild" 多 30 页。两本书都按 regression line 定价。多多少钱？给出 dollars and cents 数字。</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：$0.36</strong></p>
+      <p>predicted y = 0.012 · x + 9。两本书：</p>
+      <ul>
+        <li>Δx = 30 (pages)</li>
+        <li>Δ predicted y = m · Δx = 0.012 · 30 = <strong>$0.36</strong></li>
+      </ul>
+      <p class="tip"><strong>速算技巧</strong>：算"两个 x 的 predicted y 之差"只需要 slope，不需要 intercept（intercept 抵消）。</p>
+    </details>
+  </div>
+
+  <h3>真题 3：Wi23 Final Q7 P3.3 ⭐⭐（基本预测）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2023 Final · Problem 3.3（书店 · 给 pages 算 price）</div>
+    <p>"The Goldfinch" 有 700 页。按 regression line 应该定多少钱？</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：$17.40</strong></p>
+      <p>predicted y = 0.012 · 700 + 9 = 8.40 + 9 = <strong>17.40</strong></p>
+    </details>
+  </div>
+
+  <h3>真题 4：Wi23 Final Q7 P3.4 ⭐⭐⭐（outlier 反推 · 杠杆点）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2023 Final · Problem 3.4（书店 · regression line 被 outlier 影响）</div>
+    <p>原 Dhruv 用错误数据建了线（其中 "Roadside Picnic" 的 price 误录为 −$12 而非 $12）。改正后重建线，<strong>slope 减小</strong>。问 "Roadside Picnic" 有<strong>多少页</strong>？(选项)</p>
+    <ul>
+      <li>fewer than 500 pages</li>
+      <li>more than 500 pages</li>
+      <li>exactly 500 pages</li>
+      <li>not enough information</li>
+    </ul>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：fewer than 500 pages</strong></p>
+      <p><strong>关键直觉</strong>：</p>
+      <ul>
+        <li>regression line 必过 (mean_x, mean_y) = (500, 15)（pivot 点）。</li>
+        <li>原数据里 "Roadside Picnic" price 是 −$12（极低，离 mean 很远在下方）。</li>
+        <li>改正后 price 变成 +$12（仍低于 mean = 15，但接近多了）。</li>
+        <li>这相当于把"原来的 outlier"<strong>朝上提</strong>了。</li>
+        <li>这本书在 pivot 的哪一侧（pages 比 500 大还是小）决定了它怎么"撬动"线：
+          <ul>
+            <li>如果 pages &lt; 500（pivot 左侧）：把它的 y 提高 → 左侧 y 上升 → 线 <strong>左端上升，右端下降 → slope 减小</strong> ✓</li>
+            <li>如果 pages &gt; 500：把它的 y 提高 → 右侧 y 上升 → slope 增大 ✗</li>
+          </ul>
+        </li>
+        <li>题目说 slope 减小 → "Roadside Picnic" 在左侧 → <strong>pages &lt; 500</strong>。</li>
+      </ul>
+      <p class="warn"><strong>核心套路</strong>：outlier 是"杠杆点"，影响方向取决于它在 pivot (mean_x, mean_y) 的哪一侧 + 它的 y 向哪边偏。</p>
+    </details>
+  </div>
+
+  <h3>真题 5：Wi23 Final Q7 P3.6 ⭐⭐（bootstrap regression · prediction interval 陷阱）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2023 Final · Problem 3.6（bootstrap slope &amp; intercept 与 prediction interval）</div>
+    <p>对 scatter plot bootstrap 10000 次，每次得一组 (slope, intercept)。95% 的 slopes 在 <code>[a, b]</code>，95% 的 intercepts 在 <code>[c, d]</code>。这是否意味着 "用 regression line 预测 500 页的书的价格"的 95% 区间是 <code>[500a + c, 500b + d]</code>？</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：No</strong></p>
+      <p>关键：slope 和 intercept 的 bootstrap 分布<strong>不独立</strong>——同一次 resample 决定一组 (m_i, b_i)。把 slope CI 的端点 a、b 与 intercept CI 的端点 c、d <strong>独立组合</strong>是错的。</p>
+      <p><strong>正确做法</strong>：对每次 bootstrap 算 predicted price = m_i · 500 + b_i，得到 10000 个 predicted prices，取这些 prices 的 [2.5, 97.5] percentile。</p>
+      <p class="tip">这个题型 Lec 25（Section 3）会更详细讲。</p>
+    </details>
+  </div>
+
+  <h3>真题 6：Wi23 Final Q7 P11-13 ⭐⭐⭐（选数据科学工具 · Final 综合考察）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2023 Final · Problem 11/12/13（每题选最合适的工具）</div>
+    <p>选项：hypothesis testing / permutation (A/B) testing / Central Limit Theorem / regression</p>
+    <p><strong>(P11)</strong> Are nonfiction books longer than fiction books?<br>
+    <strong>(P12)</strong> Do people have more friends as they get older?<br>
+    <strong>(P13)</strong> Does an ice cream shop sell more chocolate or vanilla?</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <ul>
+        <li><strong>P11 → permutation testing</strong>。两组（fiction / nonfiction）来自不同 distribution 吗？没有 known population → 不能 standard hypothesis；不是 single proportion → 不是 CLT；两组比较 → permutation。</li>
+        <li><strong>P12 → regression</strong>。两个 continuous 变量（age vs # friends）的关系 → regression 最适合。</li>
+        <li><strong>P13 → hypothesis testing</strong>。Single proportion（chocolate 占总和的比例 = 0.5 吗）→ standard hypothesis test。</li>
+      </ul>
+      <p class="warn"><strong>工具判断决策树</strong>：
+        <ul>
+          <li>两个 continuous 变量的<em>关系</em> → regression</li>
+          <li>两组样本是否同分布（没有 population 参数）→ permutation</li>
+          <li>单样本 vs 已知 population distribution → standard hypothesis testing（可结合 CLT）</li>
+          <li>估 population parameter → bootstrap CI 或 CLT CI</li>
+        </ul>
+      </p>
+    </details>
+  </div>
+
+  <h3>真题 7：Su24 Final Q9 Problem 9 ⭐（T/F · slope in original units 范围）</h3>
+  <div class="q-block">
+    <div class="q-source">Summer 2024 Final · Problem 9（T/F · slope in original units）</div>
+    <p>True or False: The slope of the regression line, when both variables are measured in <strong>original units</strong>, is never more than 1.</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：False</strong></p>
+      <p>反例：如果 x 增 1，y 增 20，slope = 20 &gt; 1。slope = r · SD_y / SD_x 在 original units 下可以是任意实数，因为 SD_y / SD_x 没有上界。<strong>只有 SU 形式</strong>下 slope = r 才在 [-1, 1]。</p>
+    </details>
+  </div>
+
+  <h3>真题 8：Su24 Final Q9 P8.1 ⭐⭐⭐（反推 SD_y · 经典题型）</h3>
+  <div class="q-block">
+    <div class="q-source">Summer 2024 Final · Problem 8.1（Tour de France 阶段时长）</div>
+    <p>给定 mean stage length (km) = 200，SD = 80，mean time (h) = 6，r = 2/3。Regression 预测 160 km 的阶段需要 5 hours。求 SD_time。</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：3 hours</strong></p>
+      <p>用 SU 公式 <code>y_su = r · x_su</code>：</p>
+      <ul>
+        <li>x_su = (160 − 200) / 80 = <strong>−0.5</strong></li>
+        <li>predicted y_su = (5 − 6) / SD_y = <strong>−1 / SD_y</strong></li>
+        <li>代入：−1 / SD_y = (2/3) · (−0.5) = −1/3</li>
+        <li>→ SD_y = <strong>3</strong></li>
+      </ul>
+      <p class="tip"><strong>题型模板</strong>：题目给"mean_x、SD_x、mean_y、r、一对 (x, predicted y)" → 缺哪个就用 <code>y_su = r · x_su</code> 反推哪个。SD_y 缺 → 反推 SD_y；r 缺 → 反推 r；mean_y 缺 → 反推 mean_y。</p>
+    </details>
+  </div>
+
+  <h3>真题 9：Su24 Final Q9 P8.3 ⭐⭐（加常数对 slope 的影响）</h3>
+  <div class="q-block">
+    <div class="q-source">Summer 2024 Final · Problem 8.3（所有 stage 加 30 min 休息）</div>
+    <p>每个 Tour de France stage 强制加 30 分钟（0.5 hours）休息。Regression line 的 <strong>slope</strong> 会怎么变？</p>
+    <ol type="A">
+      <li>Decrease</li>
+      <li>Stay the same</li>
+      <li>Increase</li>
+      <li>Cannot say for sure</li>
+    </ol>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：B（Stay the same）</strong></p>
+      <p>加 30 min 是 <code>y → y + 0.5</code>。整体平移：mean_y 增 0.5，SD_y 不变（spread 不变），r 不变（SU 计算里平移被减掉）。所以 m = r·SD_y/SD_x 不变。</p>
+      <p>（intercept 会变：<code>b → b + 0.5</code>。）</p>
+    </details>
+  </div>
+
+  <h3>真题 10：Su24 Final Q9 P8.4 ⭐⭐⭐（反推 r · 极端情况）</h3>
+  <div class="q-block">
+    <div class="q-source">Summer 2024 Final · Problem 8.4（同 mean/SD，新 r）</div>
+    <p>同样的 means、SDs（mean_x = 200，SD_x = 80，mean_y = 6，SD_y = 1.5）。若预测 360 km 的 stage 需要 9 hours，求 r。</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：r = 1</strong></p>
+      <p>用 SU：</p>
+      <ul>
+        <li>x_su = (360 − 200) / 80 = <strong>2</strong></li>
+        <li>predicted y_su = (9 − 6) / 1.5 = <strong>2</strong></li>
+        <li>代入：2 = r · 2 → r = <strong>1</strong></li>
+      </ul>
+      <p class="tip">当 x_su 和 predicted y_su 相等时（且都不为 0），r = 1（完美正向 linear）。</p>
+    </details>
+  </div>
+
+  <h3>真题 11：Wi24 Quiz 6 P16.4 ⭐⭐（intercept &amp; 正负陷阱）</h3>
+  <div class="q-block">
+    <div class="q-source">Winter 2024 Quiz 6 · Problem 16.4（"intercept must be positive"）</div>
+    <p>True or False: Since the number of parking spaces is always a positive integer, the regression line predicting total spaces from S spaces <strong>must have a positive y-intercept</strong>.</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>答案：False</strong></p>
+      <p>intercept = regression line 在 x = 0 时的 y 值。即使所有数据点的 x、y 都 &gt; 0，<strong>line 向左延伸到 x = 0 时 y 可以是负的</strong>。</p>
+      <p>反例：数据点 (10, 20)、(20, 35)、(30, 50)。slope = 1.5，b = mean_y − m·mean_x = 35 − 1.5·20 = 5（正）。但如果数据是 (10, 5)、(20, 8)、(30, 11)，slope = 0.3，b = 8 − 0.3·20 = 2（仍正）。现在数据是 (100, 10)、(200, 20)、(300, 30)：slope = 0.1，b = 20 − 0.1·200 = 0（正）。<br>但 (100, 10)、(200, 15)、(300, 18)：slope ≈ 0.04，b = mean_y − slope·mean_x = 14.33 − 0.04·200 ≈ 6.3（正）。要 intercept &lt; 0 比较困难但<strong>原理上可能</strong>，只要 mean_y &lt; m·mean_x 即可。</p>
+      <p class="warn">关键：intercept 是<strong>纯数学</strong>，跟数据是否非负<strong>无关</strong>。</p>
+    </details>
+  </div>
+
+  <h3>真题 12：Sp23 Final Q11 P6.1/6.2 ⭐⭐（比较 slope 大小）</h3>
+  <div class="q-block">
+    <div class="q-source">Spring 2023 Final · Problem 6.1/6.2（4 个 slope 的比较）</div>
+    <p>4 个 regression 配对：</p>
+    <ol>
+      <li>Predict Rent (mean $2500, SD $500) from Sqft (mean 800, SD 200)，r = 0.7</li>
+      <li>Predict Sqft from Rent，r = 0.7</li>
+      <li>Predict Rent from Bedrooms (mean 2, SD 0.5)，r = 0.5</li>
+      <li>Predict Bedrooms from Rent，r = 0.5</li>
+    </ol>
+    <p>(a) 哪个 slope 最<strong>大</strong>？(b) 哪个 slope 最<strong>小</strong>？</p>
+    <details>
+      <summary>显示答案 &amp; 解析</summary>
+      <p><strong>(a) 答案：Option 3</strong>（最大）。<strong>(b) 答案：Option 4</strong>（最小）。</p>
+      <ul>
+        <li>Option 1：m = 0.7 · 500 / 200 = 1.75</li>
+        <li>Option 2：m = 0.7 · 200 / 500 = 0.28</li>
+        <li>Option 3：m = 0.5 · 500 / 0.5 = <strong>500</strong>（每多一间卧室预测多 $500 房租）</li>
+        <li>Option 4：m = 0.5 · 0.5 / 500 = <strong>0.0005</strong>（每多 $1 房租预测多 0.0005 间卧室）</li>
+      </ul>
+      <p class="tip"><strong>直觉</strong>：predict y 的 SD<em>大</em>变量从 SD<em>小</em>变量 → slope 大；反过来 → slope 小。</p>
+    </details>
+  </div>
+
+  <hr>
+
+  <h2 id="checklist">✅ 自我讲解 checklist</h2>
+  <p>看完本节后，对着 Claude 把下面每条都讲一遍（要能讲<strong>为什么</strong>）：</p>
+
+  <div class="checklist">
+    <label><input type="checkbox"><span> 写出 regression line in original units 的两条公式 m 和 b（不准看），并说明每条是怎么从 SU 形式推出来的。</span></label>
+    <label><input type="checkbox"><span> 为什么 regression line <strong>必</strong>过 (mean_x, mean_y)？用 b 的公式代入验证。</span></label>
+    <label><input type="checkbox"><span> 给 r = 0.6，mean_x = 500，mean_y = 15，SD_x = 200，SD_y = 4 → 算 m 和 b（手算）。</span></label>
+    <label><input type="checkbox"><span> SU 形式 slope = r ∈ [-1, 1]，original units 形式 slope 没有这个限制——为什么？给一个 slope = 20 的例子。</span></label>
+    <label><input type="checkbox"><span> 单位变换表：x → x + c 时 m 不变、b 改变；y → c·y 时 m × c、b × c；x、y 同步 × c 时 m 不变。每条用公式推一遍。</span></label>
+    <label><input type="checkbox"><span> 标准化 x（只 x）后 regression line 长什么样？新的 m 是什么？新的 b 是什么？</span></label>
+    <label><input type="checkbox"><span> Outlier 的"杠杆点"性质：为什么 outlier 在 pivot 哪一侧 + y 方向偏哪边决定了 slope 的变化方向？讲 Wi23 Q7 P3.4 的推理。</span></label>
+    <label><input type="checkbox"><span> error / residual 的定义。为什么 regression line 的 errors 之和 = 0？</span></label>
+    <label><input type="checkbox"><span> RMSE 的三步算法（平方、均值、开方）+ 写出对应代码。RMSE 与 SD 的相似性。</span></label>
+    <label><input type="checkbox"><span> 为什么 regression line 是 "least squares line"？没有其它直线 RMSE 比它更小——Wi26 Q11(a) 选项陷阱讲一遍。</span></label>
+    <label><input type="checkbox"><span> regression line, line of best fit, least squares line 是同义词。method of least squares 是干啥的。</span></label>
+    <label><input type="checkbox"><span> "all my data has y &gt; 0，所以 intercept &gt; 0" 为什么是错的？给一个反例。</span></label>
+    <label><input type="checkbox"><span> Bootstrap regression line 的陷阱：为什么不能把 slope CI 端点和 intercept CI 端点"独立组合"算 prediction CI？正确做法是什么？</span></label>
+    <label><input type="checkbox"><span> 选数据科学工具的决策树：什么时候用 regression vs hypothesis testing vs permutation vs CLT？讲 Wi23 P11-13 三个例子。</span></label>
+    <label><input type="checkbox"><span> "Slope 公式分子分母方向写反"是高频错误——用一个具体例子（比如 mean_x = 100, mean_y = 10）讲一遍正确的算法。</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="index.html">📗 Final 总目录</a></span>
+  <span><a href="01-correlation.html">← 上一节</a> <a href="03-residuals.html">下一节: Residuals →</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

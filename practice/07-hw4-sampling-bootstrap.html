@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 07 · HW 4 — Sampling &amp; Bootstrap CI · DSC10</title>
+<style>
+  :root { --bg:#fafaf7; --text:#1f2328; --muted:#57606a; --accent:#0969da; --code-bg:#1e1e2e; --code-text:#cdd6f4; --warn-bg:#fff8c5; --warn-border:#d4a72c; --tip-bg:#ddf4ff; --tip-border:#54aeff; --ok-bg:#dafbe1; --ok-border:#1a7f37; --tier-1:#cf222e; --tier-2:#bf8700; --tier-3:#6e7781; --border:#d0d7de; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.7; font-size:16px; }
+  .nav-top, .nav-bottom { background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:14px; flex-wrap:wrap; gap:8px; }
+  .nav-bottom { border-bottom:none; border-top:1px solid var(--border); margin-top:60px; }
+  .nav-top a, .nav-bottom a { color:var(--accent); text-decoration:none; margin-right:16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration:underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color:var(--muted); cursor:not-allowed; text-decoration:none; }
+  main { max-width:880px; margin:0 auto; padding:32px 24px 60px; }
+  h1 { font-size:28px; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:22px; margin-top:48px; border-left:4px solid var(--accent); padding-left:12px; }
+  h3 { font-size:18px; margin-top:28px; }
+  p, ul, ol { margin:12px 0; }
+  ul, ol { padding-left:28px; }
+  li { margin:4px 0; }
+  code { font-family:"Menlo","Monaco","Consolas",monospace; background:#eef0f2; padding:2px 6px; border-radius:4px; font-size:14px; color:#cf222e; }
+  pre { background:var(--code-bg); color:var(--code-text); padding:16px; border-radius:8px; overflow-x:auto; font-size:14px; line-height:1.5; margin:16px 0; }
+  pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:14px; }
+  .tier { display:inline-block; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:600; margin-right:8px; }
+  .tier-1 { background:#ffebe9; color:var(--tier-1); border:1px solid #ffcecb; }
+  .tier-2 { background:#fff8c5; color:var(--tier-2); border:1px solid #d4a72c; }
+  .meta { background:#f6f8fa; border-left:4px solid var(--accent); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .warn { background:var(--warn-bg); border-left:4px solid var(--warn-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .tip { background:var(--tip-bg); border-left:4px solid var(--tip-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .ok { background:var(--ok-bg); border-left:4px solid var(--ok-border); padding:10px 14px; margin:12px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .q-block { background:#fff; border:1px solid var(--border); border-radius:8px; padding:18px 20px; margin:22px 0; }
+  .q-id { display:inline-block; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:4px; margin-right:10px; letter-spacing:0.5px; }
+  .q-title { font-size:16px; font-weight:600; }
+  .q-stmt { color:var(--muted); font-size:14px; margin:10px 0; border-left:3px solid #d0d7de; padding-left:10px; font-style:italic; }
+  .think, .why { margin:12px 0; font-size:14.5px; }
+  .think strong { color:#6f42c1; }
+  .why strong { color:#1f883d; }
+  .checklist { background:#f0f9ff; border:1px solid #54aeff; border-radius:8px; padding:16px 20px; }
+  .checklist label { display:block; margin:8px 0; cursor:pointer; user-select:none; }
+  .checklist input[type="checkbox"] { margin-right:8px; transform:scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration:line-through; color:var(--muted); }
+  .toc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:24px 0; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { margin:4px 0; }
+  .toc a { color:var(--accent); text-decoration:none; }
+  .crosslink { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:20px 0; font-size:14px; }
+  .crosslink h4 { margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600; }
+  .crosslink ul { margin:4px 0; padding-left:20px; }
+  .crosslink a { color:var(--accent); text-decoration:none; }
+  table { border-collapse:collapse; width:100%; margin:16px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 12px; text-align:left; }
+  th { background:#f6f8fa; font-weight:600; }
+  hr { border:none; border-top:1px solid var(--border); margin:40px 0; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="06-lab4-bootstrap-german-tank.html">⬅ 上一份：Lab 4</a> | <a href="08-midterm-project-spotify.html">下一份 ➡：Midterm Project</a></span>
+</nav>
+
+<main>
+  <h1>Practice 07 · HW 4 — Sampling, Bootstrap, CI 解读</h1>
+  <p class="meta">
+    <strong>原始截止</strong>：HW 4（CIT 9–13 之间）｜
+    <strong>对应模块</strong>：Midterm（lotto 部分）+ Quiz 3（bootstrap CI）｜
+    <strong>主题</strong>：lotto 模拟、convenience vs SRS、bootstrap CI、CI 解读 4 道连续陷阱、Uber/Lyft 价格对比 ｜
+    <strong>预计时长</strong>：3 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#overview">📋 作业概览 + 知识点回链</a></li>
+      <li><a href="#sec1">📚 Section 1 — Lucky Triton Lotto cont'd（Q1.1–1.5）simulation 实战</a></li>
+      <li><a href="#sec2">📚 Section 2 — Sampling with NBA Data（Q2.1–2.5）convenience vs SRS</a></li>
+      <li><a href="#sec3">📚 Section 3 — Milk Tea, Yippee!（Q3.1–3.10）bootstrap + CI 解读</a></li>
+      <li><a href="#sec4">📚 Section 4 — Need a Lyft?（Q4.1–4.3）按组 bootstrap</a></li>
+      <li><a href="#pitfalls">⚠️ 本作业典型陷阱</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="overview">📋 作业概览</h2>
+
+  <p>HW 4 跨越 Midterm 末期到 Quiz 3 初期，是 sampling/bootstrap 概念扎根的一份关键作业。结构：</p>
+  <ol>
+    <li><strong>Section 1（Lotto）</strong>：把上学期末的"中奖概率"主题延续到模拟——买 100,000 张票看实际中奖期望（结果：必亏）。</li>
+    <li><strong>Section 2（NBA）</strong>：convenience sample（只挑特定球队）vs SRS。理解为什么 convenience 即使<u>大</u>也<u>不能</u>代表 population。</li>
+    <li><strong>Section 3（Milk Tea）</strong>：Quiz 3 的<strong>核心</strong>——bootstrap CI + <u>连续 5 道 CI 解读题</u>。Q3.4 / 3.5 / 3.6 / 3.7 / 3.10 是 Quiz 3 必考概念的浓缩。</li>
+    <li><strong>Section 4（Uber/Lyft）</strong>：按组 bootstrap——query <u>之前</u>不是 <u>之后</u>，写通用 <code>app_and_hist</code> 函数。</li>
+  </ol>
+
+  <p><strong>Tier 速览</strong>：</p>
+  <ul>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q3.4：CI <u>不是</u>"95% 的<u>值</u>落在其中"——CI 是关于 <u>parameter</u> 的，不是关于<u>个体分布</u>的范围。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q3.5：CI <u>不是</u>"truth 有 95% 概率落在 CI"——truth 固定，CI 是 random 的。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q3.6：2000 个独立 95% CI 中约 <strong>1900</strong> 个含 truth。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q3.7：confidence level 越高 → CI 越<strong>宽</strong>。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q3.10：difference CI 比 single-proportion CI <strong>更宽</strong>（unc. of diff = unc(A) + unc(B)）。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q4.1：babypandas mean() 处理 string 列会报错——先 <code>get([...])</code> 再 groupby。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q4.2：<strong>先 query 后 bootstrap</strong>，而<u>不是</u>先 bootstrap 再 query。</li>
+    <li><span class="tier tier-2">⭐⭐</span> Q2.3：convenience sample 不行，<u>样本大小弥补不了</u>。</li>
+  </ul>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链：</h4>
+    <ul>
+      <li>Bootstrap 模板、CI 计算 → <a href="../quiz3/02-bootstrap-ci.html#concepts">quiz3/02-bootstrap-ci</a></li>
+      <li>CI 解读（Q3.4–3.7、Q3.10 的根）→ <a href="../quiz3/03-ci-interpretation-spread.html#concepts">quiz3/03-ci-interpretation-spread</a></li>
+      <li>Population / sample、parameter / statistic、SRS vs convenience → <a href="../quiz3/01-distributions-sampling.html#concepts">quiz3/01-distributions-sampling</a></li>
+      <li>Simulation 模板（Section 1）→ <a href="../midterm/07-probability-simulation.html">midterm/07-probability-simulation</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec1">📚 Section 1 — Lucky Triton Lotto, Continued</h2>
+
+  <p><strong>背景</strong>：彩票规则——5 个 1–29 之间的数 + 1 个 1–8 的 "Tritonball"。中奖号码已知。每张 $5。本节模拟买 10 万张票看实际净收益。</p>
+
+  <!-- Q1.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.1</span><span class="q-title"><code>simulate_one_ticket()</code></span>
+<pre><code>def simulate_one_ticket():
+    first_five = np.random.choice(np.arange(1, 30), 5, replace=False)
+    tritonball = np.random.choice(np.arange(1, 9))
+    return np.append(first_five, tritonball)</code></pre>
+    <p class="why"><strong>💡 注意 <code>replace=False</code></strong>：彩票前 5 个数<u>不能重复</u>（同一票里 5 个 distinct 数字）。Tritonball 单抽一个，没"重复"问题，所以不写 replace。</p>
+    <p class="why"><strong>💡 <code>np.arange(1, 30)</code> = [1..29]</strong>，<code>np.arange(1, 9)</code> = [1..8]。注意右端开区间。</p>
+  </div>
+
+  <!-- Q1.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.2</span><span class="q-title"><code>num_matches</code>（一行）</span>
+<pre><code>num_matches = np.count_nonzero(winning == simulated_ticket)</code></pre>
+    <p class="why"><strong>💡 <strong>position-wise</strong> 比较</strong>：<code>winning == ticket</code> 返回 boolean array（逐位比较）。<code>count_nonzero</code> 数 True 数量。<u>注意</u>：这<u>不是</u> set 匹配。如果票上有 15 但位置错了，不算 match。这是题目设定（与现实彩票不同）。</p>
+  </div>
+
+  <!-- Q1.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.3</span><span class="q-title"><code>count_free_housing</code>：模拟 100,000 票中头奖次数</span>
+<pre><code>winning = np.array([15, 9, 24, 23, 1, 3])
+count_free_housing = 0
+for i in np.arange(100000):
+    ticket = simulate_one_ticket()
+    if np.count_nonzero(winning == ticket) == 6:
+        count_free_housing = count_free_housing + 1</code></pre>
+    <p class="why"><strong>💡 理论概率超低</strong>：6 位全中的概率 ≈ 1/(C(29,5)×8×5!/5!) = 1/(118755 × 8) ≈ 1/950040 ≈ 1.05×10⁻⁶（不计排列）；位置 sensitive 后还要乘 1/120 → ≈ 8.77×10⁻⁹。100,000 票 → 期望中奖 0.000877 次 → <strong>几乎一定 = 0</strong>。这正是彩票的特点：理论上可能，实际上别想。</p>
+  </div>
+
+  <!-- Q1.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.4</span><span class="q-title"><code>most_matches</code>：100,000 票中最多匹配几位</span>
+<pre><code>most_matches = 0
+for i in np.arange(100000):
+    ticket = simulate_one_ticket()
+    matches = np.count_nonzero(winning == ticket)
+    if matches &gt; most_matches:
+        most_matches = matches</code></pre>
+    <p class="why"><strong>💡 max 模板</strong>：维护 running max。each iteration 比较，更大就更新。每次随机抽，最大值通常 ≤ 3 或 4（更高极罕见）。</p>
+  </div>
+
+  <!-- Q1.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.5</span><span class="q-title"><code>net_winnings</code>（关键：必为负！）</span>
+<pre><code>prizes = np.array([0, 10, 25, 100, 1000, 5000, 20000])
+net_winnings = -5 * 100000   # 起步：买 100,000 票 = -$500,000
+for i in np.arange(100000):
+    ticket = simulate_one_ticket()
+    matches = np.count_nonzero(winning == ticket)
+    net_winnings = net_winnings + prizes[matches]</code></pre>
+    <p class="why"><strong>💡 用 array 索引代替 if/elif</strong>：<code>prizes[matches]</code>——matches 是 0/1/.../6，自动取对应奖金。比 6 个 elif 干净。</p>
+    <p class="why"><strong>💡 期望必为负</strong>：彩票运营方期望利润 &gt; 0，所以购票人期望必为负。autograder 测 <code>net_winnings &lt; 0</code>。<u>每跑一次值不同</u>（随机），但永远负。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec2">📚 Section 2 — Sampling with NBA Data</h2>
+
+  <p><strong>背景</strong>：NBA 球员数据（含 Points、Salary 等）。题目提供 <code>compute_statistics</code> 函数算样本均值。本节练 convenience vs SRS 的区别。</p>
+
+  <!-- Q2.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.1</span><span class="q-title"><code>convenience_sample</code>：NYK / BRK / PHI 三队</span>
+<pre><code>convenience_sample = nba_data[
+    (nba_data.get('Team') == 'NYK') |
+    (nba_data.get('Team') == 'BRK') |
+    (nba_data.get('Team') == 'PHI')
+]</code></pre>
+    <p class="why"><strong>💡 <code>|</code> 不是 <code>or</code></strong>：Series 之间逻辑或必须用 <code>|</code>（按位）。<code>or</code> 会触发 ValueError。每段条件外加括号——优先级问题。</p>
+  </div>
+
+  <!-- Q2.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.2</span><span class="q-title"><code>convenience_stats</code></span>
+<pre><code>convenience_stats = compute_statistics(convenience_sample)</code></pre>
+    <p class="why"><strong>💡 直接调用</strong>。compute_statistics 是题目预定义的，返回 [mean_points, mean_salary]。convenience sample 这三个东海岸球队的均值可能跟整体差很多——这是 Q2.3 的引子。</p>
+  </div>
+
+  <!-- Q2.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.3</span><span class="q-title"><code>sampling_q3</code>：convenience 是否代表 population？</span>
+<pre><code>sampling_q3 = 2   # 否</code></pre>
+    <p class="why"><strong>💡 为什么 convenience 不行</strong>：convenience sample 是<u>非随机</u>挑选（如"挑离你近的"或"挑这三队"）。<u>系统性</u>偏差——这三队的薪资分布、得分文化可能<u>系统</u>不同于其他队，所以即使<u>样本多</u>也无法代表 population。<br>
+      关键：sample 是否能 estimate population 不取决于<u>大小</u>，而取决于<u>random &amp; representative</u>。
+    </p>
+    <p class="why"><strong>💡 对比 SRS</strong>：SRS 每个个体被选概率相同——即使 sample 小（30 个），也<u>无偏</u> on average。大样本 SRS 既<u>无偏</u>又<u>方差小</u>。convenience 永远<u>有偏</u>。</p>
+  </div>
+
+  <!-- Q2.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.4</span><span class="q-title"><code>my_small_stats</code>（SRS 70）+ <code>sampling_q4</code></span>
+<pre><code>my_small_stats = compute_statistics(nba_data.sample(70), draw=False)
+
+sampling_q4 = 3</code></pre>
+    <p class="why"><strong>💡 <code>.sample(70)</code> 默认无放回</strong>。每次跑得到<u>不同</u>结果（randomness），但都<u>接近</u> population mean。sampling_q4 = 3 是"close but every time slightly different"。</p>
+  </div>
+
+  <!-- Q2.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.5</span><span class="q-title"><code>my_large_stats</code>（SRS 180）+ <code>sampling_q5</code></span>
+<pre><code>my_large_stats = compute_statistics(nba_data.sample(180), draw=False)
+
+sampling_q5 = 1   # 更大 sample → 更小 variance</code></pre>
+    <p class="why"><strong>💡 CLT 暗示</strong>：<code>SD_sample_mean = pop_SD / √n</code>。n 从 70 → 180 → SD 减小到 √(70/180) ≈ 0.62 倍。所以大样本的 estimate 更紧贴 population mean，且 estimate 之间 variation 也更小。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec3">📚 Section 3 — Milk Tea, Yippee!</h2>
+
+  <p><strong>背景</strong>：survey 问大家最喜欢哪种 tea（jasmine / black / green / oolong）。原数据 ≈ 200 行。本节用 bootstrap 估计真比例。</p>
+
+  <!-- Q3.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.1</span><span class="q-title"><code>jasmine_proportion</code></span>
+<pre><code>jasmine_proportion = np.count_nonzero(survey.get('tea') == 'jasmine') / survey.shape[0]</code></pre>
+    <p class="why"><strong>💡 套路</strong>：count_nonzero(boolean Series) = True 数量，除以总数 = 比例。也可以 <code>(survey.get('tea') == 'jasmine').mean()</code> —— 等价。</p>
+  </div>
+
+  <!-- Q3.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.2</span><span class="q-title"><code>boot_jasmine_proportions</code>：1000 次 bootstrap</span>
+<pre><code>boot_jasmine_proportions = np.array([])
+for i in np.arange(1000):
+    resample = survey.sample(survey.shape[0], replace=True)
+    p = np.count_nonzero(resample.get('tea') == 'jasmine') / resample.shape[0]
+    boot_jasmine_proportions = np.append(boot_jasmine_proportions, p)</code></pre>
+    <div class="warn"><strong>⚠️ autograder 提示</strong>："all of your resamples have the same mean — take a closer look at how you're resampling" —— 漏写 <code>replace=True</code> 是<u>最常见</u>错误。详见 Lab 4 Q5。</div>
+  </div>
+
+  <!-- Q3.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.3</span><span class="q-title">95% CI</span>
+<pre><code>jasmine_lower_bound = np.percentile(boot_jasmine_proportions, 2.5)
+jasmine_upper_bound = np.percentile(boot_jasmine_proportions, 97.5)</code></pre>
+  </div>
+
+  <!-- Q3.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.4</span><span class="q-title">⭐ CI 解读陷阱 1："95% of people fall in CI"？</span>
+<pre><code>q3_4 = False</code></pre>
+    <p class="why"><strong>💡 错答的本质</strong>："95% 的人喜欢度在 CI 内" —— 把 CI 当成<u>个体分布</u>的范围。<br>
+      CI 是关于 <u>parameter</u>（population <em>proportion</em>，一个数）的估计区间。它<u>不</u>描述"个体的喜好值"——每个个体的"喜好"是 {0, 1}（喜欢/不喜欢 jasmine），跟 CI 的小数没关系。</p>
+  </div>
+
+  <!-- Q3.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.5</span><span class="q-title">⭐ CI 解读陷阱 2："95% probability truth is in CI"？</span>
+<pre><code>q3_5 = False</code></pre>
+    <p class="why"><strong>💡 必背</strong>：truth（真比例）是 <u>fixed</u>，CI 也是 <u>computed</u>（从你的 sample 算出来后 fixed）。两个 fixed 的对象，要么含、要么不含，没"95% 概率"。<br>
+      <strong>正确版</strong>：如果重复这个<u>过程</u>（每次抽 sample → bootstrap → CI）很多次，约 95% 的 CIs 会包含 truth。<u>随机的是过程</u>，不是 truth。</p>
+  </div>
+
+  <!-- Q3.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.6</span><span class="q-title"><code>how_many</code>：2000 个独立 95% CI 中含 truth 的数量？</span>
+<pre><code>how_many = 1900   # = 2000 × 0.95</code></pre>
+    <p class="why"><strong>💡 这是 95% CI <u>正确</u>解读的直接计算</strong>：每个 CI 独立 95% 含真值 → 期望 2000 × 0.95 = 1900。本题<u>正面</u>考你 Q3.5 的概念。</p>
+  </div>
+
+  <!-- Q3.7 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.7</span><span class="q-title"><code>ci_90 / ci_96 / ci_99</code>：CI 宽度 vs confidence</span>
+    <p class="q-stmt">三个 CI 给出：[0.195, 0.30] / [0.185, 0.31] / [0.175, 0.325]。哪个对应 90% / 96% / 99%？</p>
+<pre><code>ci_90 = 2   # 最窄 (0.105)
+ci_96 = 1   # 中等 (0.125)
+ci_99 = 3   # 最宽 (0.150)</code></pre>
+    <p class="why"><strong>💡 必背规律</strong>：confidence level <u>越高</u> → CI <u>越宽</u>。直觉：要"更自信"地包含 truth，自然 net 撒得更大。99% &gt; 96% &gt; 90% → 对应 CI 宽度依次递减。</p>
+    <p class="why"><strong>💡 数学</strong>：c% CI 的 percentile = (100−c)/2 到 (100+c)/2。c 越大，区间越靠两端。bootstrap 分布偏中间集中，所以两端值更极端 → CI 更宽。</p>
+  </div>
+
+  <!-- Q3.8 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.8</span><span class="q-title"><code>differences_in_resamples()</code>：jasmine − black</span>
+<pre><code>def differences_in_resamples():
+    differences = np.array([])
+    for i in np.arange(1000):
+        resample = survey.sample(survey.shape[0], replace=True)
+        j = np.count_nonzero(resample.get('tea') == 'jasmine') / resample.shape[0]
+        b = np.count_nonzero(resample.get('tea') == 'black')   / resample.shape[0]
+        differences = np.append(differences, j - b)
+    return differences
+
+boot_differences = differences_in_resamples()</code></pre>
+    <p class="why"><strong>💡 一次 resample 两个比例</strong>：从<u>同一个</u> resample 算 jasmine_prop 和 black_prop，相减。<u>不要</u>分别 resample 然后相减——那会破坏 jasmine 和 black 之间的<u>相关性</u>。</p>
+  </div>
+
+  <!-- Q3.9 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.9</span><span class="q-title">difference 的 95% CI</span>
+<pre><code>diff_lower_bound = np.percentile(boot_differences, 2.5)
+diff_upper_bound = np.percentile(boot_differences, 97.5)</code></pre>
+  </div>
+
+  <!-- Q3.10 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.10</span><span class="q-title">⭐ <code>q3_10</code>：difference CI 比 jasmine CI 更宽还是更窄？</span>
+<pre><code>q3_10 = 2   # 更窄的是 jasmine（即 difference 更宽）</code></pre>
+    <p class="why"><strong>💡 直觉</strong>：估计<u>两个</u>未知参数之差 &gt; 估计<u>单一</u>未知参数。jasmine 比例是单一未知 → 不确定度 only from jasmine sampling。difference 涉及 jasmine 和 black 两个 sampling 不确定度 → 总不确定度 = √(var_j + var_b)（假设独立）&gt; var_j。</p>
+    <p class="why"><strong>💡 实际数</strong>：jasmine CI 宽度 ≈ 0.1，difference CI 宽度 ≈ 0.15。差距明显。这正是 Q3.7 同一思想（越多 random source → 越宽 CI）的应用。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec4">📚 Section 4 — Need a Lyft?</h2>
+
+  <p><strong>背景</strong>：rideshare DataFrame 含 Uber 和 Lyft 价格 + 文本列（type, source 等）。问：哪家平均更便宜？bootstrap 各自的 99% CI。</p>
+
+  <!-- Q4.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.1</span><span class="q-title"><code>uber_lyft_means</code>（先 get([...]) 再 groupby）</span>
+<pre><code>uber_lyft_means = (
+    rideshare.get(['app', 'price'])
+             .groupby('app')
+             .mean()
+             .sort_values(by='price')
+)</code></pre>
+    <div class="warn"><strong>⚠️ 关键 babypandas 陷阱</strong>：直接 <code>rideshare.groupby('app').mean()</code> 会<u>报错</u>——因为 rideshare 含字符串列（type、source 等）。pandas 2.x 不再自动忽略非数值列，babypandas 又不支持 <code>numeric_only=True</code>。<u>必须先 <code>.get(['app', 'price'])</code></u> 去掉非数值列。</div>
+    <p class="why"><strong>💡 sort 后 index 顺序</strong>：升序后 Uber 在第一行（更便宜）。autograder 验 index = ['Uber', 'Lyft']。</p>
+  </div>
+
+  <!-- Q4.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.2</span><span class="q-title">Uber 99% CI</span>
+    <p class="q-stmt">Hint："Make sure to query <strong>before</strong> resampling!"</p>
+<pre><code>uber_only = rideshare[rideshare.get('app') == 'Uber']   # 先 query
+
+uber_means = np.array([])
+for i in np.arange(1000):
+    resample = uber_only.sample(uber_only.shape[0], replace=True)   # 再 bootstrap
+    uber_means = np.append(uber_means, resample.get('price').mean())
+
+lower_bound = np.percentile(uber_means, 0.5)
+upper_bound = np.percentile(uber_means, 99.5)</code></pre>
+    <p class="why"><strong>💡 必须先 query 后 bootstrap</strong>：如果先 bootstrap 整个 rideshare 再 query Uber，每次 resample 中 Uber 行数<u>变化</u>——你想要的是"Uber 内部"重抽，<u>不</u>是"混着 Uber+Lyft 抽再筛"。</p>
+    <p class="why"><strong>💡 99% CI percentile = 0.5 / 99.5</strong>：套公式 (100−99)/2 = 0.5 和 (100+99)/2 = 99.5。</p>
+  </div>
+
+  <!-- Q4.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 4.3</span><span class="q-title"><code>app_and_hist(app_name)</code>：通用函数</span>
+<pre><code>def app_and_hist(app_name):
+    app_data = rideshare[rideshare.get('app') == app_name]
+    means = np.array([])
+    for i in np.arange(1000):
+        resample = app_data.sample(app_data.shape[0], replace=True)
+        means = np.append(means, resample.get('price').mean())
+    lower = np.percentile(means, 0.5)
+    upper = np.percentile(means, 99.5)
+    # ... plot ...
+    return f'A 99% confidence interval for the average {app_name} ride price is [{lower}, {upper}].'</code></pre>
+    <div class="warn"><strong>⚠️ 必须 <code>return</code>，不是 <code>print</code></strong>：题目要求函数<u>返回</u>字符串（外部可以用 <code>uber_string = app_and_hist('Uber')</code>）。如果 print + 无 return，<code>uber_string</code> 会是 None。autograder 提示 "Make sure your function returns a string, and doesn't just print"。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="pitfalls">⚠️ 本作业典型陷阱</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：CI 解读 4 道连击（Q3.4/3.5/3.6/3.7）</strong><br>
+    ① CI 不是"95% 个体落在 CI"；② CI 不是"truth 有 95% 概率在 CI"；③ 重复多次的话约 95% CI 含 truth；④ 高 confidence → 宽 CI。<u>每一条都是 Quiz 3 / Quiz 4 / Final 高频考点。</u>
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：bootstrap 必须 <code>replace=True</code></strong><br>
+    Q3.2 / Q4.2 / Q4.3。漏写 → resample 都跟原样本一样 → estimate 都相同。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：先 query 后 bootstrap（不能反）</strong><br>
+    Q4.2：要算 Uber CI 就先 <code>rideshare[app == 'Uber']</code>，再对子表 bootstrap。先 bootstrap 整个 rideshare 再查 Uber 是错的。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：babypandas groupby 不能用 mean() 含非数值列</strong><br>
+    Q4.1：rideshare 有 string 列 → 必须先 <code>get(['app', 'price'])</code> 再 groupby。pandas 2.x 不再自动跳过非数值。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：convenience sample 不行（哪怕大）</strong><br>
+    Q2.3：sample 是否能 estimate population 关键在<u>无偏</u>（random + representative），不在 size。convenience sample 的 bias 是 systematic，n 多大都救不了。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 6：difference CI 比 single CI 更宽</strong><br>
+    Q3.10：估两个量之差，不确定度叠加（变方差和）。考试常考"以下哪个 CI 最宽？"——差 CI 几乎总是最宽的。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 7：Q4.3 必须 <code>return</code> 而不是 <code>print</code></strong><br>
+    函数<u>返回</u>字符串，外部才能用变量接住。print 只在屏幕显示，函数返回值是 None。autograder 抓得很严。
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① 彩票 Q1：array 索引 <code>prizes[matches]</code> 为什么比 6 个 elif 优雅？</span></label>
+    <label><input type="checkbox"><span>② Q2.3 convenience vs SRS：为什么 convenience 即使 sample 大也不能代表 population？</span></label>
+    <label><input type="checkbox"><span>③ Q2.5：CLT 怎么解释 n=180 比 n=70 的 estimate 更稳定？SD 是什么关系？</span></label>
+    <label><input type="checkbox"><span>④ Q3.4：CI 不是"95% 的<u>个体</u>在 CI"。为什么？CI 是关于谁的范围？</span></label>
+    <label><input type="checkbox"><span>⑤ Q3.5：CI 不是"95% 概率<u>truth</u>在 CI"。为什么？<u>谁</u>是 random、<u>谁</u>是 fixed？</span></label>
+    <label><input type="checkbox"><span>⑥ Q3.6：CI 正确解读："如果重复<u>过程</u> X 次，约 95% 的 CIs 含 truth"——这跟 Q3.4 / 3.5 错答的区别？</span></label>
+    <label><input type="checkbox"><span>⑦ Q3.7：confidence 越高 → CI 越<u>宽</u>。为什么直觉上 + 公式上都对？</span></label>
+    <label><input type="checkbox"><span>⑧ Q3.10：difference CI 为什么比 single proportion CI 更宽？方差怎么叠加？</span></label>
+    <label><input type="checkbox"><span>⑨ Q4.1：babypandas 中 <code>df.groupby('x').mean()</code> 有数值/非数值混列时为什么报错？怎么改？</span></label>
+    <label><input type="checkbox"><span>⑩ Q4.2 / 4.3：先 query 后 bootstrap vs 反过来——结果有什么<u>本质</u>区别？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="06-lab4-bootstrap-german-tank.html">⬅ 上一份：Lab 4</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="08-midterm-project-spotify.html">下一份 ➡：Midterm Project</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

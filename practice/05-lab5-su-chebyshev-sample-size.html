@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice 05 · Lab 5 — SU · Chebyshev · Sample Size · DSC10</title>
+<style>
+  :root { --bg:#fafaf7; --text:#1f2328; --muted:#57606a; --accent:#0969da; --code-bg:#1e1e2e; --code-text:#cdd6f4; --warn-bg:#fff8c5; --warn-border:#d4a72c; --tip-bg:#ddf4ff; --tip-border:#54aeff; --ok-bg:#dafbe1; --ok-border:#1a7f37; --tier-1:#cf222e; --tier-2:#bf8700; --tier-3:#6e7781; --border:#d0d7de; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.7; font-size:16px; }
+  .nav-top, .nav-bottom { background:#fff; border-bottom:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:14px; flex-wrap:wrap; gap:8px; }
+  .nav-bottom { border-bottom:none; border-top:1px solid var(--border); margin-top:60px; }
+  .nav-top a, .nav-bottom a { color:var(--accent); text-decoration:none; margin-right:16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration:underline; }
+  .nav-top a.disabled, .nav-bottom a.disabled { color:var(--muted); cursor:not-allowed; text-decoration:none; }
+  main { max-width:880px; margin:0 auto; padding:32px 24px 60px; }
+  h1 { font-size:28px; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:8px; }
+  h2 { font-size:22px; margin-top:48px; border-left:4px solid var(--accent); padding-left:12px; }
+  h3 { font-size:18px; margin-top:28px; }
+  p, ul, ol { margin:12px 0; }
+  ul, ol { padding-left:28px; }
+  li { margin:4px 0; }
+  code { font-family:"Menlo","Monaco","Consolas",monospace; background:#eef0f2; padding:2px 6px; border-radius:4px; font-size:14px; color:#cf222e; }
+  pre { background:var(--code-bg); color:var(--code-text); padding:16px; border-radius:8px; overflow-x:auto; font-size:14px; line-height:1.5; margin:16px 0; }
+  pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:14px; }
+  .tier { display:inline-block; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:600; margin-right:8px; }
+  .tier-1 { background:#ffebe9; color:var(--tier-1); border:1px solid #ffcecb; }
+  .tier-2 { background:#fff8c5; color:var(--tier-2); border:1px solid #d4a72c; }
+  .meta { background:#f6f8fa; border-left:4px solid var(--accent); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .warn { background:var(--warn-bg); border-left:4px solid var(--warn-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .tip { background:var(--tip-bg); border-left:4px solid var(--tip-border); padding:12px 16px; margin:20px 0; border-radius:0 6px 6px 0; }
+  .ok { background:var(--ok-bg); border-left:4px solid var(--ok-border); padding:10px 14px; margin:12px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .q-block { background:#fff; border:1px solid var(--border); border-radius:8px; padding:18px 20px; margin:22px 0; }
+  .q-id { display:inline-block; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:4px; margin-right:10px; letter-spacing:0.5px; }
+  .q-title { font-size:16px; font-weight:600; }
+  .q-stmt { color:var(--muted); font-size:14px; margin:10px 0; border-left:3px solid #d0d7de; padding-left:10px; font-style:italic; }
+  .think, .why { margin:12px 0; font-size:14.5px; }
+  .think strong { color:#6f42c1; }
+  .why strong { color:#1f883d; }
+  .checklist { background:#f0f9ff; border:1px solid #54aeff; border-radius:8px; padding:16px 20px; }
+  .checklist label { display:block; margin:8px 0; cursor:pointer; user-select:none; }
+  .checklist input[type="checkbox"] { margin-right:8px; transform:scale(1.1); }
+  .checklist input[type="checkbox"]:checked + span { text-decoration:line-through; color:var(--muted); }
+  .toc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin:24px 0; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { margin:4px 0; }
+  .toc a { color:var(--accent); text-decoration:none; }
+  .crosslink { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin:20px 0; font-size:14px; }
+  .crosslink h4 { margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600; }
+  .crosslink ul { margin:4px 0; padding-left:20px; }
+  .crosslink a { color:var(--accent); text-decoration:none; }
+  table { border-collapse:collapse; width:100%; margin:16px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 12px; text-align:left; }
+  th { background:#f6f8fa; font-weight:600; }
+  hr { border:none; border-top:1px solid var(--border); margin:40px 0; }
+
+/* === DSC10 dark mode (injected) === */
+/* --- dark mode patch v2 --- */
+[data-theme="dark"] .meta { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .crosslink { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .err { background: #3a1f1f; color: #f8d0d0; border-left-color: #f85149; }
+[data-theme="dark"] .scatter-ascii { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .score-card { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .qid { background: #1e2c3f; color: #58a6ff; }
+[data-theme="dark"] .badge-active { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-final { background: #3a1f2f; color: #f0a3c8; border-color: #7a3a5a; }
+[data-theme="dark"] .badge-midterm { background: #1c2a3a; color: #7aa7ff; border-color: #4485c4; }
+[data-theme="dark"] .badge-quiz3 { background: #1a2e1f; color: #5acc7f; border-color: #3a5238; }
+[data-theme="dark"] .badge-quiz4 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] strong { color: inherit; }
+
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --text: #d8dee4;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12;
+  --code-text: #c9d1d9;
+  --warn-bg: #3a2e00;
+  --warn-border: #a18419;
+  --tip-bg: #1c2a3a;
+  --tip-border: #4485c4;
+  --danger-bg: #3a1f1f;
+  --danger-border: #f85149;
+  --ok-bg: #1a2e1f;
+  --ok-border: #3fb950;
+  --tier-1: #f85149;
+  --tier-2: #d4a72c;
+  --tier-3: #8b949e;
+  --border: #30363d;
+  --q-bg: #161a1f;
+}
+/* Tweaks for section pages (var-based) under dark */
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top,
+[data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] details { background: #161a1f; }
+[data-theme="dark"] details[open] { background: #1a1f24; }
+[data-theme="dark"] .q-block { background: #161a1f; }
+[data-theme="dark"] .checklist { background: #14202c; border-color: #4485c4; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .formula-big { background: #3a2e00; border-left-color: #a18419; color: #f0e6c0; }
+[data-theme="dark"] .ascii-plot { background: #161a1f; color: #d8dee4; }
+[data-theme="dark"] .highlight { background: #3a2e00; color: #f0e6c0; padding: 0 4px; border-radius: 3px; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+#theme-toggle:active { transform: scale(0.95); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="../index.html">📚 DSC10 总目录</a> · <a href="index.html">🛠 Practice 目录</a></span>
+  <span><a href="04-hw5-clt-normal.html">⬅ 上一份：HW 5</a> | <a href="06-lab4-bootstrap-german-tank.html">下一份 ➡：Lab 4</a></span>
+</nav>
+
+<main>
+  <h1>Practice 05 · Lab 5 — Variability, Normal &amp; Sample Size</h1>
+  <p class="meta">
+    <strong>原始截止</strong>：Thursday, May 14th 2026, 11:59 PM ｜
+    <strong>涵盖讲义</strong>：CIT 14.2–14.6 ｜
+    <strong>对应模块</strong>：Quiz 3 ｜
+    <strong>主题</strong>：手算 variance / SD、SU、Chebyshev vs Normal、样本量选择 ｜
+    <strong>预计时长</strong>：2–2.5 小时
+  </p>
+
+  <div class="toc">
+    <strong>本份目录</strong>
+    <ul>
+      <li><a href="#overview">📋 作业概览 + 知识点回链</a></li>
+      <li><a href="#sec1">📚 Part 1 — Comparing Grades Using SU（Q1.1–1.4）</a></li>
+      <li><a href="#sec2">📚 Part 2 — Chebyshev &amp; Normal Curves（Q2.1–2.4）</a></li>
+      <li><a href="#sec3">📚 Part 3 — Choosing Sample Size（Q3.1–3.7）CI 宽度法</a></li>
+      <li><a href="#pitfalls">⚠️ 本作业典型陷阱</a></li>
+      <li><a href="#checklist">✅ 自我复述 checklist</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="overview">📋 作业概览</h2>
+
+  <p>Lab 5 是 Quiz 3 的<strong>基础 lab</strong>，覆盖三块：</p>
+  <ol>
+    <li><strong>Part 1（Q1）：</strong>从头实现 variance / SD（<u>禁止用 np.std</u>），再用 SU 比较 Kathleen 和 Eric 的相对成绩。</li>
+    <li><strong>Part 2（Q2）：</strong>Chebyshev <u>下界</u> vs Normal <u>近似</u>——同一个"top 5%"问题，假设不同分布得到完全不同的 SD 数。</li>
+    <li><strong>Part 3（Q3）：</strong>给定 CI <u>宽度</u>，反推样本量。最后发现 req_sample_size &gt; population——说明 95% 置信 + 宽度 ≤ 10 不可能同时达成。</li>
+  </ol>
+
+  <p><strong>Tier 速览</strong>：</p>
+  <ul>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Variance 公式 = mean((x − mean)²)；SD = √variance。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q2.3（Chebyshev top 5%）需 z = √20 ≈ 4.5 SDs。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q2.4（Normal top 5%）只需 &lt; 2 SDs（95% 在 ±2 SD → 单侧 2.5% &lt; 5%）。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q3.4: target_sd = width / 4（因为 95% CI 宽 = 4·SD）。</li>
+    <li><span class="tier tier-1">⭐⭐⭐</span> Q3.6: <code>n = (pop_SD / target_sd)²</code>，是 Quiz 3 必背公式。</li>
+    <li><span class="tier tier-2">⭐⭐</span> Q1.4: 比例（proportion ≤ score）= <code>(series &lt;= val).mean()</code>。</li>
+  </ul>
+
+  <div class="crosslink">
+    <h4>🔗 知识点回链：</h4>
+    <ul>
+      <li>Variance / SD / SU 公式 → <a href="../quiz3/03-ci-interpretation-spread.html#concepts">quiz3/03-ci-interpretation-spread</a></li>
+      <li>Chebyshev 不等式、Normal 68-95-99.7 → <a href="../quiz3/04-chebyshev-normal.html#concepts">quiz3/04-chebyshev-normal</a></li>
+      <li>样本量公式 <code>n ≥ (4·SD/w)²</code> → <a href="../quiz3/06-sample-size-models.html#concepts">quiz3/06-sample-size-models</a></li>
+      <li>HW 5 用相同公式做 Drake/Kendrick → <a href="04-hw5-clt-normal.html#sec3">Practice 04 §sec3</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec1">📚 Part 1 — Comparing Grades Using Standard Units</h2>
+
+  <p><strong>背景</strong>：Kathleen 在 BILD 1 拿了 87，Eric 在 MATH 18 拿了 92。两个班的难度不同（hist 显示 BILD 中位 ≈ 65，MATH 中位 ≈ 90）。用 SU 比较"相对"成绩。</p>
+
+  <!-- Q1.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.1</span><span class="q-title"><code>compute_variance(data)</code>（手动，不用 np.std）</span>
+<pre><code>def compute_variance(data):
+    data = np.array(data)
+    n = len(data)
+    average = data.mean()           # 也可以 np.mean(data)
+    sum_squared_diff = ((data - average) ** 2).sum()
+    return sum_squared_diff / n
+
+bild_midterm_var = compute_variance(bild_midterm.get('Score'))
+math_midterm_var = compute_variance(math_midterm.get('Score'))</code></pre>
+    <p class="why"><strong>💡 variance 公式</strong>：<code>variance = mean((x − mean)²)</code>。注意分母是 <strong>n</strong>（population），不是 n−1（sample，Bessel）。DSC 10 全用 population SD。</p>
+    <p class="why"><strong>💡 broadcasting</strong>：<code>(data - average)</code> 自动让每个元素减 mean。<code>** 2</code> 逐元素平方。<code>.sum()</code> 求和。整个表达式向量化、无 for loop。</p>
+    <div class="ok"><strong>✅ 期望</strong>：<code>bild_midterm_var ≈ 173.205</code>，<code>math_midterm_var ≈ 84.266</code>。验证 <code>compute_variance([1, 2, 3, 4, 5]) == 2.0</code> ✓</div>
+  </div>
+
+  <!-- Q1.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.2</span><span class="q-title"><code>compute_sd(data)</code>—— 一行</span>
+    <p class="q-stmt">Hint: "Your implementation of compute_sd should only take <strong>one line</strong>, that involves both the return keyword and the function compute_variance."</p>
+<pre><code>def compute_sd(data):
+    return np.sqrt(compute_variance(data))</code></pre>
+    <p class="why"><strong>💡 SD = √variance</strong>。复用 Q1.1，简洁。这也是 lab 想让你练的"function composition"。</p>
+    <div class="ok"><strong>✅ 期望</strong>：BILD SD ≈ 13.16，MATH SD ≈ 9.18。注意 BILD 数据散得更开（histogram 宽），SD 更大。</div>
+  </div>
+
+  <!-- Q1.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.3</span><span class="q-title"><code>compute_su(score, avg, sd)</code></span>
+    <p class="q-stmt">"Warning: Be careful with the order of operations!"</p>
+<pre><code>def compute_su(score, avg, sd):
+    return (score - avg) / sd
+
+kathleen_su = compute_su(kathleen_score, bild_midterm.get('Score').mean(), compute_sd(bild_midterm.get('Score')))
+eric_su     = compute_su(eric_score,     math_midterm.get('Score').mean(), compute_sd(math_midterm.get('Score')))</code></pre>
+    <p class="why"><strong>💡 注意减法的顺序</strong>：(score − avg) / sd，不是 (avg − score) / sd。warning 提示就是怕你写反。SU 是"score 比 mean 高<u>几个</u> SD"。</p>
+    <div class="ok"><strong>✅ 期望</strong>：<code>kathleen_su ≈ 1.668</code>（比班级均高 1.67 个 SD），<code>eric_su ≈ 0.383</code>（比班级均高 0.38 个 SD）。
+      <br>→ <strong>Kathleen 在自己班相对表现远好于 Eric</strong>，即使绝对分数低 5 分。这就是 SU 的力量：把<u>不同尺度</u>的成绩放到同一坐标系。</div>
+  </div>
+
+  <!-- Q1.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 1.4</span><span class="q-title">Kathleen / Eric 的 proportion</span>
+    <p class="q-stmt">"For both Kathleen and Eric individually, calculate the proportion of students they scored higher than (or the same as)."</p>
+<pre><code>kathleen_proportion = (bild_midterm.get('Score') &lt;= kathleen_score).mean()
+eric_proportion     = (math_midterm.get('Score') &lt;= eric_score    ).mean()</code></pre>
+    <p class="why"><strong>💡 经典 babypandas 套路</strong>：<code>(series &lt;= val).mean()</code> = bool Series 的均值 = True 的比例 = "≤ val 的占比"。<br>
+      也可以写成 <code>np.count_nonzero(series &lt;= val) / series.shape[0]</code>，等价但啰嗦。</p>
+    <div class="ok"><strong>✅ 期望</strong>：<code>kathleen_proportion == 0.954</code>，<code>eric_proportion == 0.582</code>。Kathleen 比 95.4% 同学高分，Eric 只比 58.2% 高。结论与 SU 一致：Kathleen 相对表现更好。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec2">📚 Part 2 — Chebyshev's Inequality &amp; Normal Curves</h2>
+
+  <!-- Q2.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.1</span><span class="q-title">哪个直方图大致正态？</span>
+    <p class="q-stmt">BILD 1（钟形对称）vs MATH 18（左偏 / 右尾被截）。Normal 必备特征：<u>对称</u> + <u>单峰</u> + 钟形。</p>
+<pre><code>q2_1 = 1   # 只有 BILD 1 大致 normal</code></pre>
+    <p class="why"><strong>💡 MATH 18 不 normal</strong>：histogram 显示分数集中在 80–100，<u>不对称</u>（左侧拖尾、右侧被 100 上限截断）。Normal 要求两侧对称延伸。</p>
+  </div>
+
+  <!-- Q2.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.2</span><span class="q-title">MATH 18：mean / median / mode 排序（最小→最大）</span>
+    <p class="q-stmt">"Don't compute any of these values manually!" — 看直方图判断。</p>
+<pre><code>q2_2 = [1, 2, 3]   # mean &lt; median &lt; mode</code></pre>
+    <p class="why"><strong>💡 左偏分布</strong>：MATH 18 的 histogram 是左偏（long left tail）。规则：左偏 → <strong>mean &lt; median &lt; mode</strong>（mean 被左尾拉低）。右偏反过来：mean &gt; median &gt; mode。<br>
+      记忆口诀："mean 跟着尾巴走"——尾巴在哪边，mean 就在哪边的极端。
+    </p>
+  </div>
+
+  <!-- Q2.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.3</span><span class="q-title">无假设（Chebyshev）：top 5% 要 ≥ 几个 SD？</span>
+    <p class="q-stmt">4 选项：1=4.5 SDs（用 z=√20）；2=2 SDs；3=略小于 2 SDs；4=无法保证。</p>
+<pre><code>q2_3 = 1   # 4.5 SDs (z = √20)</code></pre>
+    <p class="why"><strong>💡 推导</strong>：要在<u>任何</u>分布下保证 top 5%。Chebyshev：1 − 1/k² ≥ 0.95 → k² ≥ 20 → k ≥ √20 ≈ 4.47 ≈ <strong>4.5 SDs</strong>。<br>
+      这告诉你：在 mean ± 4.5·SD 内至少 95% 的数据。<u>如果</u> Kathleen 得分高于 mean + 4.5·SD，她<u>必然</u>在 top 5%（实际：top 2.5% 至少）。但 4.5 SDs 是个非常高的门槛——很难达到。
+    </p>
+    <p class="why"><strong>💡 为什么不是 2 SDs（选项 2）</strong>：2 SDs 只保证 75% 在 ±2·SD 内（Chebyshev: 1 − 1/4 = 75%），不到 95%。所以高于 mean + 2·SD 不一定保证 top 5%——可能两边各有 12.5% 还在 ±2·SD 外。</p>
+  </div>
+
+  <!-- Q2.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 2.4</span><span class="q-title">假设 normal 分布：top 5% 要 ≥ 几个 SD？</span>
+    <p class="q-stmt">同 4 选项。这次假设正态，结果应该不同。</p>
+<pre><code>q2_4 = 3   # 略小于 2 SDs</code></pre>
+    <p class="why"><strong>💡 推导</strong>：normal 下 95% 数据在 mean ± 2·SD 之间，所以<u>每侧</u>各 2.5%。<u>高于</u> mean + 2·SD 的只有 2.5%（&lt; 5%）。所以"略小于 2 SDs"就够进 top 5%（具体是 ≈ 1.645 SDs，norm.cdf(1.645) ≈ 0.95）。</p>
+    <p class="why"><strong>💡 选项 3 的推理</strong>："50% 在 mean 以下，2 SDs 以上是 2.5% → mean + 2·SD 把你拍进 top 2.5%（自然 ⊂ top 5%）"。所以<u>略小于</u> 2 SDs 就能进 top 5%。<br>
+      <strong>对比 Chebyshev 的 4.5 SDs</strong>：相同的问题，假设 normal 比"任何分布"宽松很多——只需 2 SDs 而不是 4.5。这就是为什么正态假设非常有用（也是为什么 CLT 重要）。
+    </p>
+    <div class="warn"><strong>⚠️ 经典对比</strong>：Q2.3 用 Chebyshev 得 z = √20 ≈ 4.47；Q2.4 用 Normal 得 z ≈ 1.645。<u>同一个 top-5% 问题</u>，假设不同 → 阈值差几倍。考试会考这个对比，要能讲清"Chebyshev 是 lower bound (for any distribution)，Normal 是 exact (for normal only)"。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="sec3">📚 Part 3 — Choosing Sample Size</h2>
+
+  <p><strong>背景</strong>：UCSD 一门新课，900 个学生符合先修要求，但不知道实际有多少会选。给定的是<u>整个</u> population 数据（0 = 不上、1 = 上），让你模拟<u>抽样</u>过程。最终目标：95% CI 宽度 ≤ 10 个学生。</p>
+
+  <!-- Q3.1 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.1</span><span class="q-title">补全 <code>simulation</code> 函数</span>
+<pre><code>def simulation(population, num_iterations, sample_size):
+    results = np.array([])
+    for i in np.arange(num_iterations):
+        sampled = population.sample(sample_size)
+        proportion_taking_class = sampled.get('Planning on taking').mean()
+        results = np.append(results, proportion_taking_class)
+    # ... 后面是画图代码</code></pre>
+    <p class="why"><strong>💡 sample 默认无放回</strong>：题目说 "without replacement"，<code>.sample(n)</code> 默认就是这个。如果是有放回要加 <code>replace=True</code>。</p>
+    <p class="why"><strong>💡 proportion 等于 mean of 0/1 列</strong>：再次出现的 "proportion as mean" trick。Q3.2 会用图确认这个 sample 比例分布近似 normal（CLT）。</p>
+  </div>
+
+  <!-- Q3.2 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.2</span><span class="q-title">sample proportion 像 normal 还是像原 population？</span>
+<pre><code>q3_2 = 1   # 更像 normal</code></pre>
+    <p class="why"><strong>💡 CLT 直接结论</strong>：原 population 是 0/1（两个柱），但 sample mean (= proportion) 的分布近似 normal——这正是 CLT 的核心声明。</p>
+  </div>
+
+  <!-- Q3.3 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.3</span><span class="q-title">把宽度 10 个学生 → proportion</span>
+<pre><code>num_eligible_students = 900
+width_as_proportion = 10 / num_eligible_students   # ≈ 0.01111</code></pre>
+    <p class="why"><strong>💡 转换</strong>：我们要的统计量是 proportion（0–1 之间），CI 宽度也要换成 proportion 单位。10 / 900 ≈ 0.01111。</p>
+  </div>
+
+  <!-- Q3.4 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.4</span><span class="q-title">需要的 SD = ? → <code>target_sd</code></span>
+    <p class="q-stmt">"95% of the data lies between <strong>plus and minus 2 SDs</strong> of the mean."</p>
+<pre><code>target_sd = width_as_proportion / 4   # ≈ 0.002778</code></pre>
+    <p class="why"><strong>💡 关键推导</strong>：95% CI = mean ± 2·SD → CI 宽度 = 4·SD。所以 <code>SD = width / 4</code>。这是 Quiz 3 必背的"width 公式"。</p>
+    <p class="why"><strong>💡 不是 ÷ 2</strong>：常见错答。CI 宽度是<u>总长</u>（右端 − 左端），不是半径。半径才是 2·SD；总长是 4·SD。
+    </p>
+  </div>
+
+  <!-- Q3.5 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.5</span><span class="q-title"><code>population_sd</code>（用 Part 1 的 compute_sd）</span>
+<pre><code>population_sd = compute_sd(population.get('Planning on taking'))
+# ≈ 0.4583</code></pre>
+    <p class="why"><strong>💡 总体是 0/1 数据</strong>，900 个学生中 ≈ 70% 会上（看 histogram）。所以 SD ≈ √(0.7 × 0.3) ≈ 0.458。compute_sd 算出来就是这个数。</p>
+    <p class="why"><strong>💡 babypandas 限制提醒</strong>：题目要求用<u>你自己写的</u> compute_sd（Part 1），不允许直接 <code>np.std</code>。<u>但</u>实际上 <code>np.std</code> 也行（数值一样）——题目只是想让你 reuse 自己的函数。</p>
+  </div>
+
+  <!-- Q3.6 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.6</span><span class="q-title"><code>req_sample_size</code>—— 终极样本量公式</span>
+<pre><code>req_sample_size = (population_sd / target_sd) ** 2
+# = (0.4583 / 0.002778)² ≈ (165)² ≈ 27,216</code></pre>
+    <p class="why"><strong>💡 推导</strong>：从 CLT <code>SD_sample_mean = pop_SD / √n</code>，求 n：<code>n = (pop_SD / target_sd)²</code>。<br>
+      这就是 "Quiz 3 必背公式" <code>n ≥ (4·SD/w)²</code> 的等价形式——把 <code>target_sd = w/4</code> 代入即得。
+    </p>
+    <div class="ok"><strong>✅ 期望</strong>：<code>req_sample_size ≈ 27216</code>（autograder 验 <code>np.isclose(req_sample_size, 27216)</code>）。</div>
+  </div>
+
+  <!-- Q3.7 -->
+  <div class="q-block">
+    <span class="q-id">Q 3.7</span><span class="q-title">4 个 T/F 陈述</span>
+    <p class="q-stmt">req_sample_size = 27216 但 population = 900。这是<u>不可能</u>的（无放回抽样不能取多于 population）。怎么办？</p>
+<pre><code>statement_1 = True    # 退而求其次：放宽 CI 宽度
+statement_2 = False   # "Sampling with replacement" 不能解决（采样独立性问题不同）
+statement_3 = True    # 退而求其次：降低 confidence 水平（如 80% 而不是 95%）
+statement_4 = False   # 不能"扩大 population"——总体就是 900 个</code></pre>
+    <p class="why"><strong>💡 statement_1 True</strong>：宽度变宽 → 需 SD 上限放宽 → 需 n 变小。可行。</p>
+    <p class="why"><strong>💡 statement_2 False</strong>：有放回采样跟无放回在大样本时差别不大，但<u>不能</u>突破"独立信息量"上限——900 个学生最多 900 份独立信息。重复采样得到的额外样本是<u>冗余</u>的，不真正减小不确定度。</p>
+    <p class="why"><strong>💡 statement_3 True</strong>：降低 confidence（如从 95% 到 68%）→ SD 系数从 2 变 1 → 同样 SD 给出更窄 CI → 需要的 n 缩小。可行（但 confidence 没那么高）。</p>
+    <p class="why"><strong>💡 statement_4 False</strong>：population 是<u>客观存在</u>（900 个符合 prerequisites 的学生），不是你能"做大"的。荒谬。</p>
+    <div class="warn"><strong>⚠️ 真实 takeaway</strong>：当 req_sample_size &gt; population，意味着原 95% / width 10 这个组合<u>本质不可能</u>。必须放弃一个目标（confidence 或 precision），或者承认无法保证。</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="pitfalls">⚠️ 本作业典型陷阱</h2>
+
+  <div class="warn">
+    <strong>陷阱 1：variance 分母是 n，不是 n − 1</strong><br>
+    DSC 10 永远用 population variance（÷ n），与 numpy 的默认 <code>np.std</code> 一致。<u>不是</u> sample variance（÷ n−1）。如果你写了 <code>/ (n - 1)</code>，所有结果会偏大。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 2：Chebyshev vs Normal 用错</strong><br>
+    Q2.3（"无假设"）必须用 Chebyshev → 4.5 SDs。Q2.4（"normal"）用 68-95-99.7 → 略 &lt; 2 SDs。如果反了，差几倍。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 3：CI 宽度 = 4·SD 不是 2·SD</strong><br>
+    Q3.4 关键公式：<code>target_sd = width / 4</code>。宽度是<u>左右两端之差</u>，半径才是 2·SD。把 /4 写成 /2 → target_sd 大一倍 → req_sample_size 小 4 倍 → 答案完全错。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 4：左偏 / 右偏 mean-median-mode 顺序</strong><br>
+    Q2.2：<strong>左偏</strong>（tail 在左）→ mean &lt; median &lt; mode；<strong>右偏</strong>（tail 在右）→ mean &gt; median &gt; mode。口诀："mean 跟着尾巴走"——尾在哪 mean 偏到哪。
+  </div>
+
+  <div class="warn">
+    <strong>陷阱 5：Q3.7 误以为"有放回"能解决</strong><br>
+    Statement 2 是干扰项。直觉是"sample with replacement 可以抽无数次"——但<u>额外抽到的是重复信息</u>，不增加独立观测数。population 数量是真正的"信息上限"。
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="checklist">✅ 自我复述 checklist</h2>
+  <div class="checklist">
+    <label><input type="checkbox"><span>① Variance 公式？为什么用 n（population）而不是 n−1（sample）？</span></label>
+    <label><input type="checkbox"><span>② SU 公式？为什么 (score − mean) / SD 而不是 (mean − score) / SD？SU 表示什么"距离"？</span></label>
+    <label><input type="checkbox"><span>③ Q1.4 的 <code>(series &lt;= val).mean()</code> 为什么等于"≤ val 的比例"？bool 在 mean 时怎么处理？</span></label>
+    <label><input type="checkbox"><span>④ Chebyshev 不等式：1 − 1/k² 是<strong>下界</strong>还是精确比例？对什么分布成立？</span></label>
+    <label><input type="checkbox"><span>⑤ Q2.3 选 4.5 SDs：从 1 − 1/k² ≥ 0.95 怎么解？为什么是 √20？</span></label>
+    <label><input type="checkbox"><span>⑥ Q2.4 选略 &lt; 2 SDs：normal 下 mean + 2·SD 把你拍进哪个百分位？为什么 &lt; 5%？</span></label>
+    <label><input type="checkbox"><span>⑦ Q3.4：CI 宽度 = 2·SD 还是 4·SD？为什么？这跟"95% 法则"什么关系？</span></label>
+    <label><input type="checkbox"><span>⑧ Q3.6 终极公式 <code>n = (pop_SD / target_sd)²</code> 怎么从 CLT 推出来的？</span></label>
+    <label><input type="checkbox"><span>⑨ Q3.7 statement_2 为什么 False？"有放回采样"为什么不能突破 population 限制？</span></label>
+    <label><input type="checkbox"><span>⑩ 左偏 vs 右偏的 mean-median-mode 顺序？口诀 + 直觉？</span></label>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="04-hw5-clt-normal.html">⬅ 上一份：HW 5</a></span>
+  <span><a href="index.html">🛠 返回 Practice 目录</a> · <a href="../index.html">📚 DSC10 总目录</a></span>
+  <span><a href="06-lab4-bootstrap-german-tank.html">下一份 ➡：Lab 4</a></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
