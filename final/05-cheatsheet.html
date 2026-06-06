@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📋 Final Cheatsheet（手抄物料库）- DSC10</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --warn-bg: #fff8c5;
+    --warn-border: #d4a72c;
+    --tip-bg: #ddf4ff;
+    --tip-border: #54aeff;
+    --danger-bg: #ffebe9;
+    --danger-border: #cf222e;
+    --ok-bg: #dafbe1;
+    --ok-border: #1a7f37;
+    --tier-1: #cf222e;
+    --tier-2: #bf8700;
+    --tier-3: #6e7781;
+    --border: #d0d7de;
+    --q-bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0; padding: 0;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .nav-top, .nav-bottom {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 14px;
+  }
+  .nav-bottom { border-bottom: none; border-top: 1px solid var(--border); margin-top: 60px; }
+  .nav-top a, .nav-bottom a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+  .nav-top a:hover, .nav-bottom a:hover { text-decoration: underline; }
+  main { max-width: 900px; margin: 0 auto; padding: 32px 24px 60px; }
+  h1 {
+    font-size: 28px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 44px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  h2 .tier {
+    display: inline-block;
+    padding: 1px 9px;
+    border-radius: 11px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+  h3 { font-size: 17px; margin-top: 22px; }
+  h4 { font-size: 15px; margin-top: 18px; color: var(--muted); }
+  p, ul, ol { margin: 10px 0; }
+  ul, ol { padding-left: 26px; }
+  li { margin: 3px 0; }
+  code {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    background: #eef0f2; padding: 2px 6px; border-radius: 4px;
+    font-size: 14px; color: #cf222e;
+  }
+  pre {
+    background: var(--code-bg); color: var(--code-text);
+    padding: 14px 16px; border-radius: 8px;
+    overflow-x: auto; font-size: 13.5px; line-height: 1.5;
+    margin: 14px 0;
+  }
+  pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 13.5px; }
+  .tier-1 { background: #ffebe9; color: var(--tier-1); border: 1px solid #ffcecb; }
+  .tier-2 { background: #fff8c5; color: var(--tier-2); border: 1px solid #d4a72c; }
+  .tier-3 { background: #f0f0f0; color: var(--tier-3); border: 1px solid #d0d7de; }
+  .warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 10px 14px; margin: 14px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: var(--tip-bg); border-left: 4px solid var(--tip-border); padding: 10px 14px; margin: 14px 0; border-radius: 0 6px 6px 0; }
+  .danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); padding: 10px 14px; margin: 14px 0; border-radius: 0 6px 6px 0; }
+  .ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); padding: 10px 14px; margin: 14px 0; border-radius: 0 6px 6px 0; }
+  .verbatim {
+    background: #f3eaff; border-left: 4px solid #8957e5;
+    padding: 10px 14px; margin: 14px 0; border-radius: 0 6px 6px 0;
+    font-style: normal;
+  }
+  table {
+    border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 14px;
+  }
+  th, td { border: 1px solid var(--border); padding: 7px 11px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; font-weight: 600; }
+  .toc {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 20px; margin: 20px 0;
+    font-size: 14px;
+  }
+  .toc ul { list-style: none; padding-left: 0; column-count: 2; column-gap: 24px; }
+  .toc li { margin: 3px 0; break-inside: avoid; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc .toc-side {
+    grid-column: 1 / -1;
+    font-weight: 700; color: var(--accent);
+    margin-top: 8px; padding-top: 4px;
+    border-top: 1px dashed var(--border);
+    column-span: all;
+  }
+  .side-divider {
+    text-align: center; margin: 60px 0 30px;
+    font-size: 20px; font-weight: 700;
+    color: var(--accent);
+    padding: 18px 0;
+    border-top: 3px double var(--accent);
+    border-bottom: 3px double var(--accent);
+    letter-spacing: 0.3em;
+  }
+  .formula {
+    background: #f6f8fa; border-left: 4px solid var(--accent);
+    padding: 8px 14px; margin: 10px 0; border-radius: 0 6px 6px 0;
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 14.5px;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .compact ul, .compact ol { margin: 6px 0; }
+  .compact li { margin: 2px 0; }
+  .badge {
+    display: inline-block; background: var(--accent-bg); color: var(--accent);
+    padding: 1px 7px; border-radius: 10px; font-size: 12px;
+    margin-left: 6px; font-weight: 600;
+  }
+
+/* === dark mode === */
+[data-theme="dark"] .verbatim { background: #2a1f3f; color: #e0d4f8; border-left-color: #b18aff; }
+:root[data-theme="dark"] {
+  --bg: #0f1419; --text: #d8dee4; --muted: #8b949e;
+  --accent: #58a6ff; --accent-bg: #1e2c3f;
+  --code-bg: #0a0d12; --code-text: #c9d1d9;
+  --warn-bg: #3a2e00; --warn-border: #a18419;
+  --tip-bg: #1c2a3a; --tip-border: #4485c4;
+  --danger-bg: #3a1f1f; --danger-border: #f85149;
+  --ok-bg: #1a2e1f; --ok-border: #3fb950;
+  --tier-1: #f85149; --tier-2: #d4a72c; --tier-3: #8b949e;
+  --border: #30363d; --q-bg: #161a1f;
+}
+[data-theme="dark"] body { background: #0f1419; color: #d8dee4; }
+[data-theme="dark"] .nav-top, [data-theme="dark"] .nav-bottom { background: #161a1f; border-color: #30363d; }
+[data-theme="dark"] th { background: #161a1f; }
+[data-theme="dark"] code { background: #2a2e35; color: #ff8088; }
+[data-theme="dark"] .toc { background: #161a1f; }
+[data-theme="dark"] .formula { background: #161a1f; }
+[data-theme="dark"] .tier-1 { background: #3a1f1f; color: #ff8088; border-color: #5a2f2f; }
+[data-theme="dark"] .tier-2 { background: #3a2e00; color: #f0e6c0; border-color: #a18419; }
+[data-theme="dark"] .tier-3 { background: #2a2e35; color: #c0c4ca; border-color: #30363d; }
+[data-theme="dark"] hr { border-top-color: #30363d; }
+
+#theme-toggle {
+  position: fixed; top: 12px; right: 16px;
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid #d0d7de; background: #fff;
+  cursor: pointer; font-size: 18px; line-height: 1;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+  padding: 0;
+}
+#theme-toggle:hover { transform: scale(1.08); }
+[data-theme="dark"] #theme-toggle { background: #1a1f24; border-color: #30363d; color: #f0e6c0; }
+</style>
+</head>
+<body>
+<button id="theme-toggle" aria-label="切换深色模式" title="切换深色 / 浅色模式">🌙</button>
+
+<nav class="nav-top">
+  <span><a href="index.html">📗 Final 总目录</a></span>
+  <span><a href="04-mock-final.html">← 04 Mock Final</a></span>
+</nav>
+
+<main>
+  <h1>📋 Final Cheatsheet（手抄物料库 · 超密集版）</h1>
+  <p style="color: var(--muted); font-size: 14px;">
+    用于：今晚屏幕通读 → 抄到 8.5×11 双面纸 → 明早再扫一遍最易记混的措辞。
+    每段标 <span class="tier tier-1">⭐⭐⭐</span> / <span class="tier tier-2">⭐⭐</span> / <span class="tier tier-3">⭐</span> 优先级。
+    考试无计算器：所有数字都是整数或简分数形式。
+  </p>
+
+  <div class="warn">
+    <strong>⏰ 使用顺序建议</strong>：① 顶部"<a href="#speed-30">考前 30 分钟速看</a>"先过一遍——这是最容易记混的；② 正面 9 节抄到纸正面；③ 背面 8 节抄到纸背面；④ 抄到一半发现纸不够 → 跳到底部"<a href="#cuts">砍刀清单</a>"按顺序删。
+  </div>
+
+  <div class="toc">
+    <strong>📑 18 个 section · 双栏导航</strong>
+    <ul>
+      <li>🚨 <a href="#speed-30">考前 30 分钟速看（top 10 措辞）</a></li>
+      <li><strong>━━ 正面 ━━</strong></li>
+      <li>1. <a href="#sec-ci">CI 一切</a> ⭐⭐⭐</li>
+      <li>2. <a href="#sec-dist">Distributions / Sampling / CLT</a> ⭐⭐⭐</li>
+      <li>3. <a href="#sec-samplesize">Sample size</a> ⭐⭐</li>
+      <li>4. <a href="#sec-hypo">Hypothesis testing</a> ⭐⭐⭐</li>
+      <li>4b. <a href="#sec-tvd">TVD</a> ⭐⭐</li>
+      <li>5. <a href="#sec-perm">Permutation testing</a> ⭐⭐⭐</li>
+      <li>6. <a href="#sec-tools">"用哪个工具" 决策表</a> ⭐⭐</li>
+      <li>7. <a href="#sec-reg">Regression 三件套</a> ⭐⭐⭐</li>
+      <li>8. <a href="#sec-resid">Residuals + Prediction</a> ⭐⭐</li>
+      <li><strong>━━ 背面 ━━</strong></li>
+      <li>9. <a href="#sec-df">DataFrame 速查</a> ⭐⭐⭐</li>
+      <li>10. <a href="#sec-bool">布尔过滤 + 字符串</a> ⭐⭐⭐</li>
+      <li>11. <a href="#sec-density">Density histogram</a> ⭐⭐</li>
+      <li>12. <a href="#sec-prob">概率规则</a> ⭐⭐⭐</li>
+      <li>13. <a href="#sec-sim">Simulation 模板</a> ⭐⭐⭐</li>
+      <li>14. <a href="#sec-nprandom">np.random 三件套</a> ⭐⭐</li>
+      <li>15. <a href="#sec-apply">.apply 陷阱</a> ⭐</li>
+      <li>16. <a href="#sec-ctrl">控制流 + 累加器</a> ⭐</li>
+      <li>🪓 <a href="#cuts">砍刀清单（纸不够时按此砍）</a></li>
+    </ul>
+  </div>
+
+  <!-- ============== 速看 ============== -->
+  <h2 id="speed-30">🚨 考前 30 分钟速看 · Top 10 易记混措辞 <span class="tier tier-1">⭐⭐⭐</span></h2>
+
+  <p>明早起床 / 进考场前 5 分钟最后扫一遍。每条都是历年错答陷阱。</p>
+
+  <ol class="compact">
+    <li><strong>CI 解读唯一正确版</strong>：<br>
+      <span class="verbatim">"Approximately X% of the <strong>intervals</strong> we create through this <strong>process</strong> will contain the true population parameter."</span><br>
+      错答：① "X% chance true param is in this CI" ❌（CI 固定、truth 固定，无概率）② "X% of sample data fall in CI" ❌ ③ "Definitely contains" ❌</li>
+
+    <li><strong>"Yes/No, due to CLT" 三问 checklist</strong>：(1) sample 是 random 吗？(2) n 够大吗（一般 ≥ 30）？(3) 我们关心的是 <em>sample mean / proportion</em> 吗？三个全 yes 才能 due to CLT。</li>
+
+    <li><strong>residual = actual − predicted</strong>。方向<strong>绝对</strong>不能反。正 residual = 真实值在线上方。</li>
+
+    <li><strong>reject / fail to reject / 永不 accept</strong>。p < α → reject null；p ≥ α → fail to reject。<em>永远</em>不写 "accept the null"。</li>
+
+    <li><strong>Bootstrap 必 <code>replace=True</code> 且 size = 原 sample size</strong>。<code>sample.sample(sample.shape[0], replace=True)</code></li>
+
+    <li><strong>Chebyshev 是下界</strong>（"at least"），不是精确。z=2 → ≥ 75%；z=3 → ≥ 88.8%；z=4 → ≥ 93.75%。</li>
+
+    <li><strong>Sample size 公式里 <code>w</code> 是 CI 总宽度</strong>，不是 margin（半宽度）。</li>
+
+    <li><strong>Density histogram bin <code>[a, b)</code> 半开区间</strong>，最后一个 bin 右端闭合。一个 value 只算进一个 bin。</li>
+
+    <li><strong><code>series.apply(func)</code> 不带括号</strong>。<code>.apply(func())</code> 会报错。</li>
+
+    <li><strong>布尔过滤用 <code>&amp;</code> / <code>|</code> / <code>~</code></strong>，<em>不是</em> <code>and</code> / <code>or</code> / <code>not</code>。每个条件外套括号。</li>
+  </ol>
+
+  <div class="side-divider">━━━ 正 面 · Lec 13–25 ≈ 2/3 权重 ━━━</div>
+
+  <!-- ============== 1. CI ============== -->
+  <h2 id="sec-ci">1. CI 一切 <span class="tier tier-1">⭐⭐⭐</span></h2>
+
+  <h3>Bootstrap CI 模板（填空版，考试常以 fill-in-the-blank 出现）</h3>
+<pre><code>boot_stats = np.array([])
+for i in np.arange(<b>10000</b>):                              # ← reps
+    resample = my_sample.sample(<b>my_sample.shape[0]</b>,     # ← 必须 = 原 sample size
+                                 replace=<b>True</b>)           # ← 必须 True
+    stat = resample.get('col').mean()                         # ← 想估什么就算什么
+    boot_stats = np.append(boot_stats, stat)
+ci = np.percentile(boot_stats, [<b>2.5</b>, <b>97.5</b>])         # ← 95% CI</code></pre>
+
+  <h3>c% CI 的 percentile</h3>
+  <div class="formula">low = (100 − c) / 2  ；  high = (100 + c) / 2</div>
+  <table>
+    <tr><th>c</th><th>low</th><th>high</th></tr>
+    <tr><td>80%</td><td>10</td><td>90</td></tr>
+    <tr><td>90%</td><td>5</td><td>95</td></tr>
+    <tr><td>92%</td><td>4</td><td>96</td></tr>
+    <tr><td>95%</td><td>2.5</td><td>97.5</td></tr>
+    <tr><td>99%</td><td>0.5</td><td>99.5</td></tr>
+  </table>
+
+  <h3>95% CLT-based CI（仅用于 sample <em>mean</em> 或 <em>proportion</em>）</h3>
+  <div class="formula">CI = [ sample_mean − 2 · (SD / √n) , sample_mean + 2 · (SD / √n) ]</div>
+  <p>这里 <code>SD</code> 是 sample SD（充当 pop SD 估计），<code>n</code> 是 sample size。系数 <strong>2</strong>（课程用 2，不是 1.96）。</p>
+
+  <h3>通用置信度 z 反推</h3>
+  <div class="formula">cdf(z) = (1 + c) / 2  →  z = stats.norm.ppf((1 + c) / 2)</div>
+  <p>例：c = 0.92 → cdf(z) = 0.96 → z ≈ 1.75。CLT CI = [mean ± z · SD/√n]。</p>
+
+  <h3>CI 解读 ✅/❌ 对照</h3>
+  <table>
+    <tr><th>说法</th><th>对错</th><th>原因</th></tr>
+    <tr><td>"95% of <strong>intervals</strong> from this <strong>process</strong> contain truth"</td><td>✅</td><td>唯一正确</td></tr>
+    <tr><td>"95% probability truth is in this CI"</td><td>❌</td><td>CI 和 truth 都固定，无概率</td></tr>
+    <tr><td>"95% of data values fall in CI"</td><td>❌</td><td>CI 估 parameter，与数据点无关</td></tr>
+    <tr><td>"95% of sample means fall in CI"</td><td>❌</td><td>CI 是为这<em>一个</em> sample mean 构造的</td></tr>
+    <tr><td>"Definitely contains the truth"</td><td>❌</td><td>5% 的 CI 是错的</td></tr>
+  </table>
+
+  <h3>CI 几何性质</h3>
+  <ul class="compact">
+    <li>更高置信度 c → 更<strong>宽</strong> CI</li>
+    <li>更大 n → 更<strong>窄</strong> CI（按 √n 缩小）</li>
+    <li>Bootstrap CI: 用 percentile，不依赖 normal</li>
+    <li>CLT CI: 公式法，只对 mean/proportion 适用</li>
+  </ul>
+
+  <hr>
+
+  <!-- ============== 2. Distributions ============== -->
+  <h2 id="sec-dist">2. Distributions / Sampling / CLT <span class="tier tier-1">⭐⭐⭐</span></h2>
+
+  <h3>三联术语区分（fill-in-the-blank 常考）</h3>
+  <table>
+    <tr><th>术语</th><th>是什么</th><th>怎么得</th></tr>
+    <tr><td><strong>Probability distribution</strong></td><td>random variable 各取值的<em>理论</em>概率</td><td>从模型推导</td></tr>
+    <tr><td><strong>Empirical distribution</strong></td><td>一个 sample 中各值的<em>观测</em>比例</td><td>从数据频次</td></tr>
+    <tr><td><strong>Sampling distribution</strong></td><td>一个 <em>statistic</em>（如 sample mean）的概率分布</td><td>从重复抽样推导/simulate</td></tr>
+  </table>
+
+  <p>大数定律：sample size ↑ → empirical → probability distribution。</p>
+
+  <h3>parameter vs statistic / population vs sample</h3>
+  <table>
+    <tr><th></th><th>population</th><th>sample</th></tr>
+    <tr><td>来源</td><td>整体</td><td>抽出的子集</td></tr>
+    <tr><td>"summary"</td><td><strong>parameter</strong>（固定但未知）</td><td><strong>statistic</strong>（随机，可算出）</td></tr>
+    <tr><td>例子</td><td>μ, σ, p</td><td>x̄, s, p̂</td></tr>
+  </table>
+
+  <h3>SRS（Simple Random Sample）</h3>
+  <ul class="compact">
+    <li>所有 size-n subset 概率相等</li>
+    <li><strong>without replacement</strong>（默认）</li>
+    <li>注意：with replacement 不算 SRS</li>
+  </ul>
+
+  <h3>Standardization</h3>
+  <div class="formula">z = (x − μ) / σ        z 无单位        线性变换</div>
+  <p>z 表示"距均值几个 SD"。z > 0 在均值上方。</p>
+
+  <h3>Chebyshev 不等式（适用<strong>任意</strong>分布）</h3>
+  <p>距均值 z 个 SD 内的比例 <strong>至少</strong>：</p>
+  <table>
+    <tr><th>z</th><th>至少占比</th><th>分数形式</th></tr>
+    <tr><td>2</td><td>75%</td><td>3/4</td></tr>
+    <tr><td>3</td><td>88.8...%</td><td>8/9</td></tr>
+    <tr><td>4</td><td>93.75%</td><td>15/16</td></tr>
+    <tr><td>5</td><td>96%</td><td>24/25</td></tr>
+    <tr><td>通用</td><td>1 − 1/z²</td><td></td></tr>
+  </table>
+
+  <div class="danger">
+    <strong>Chebyshev 给的是下界</strong>。题问"<em>至少</em>占多少" → Chebyshev。问"<em>大约</em>占多少且分布近似 normal" → 用 68/95/99.7。
+  </div>
+
+  <h3>Normal 68/95/99.7（仅当分布近似 normal）</h3>
+  <p>距均值 ±1/±2/±3 SD 内 ≈ 68% / 95% / 99.7%。</p>
+  <p>反查 z：<code>stats.norm.cdf(z)</code> 给 P(Z ≤ z)；<code>stats.norm.ppf(p)</code> 给 z 使得 P(Z ≤ z) = p。</p>
+
+  <h3>Square Root Law（核心）</h3>
+  <div class="formula">SD of sample mean = (population SD) / √n</div>
+  <p>n × 4 倍 → SD 变 1/2；n × 100 → SD 变 1/10。</p>
+
+  <h3>CLT 适用 checklist（"Yes/No, due to CLT" 必看）</h3>
+  <ol class="compact">
+    <li>Sample 是 <strong>random</strong>（SRS 或 with replacement 都 OK）</li>
+    <li>n <strong>足够大</strong>（经验上 ≥ 30；二项 np≥10、n(1-p)≥10）</li>
+    <li>我们关心的是 <strong>sample mean</strong> 或 <strong>sample proportion</strong></li>
+  </ol>
+  <p>三条全满足 → sample mean 的 sampling distribution 近似 normal，<strong>不管 population 是什么分布</strong>。</p>
+
+  <div class="warn">
+    <strong>Wi26 陷阱</strong>："约 95% 的 sample means 落在 pop mean ± 2 pop SDs" → 官方答 <strong>Yes, due to CLT</strong>（解读为 2 SEs = 2 SD-of-mean，<em>不是</em> 2 pop SDs；课程在这道题上把 "2 SDs" 当 SEs 算）。
+  </div>
+
+  <hr>
+
+  <!-- ============== 3. Sample size ============== -->
+  <h2 id="sec-samplesize">3. Sample size <span class="tier tier-2">⭐⭐</span></h2>
+
+  <h3>公式</h3>
+  <div class="formula">n ≥ ( 4 · SD / w )²        w = CI <strong>总宽度</strong></div>
+  <p>来源：95% CLT CI 总宽 = 2 · 2 · SD/√n = 4·SD/√n。令 ≤ w 解出 n。</p>
+
+  <div class="danger">
+    <code>w</code> 是<strong>总宽度</strong>（high − low），<em>不是</em>半宽度 margin。题目说 "within ±0.05" → margin = 0.05 → <code>w = 0.10</code>。
+  </div>
+
+  <h3>0/1 数据特例</h3>
+  <ul class="compact">
+    <li>SD 上界 = <strong>0.5</strong>（当 p = 0.5 时取到）</li>
+    <li>所以 0/1 数据：<code>n ≥ (4 · 0.5 / w)² = (2/w)²</code> 保守版</li>
+    <li><strong>Proportion as mean</strong>：0/1 取值的<em>均值</em> = 1 的比例，所以 proportion 可以用 mean 的全部工具（CLT、bootstrap、sample size）</li>
+  </ul>
+
+  <h3>已知 n, w 反推 SD（少见但 Wi26 考过）</h3>
+  <div class="formula">SD ≤ w · √n / 4</div>
+
+  <hr>
+
+  <!-- ============== 4. Hypothesis testing ============== -->
+  <h2 id="sec-hypo">4. Hypothesis testing <span class="tier tier-1">⭐⭐⭐</span></h2>
+
+  <h3>5 步流程</h3>
+  <ol class="compact">
+    <li>写 <strong>Null</strong>（"无差异 / 是某模型"）和 <strong>Alt</strong>（"有差异 / 不是某模型"）</li>
+    <li>选 <strong>test statistic</strong>（一个数字总结 sample 偏离 null 的程度）</li>
+    <li>计算 observed test statistic（从真实 sample）</li>
+    <li>Simulate under <strong>null</strong> 多次 → 得 null 下 test statistic 的分布</li>
+    <li>p-value = 在 null 下看到"observed <em>或更极端</em>"的比例</li>
+  </ol>
+
+  <h3>p-value 决策</h3>
+  <table>
+    <tr><th>p</th><th>结论</th><th>常用 α</th></tr>
+    <tr><td>p ≤ 0.01</td><td>"highly statistically significant"，reject null</td><td>0.01</td></tr>
+    <tr><td>0.01 < p ≤ 0.05</td><td>"statistically significant"，reject null</td><td>0.05</td></tr>
+    <tr><td>p > 0.05</td><td>"fail to reject null"</td><td>—</td></tr>
+  </table>
+
+  <div class="danger">
+    永远<strong>不写 "accept the null"</strong>。fail to reject ≠ null 为真，只是证据不够。
+  </div>
+
+  <h3>Test statistic 选 abs vs 不带 abs</h3>
+  <table>
+    <tr><th>Alt 方向</th><th>statistic</th><th>p-value 取</th></tr>
+    <tr><td>单侧（A > B 或 A < B）</td><td>带方向（如 A − B 或 mean − null_mean）</td><td>单侧 tail</td></tr>
+    <tr><td>双侧（A ≠ B）</td><td><strong>abs</strong>（如 |A − B|）</td><td>右尾（因为 abs ≥ 0）</td></tr>
+  </table>
+
+  <h3>simulate under null 的常见形态</h3>
+  <ul class="compact">
+    <li><strong>模型已知</strong>：<code>np.random.multinomial(n, [p1, p2, ...])</code></li>
+    <li><strong>simple yes/no</strong>：<code>np.random.choice([0, 1], n, p=[1-p, p])</code></li>
+    <li><strong>两组比较</strong>：见 §5 permutation</li>
+  </ul>
+
+  <hr>
+
+  <!-- ============== 4b. TVD ============== -->
+  <h2 id="sec-tvd">4b. TVD（Total Variation Distance）<span class="tier tier-2">⭐⭐</span></h2>
+
+  <h3>公式</h3>
+  <div class="formula">TVD(p, q) = 0.5 · Σ | p_i − q_i |  =  np.abs(p − q).sum() / 2</div>
+  <p>p, q 是两个 categorical distribution（每个 = 1）。</p>
+
+  <h3>性质</h3>
+  <ul class="compact">
+    <li>范围 [0, 1]。0 = 同分布、1 = 不相交支撑</li>
+    <li><strong>只用于 categorical 数据</strong>。数值变量请用 mean / median 差作为统计量</li>
+    <li>典型用法：observed 分布 vs hypothesized 模型分布</li>
+  </ul>
+
+  <h3>典型场景（Lec 20-21 + Alameda jury）</h3>
+  <ul class="compact">
+    <li>陪审团种族分布 vs 该县人口分布是否相符 → TVD as test stat</li>
+    <li>Null：陪审团是 SRS from county → simulate <code>multinomial</code> → 算每次 TVD → 比 observed TVD 看 p-value</li>
+  </ul>
+
+  <div class="danger">
+    出现"smoking 与 birth weight 相关吗" → birth weight 是<strong>数值</strong> → <strong>不能用 TVD</strong>，应用 mean 差 + permutation test。
+  </div>
+
+  <hr>
+
+  <!-- ============== 5. Permutation ============== -->
+  <h2 id="sec-perm">5. Permutation testing <span class="tier tier-1">⭐⭐⭐</span></h2>
+
+  <h3>什么时候用</h3>
+  <p>比较<strong>两组</strong> sample，问"它们是否来自同一分布"。Null = "组别 label 与 outcome 无关"。</p>
+
+  <h3>流程</h3>
+  <ol class="compact">
+    <li>合并两组为一个总池子（保留 outcome 列，丢弃原 label）</li>
+    <li>Shuffle group labels（<code>np.random.permutation</code>），分配回去</li>
+    <li>重新计算 test statistic（如 group A mean − group B mean）</li>
+    <li>重复多次 → 比 observed</li>
+  </ol>
+
+<pre><code>shuffled_labels = np.random.permutation(df.get('group'))
+shuffled = df.assign(shuffled_group=shuffled_labels)
+group_means = shuffled.groupby('shuffled_group').mean()
+stat = group_means.get('outcome').iloc[0] - group_means.get('outcome').iloc[1]</code></pre>
+
+  <h3>Permutation vs Bootstrap（必会区分）</h3>
+  <table>
+    <tr><th></th><th>Permutation</th><th>Bootstrap</th></tr>
+    <tr><td>用途</td><td>hypothesis test（比较两组）</td><td>estimate 参数 + CI</td></tr>
+    <tr><td>抽样</td><td><strong>without replacement</strong>（shuffle）</td><td><strong>with replacement</strong></td></tr>
+    <tr><td>对象</td><td>合并后的整池</td><td>原 sample</td></tr>
+    <tr><td>结果</td><td>p-value</td><td>CI（percentile）</td></tr>
+  </table>
+
+  <h3>典型例题</h3>
+  <ul class="compact">
+    <li><strong>Smoking & baby weight</strong>：母亲吸烟 vs 不吸烟两组婴儿体重 → mean 差作 stat</li>
+    <li><strong>Deflategate</strong>：Patriots vs Colts 球压差异 → mean 差作 stat</li>
+    <li><strong>A/B test</strong>：网站新旧版本转化率比较 → proportion 差作 stat</li>
+  </ul>
+
+  <hr>
+
+  <!-- ============== 6. Tool decision ============== -->
+  <h2 id="sec-tools">6. "用哪个工具"决策表 <span class="tier tier-2">⭐⭐</span></h2>
+
+  <table>
+    <tr><th>问题类型</th><th>用什么</th><th>关键代码</th></tr>
+    <tr><td>估单一参数 + CI</td><td>Bootstrap CI 或 CLT CI</td><td><code>.sample(n, replace=True)</code> 或 <code>± 2·SD/√n</code></td></tr>
+    <tr><td>两组 sample 分布是否同</td><td>Permutation test</td><td><code>np.random.permutation</code></td></tr>
+    <tr><td>观察到的分布 vs 假设模型</td><td>Hypothesis test + TVD</td><td><code>np.random.multinomial</code></td></tr>
+    <tr><td>观察到的均值 vs 假设值</td><td>Hypothesis test + mean 差</td><td>simulate under null</td></tr>
+    <tr><td>由 x 预测 y</td><td>Regression + bootstrap PI</td><td><code>m·x + b</code></td></tr>
+    <tr><td>判断两变量是否相关</td><td>Correlation r + 散点图</td><td><code>(z_x * z_y).mean()</code></td></tr>
+  </table>
+
+  <hr>
+
+  <!-- ============== 7. Regression ============== -->
+  <h2 id="sec-reg">7. Regression 三件套 <span class="tier tier-1">⭐⭐⭐</span></h2>
+
+  <h3>Correlation r</h3>
+  <div class="formula">r = mean( z_x · z_y )     z_x = (x − mean_x) / SD_x</div>
+  <ul class="compact">
+    <li>r ∈ [−1, 1]，无单位</li>
+    <li><strong>对称</strong>：r(x, y) = r(y, x)</li>
+    <li><strong>对线性变换不变</strong>（换单位、放缩、平移都不变 r）</li>
+    <li><strong>只衡量线性</strong> association。r = 0 不代表无关（可能 parabola）</li>
+    <li><strong>对 outlier 极敏感</strong>：一个点能把 r 从 0 推到 1</li>
+  </ul>
+
+  <h3>Regression line in <strong>standard units</strong></h3>
+  <div class="formula">predicted_z_y = r · z_x         过 (0, 0)，slope = r</div>
+  <p><strong>Regression to the mean</strong>：|r| < 1 → predicted z_y 比 z_x 更靠近 0（极端 x 对应不那么极端的 y）。</p>
+
+  <h3>Regression line in <strong>original units</strong>（必会公式）</h3>
+  <div class="formula">m = r · SD_y / SD_x<br>
+b = mean_y − m · mean_x<br>
+predicted_y = m · x + b</div>
+
+  <p><strong>必过点</strong>：<code>(mean_x, mean_y)</code>（代 x = mean_x → predicted_y = mean_y）。</p>
+
+  <h3>SU ↔ 原单位完整方程</h3>
+  <div class="formula">(predicted_y − mean_y) / SD_y = r · (x − mean_x) / SD_x</div>
+
+  <h3>单位换算速查表</h3>
+  <table>
+    <tr><th>把 x 换单位（× k，+ c）</th><th>把 y 换单位（× k', + c'）</th></tr>
+    <tr><td>r：<strong>不变</strong></td><td>r：<strong>不变</strong></td></tr>
+    <tr><td>SD_x：× |k|（平移不变）</td><td>SD_y：× |k'|</td></tr>
+    <tr><td>mean_x：× k + c</td><td>mean_y：× k' + c'</td></tr>
+    <tr><td>m（slope）：× k' / k</td><td></td></tr>
+    <tr><td>b（intercept）：要从 m, mean_x, mean_y 重算</td><td></td></tr>
+  </table>
+
+  <h3>Single outlier 警告</h3>
+  <p>所有 regression 题<strong>第一步</strong>问"<em>有 outlier 吗</em>"。outlier 可以把 r 从 0 拉到 1，或反过来。</p>
+
+  <hr>
+
+  <!-- ============== 8. Residuals ============== -->
+  <h2 id="sec-resid">8. Residuals + Prediction <span class="tier tier-2">⭐⭐</span></h2>
+
+  <h3>核心公式</h3>
+  <div class="formula">residual = actual − predicted     <strong>方向绝不能反</strong></div>
+  <p>正 residual = 真实点在回归线<strong>上方</strong>。</p>
+
+  <h3>RMSE（least squares 最小化的对象）</h3>
+  <div class="formula">RMSE = sqrt( mean( residual² ) )</div>
+  <p>Regression line 是<strong>所有可能直线中 RMSE 最小的</strong>那条。</p>
+
+  <h3>Residual plot 4 类 pattern</h3>
+  <table>
+    <tr><th>residual plot 形状</th><th>结论</th></tr>
+    <tr><td>无模式（patternless 散布在 0 周围）</td><td>✅ 线性模型合适</td></tr>
+    <tr><td>曲线 pattern（U 形 / 倒 U）</td><td>真关系是非线性，应换模型</td></tr>
+    <tr><td>漏斗形（方差随 x 变化）</td><td><strong>heteroscedasticity</strong>：误差不等方差</td></tr>
+    <tr><td>趋势倾斜（系统偏一边）</td><td>所选直线斜率/截距错了</td></tr>
+  </table>
+
+  <h3>关键性质</h3>
+  <ul class="compact">
+    <li>regression line 的 residuals <strong>mean = 0</strong></li>
+    <li>regression line 的 residuals 与 x 的 r = 0（无线性相关）</li>
+    <li><strong>Anscombe's quartet / Datasaurus dozen</strong>：r、mean、SD、line 完全相同，但散点图截然不同 → 必须画图</li>
+  </ul>
+
+  <h3>Prediction Interval（bootstrap 法）</h3>
+<pre><code>boot_preds = np.array([])
+for i in np.arange(reps):
+    resampled = df.sample(df.shape[0], replace=True)   # 重抽 (x, y) 整对
+    m = slope(resampled, 'x', 'y')
+    b = intercept(resampled, 'x', 'y')
+    boot_preds = np.append(boot_preds, m * x_new + b)
+ci = np.percentile(boot_preds, [2.5, 97.5])</code></pre>
+
+  <p><strong>几何性质</strong>：prediction interval 在 <code>x = mean_x</code> 处<strong>最窄</strong>，离 mean_x 越远越宽（draw_many_lines 几何观察）。</p>
+
+  <h3>Reverse regression（y on x ≠ x on y）</h3>
+  <ul class="compact">
+    <li>由 x 预测 y 的直线 ≠ 由 y 预测 x 的直线（除非 |r| = 1）</li>
+    <li>角色互换后：<code>m_new = r · SD_x / SD_y</code>（公式 SD 反过来）</li>
+    <li>两条都过 <code>(mean_x, mean_y)</code></li>
+  </ul>
+
+  <h3>Best line ≠ Best model</h3>
+  <p>RMSE 最小的<em>直线</em>可能仍然是糟糕的拟合（如真关系是 quadratic）。Residual plot 是检查工具。</p>
+
+  <div class="side-divider">━━━ 背 面 · Lec 1–12 基础 + 通用陷阱 ━━━</div>
+
+  <!-- ============== 9. DataFrame ============== -->
+  <h2 id="sec-df">9. DataFrame 速查（babypandas）<span class="tier tier-1">⭐⭐⭐</span></h2>
+
+  <div class="warn">
+    <strong>babypandas ≠ pandas</strong>：没有 <code>df['col']</code> 方括号取列、没有 <code>df.size()</code>、没有 <code>inplace=True</code>。所有操作返回新对象。
+  </div>
+
+  <h3>索引 / 取数</h3>
+  <table>
+    <tr><th>方法</th><th>语义</th><th>返回</th></tr>
+    <tr><td><code>df.get('col')</code></td><td>取一列</td><td><strong>Series</strong></td></tr>
+    <tr><td><code>df.get(['col1', 'col2'])</code></td><td>取多列</td><td><strong>DataFrame</strong></td></tr>
+    <tr><td><code>df.loc[label]</code></td><td>按 <strong>index label</strong> 取行</td><td>Series（一行）/ DataFrame（多行）</td></tr>
+    <tr><td><code>df.iloc[pos]</code></td><td>按<strong>整数位置</strong>取行</td><td>Series（一个）/ DataFrame（多个）</td></tr>
+    <tr><td><code>df.iloc[i, j]</code></td><td>第 i 行第 j 列单值</td><td>标量</td></tr>
+    <tr><td><code>df.shape[0]</code></td><td>行数（<strong>替代 size</strong>）</td><td>int</td></tr>
+    <tr><td><code>df.shape[1]</code></td><td>列数</td><td>int</td></tr>
+  </table>
+
+  <h3>重塑 / 列操作</h3>
+  <ul class="compact">
+    <li><code>df.assign(new=expr)</code>：加新列，<strong>必须</strong>重新赋值 <code>df = df.assign(...)</code></li>
+    <li><code>df.set_index('col')</code> / <code>df.reset_index()</code></li>
+    <li><code>df.sort_values('col', ascending=False)</code>：默认升序，加 <code>.iloc[0]</code> 取极值</li>
+    <li><code>df.drop(columns='col')</code> 或 <code>.drop(index=label)</code></li>
+    <li><code>df.take([i1, i2, ...])</code>：按位置取多行</li>
+  </ul>
+
+  <h3>groupby</h3>
+<pre><code>df.groupby('col').sum()       # 单列分组
+df.groupby('col').mean()
+df.groupby('col').count()     # 每组多少行
+df.groupby(['a', 'b']).mean() # 多列分组 → MultiIndex
+# 链式取极值：
+df.groupby('city').mean().sort_values('price', ascending=False).iloc[0]</code></pre>
+
+  <h3>merge（Tier 1 必考：<strong>行数预测</strong>）</h3>
+  <div class="formula">df1.merge(df2, left_on='ka', right_on='kb')</div>
+
+  <p><strong>默认 inner join</strong>：只保留两边 key 都有的。</p>
+
+  <p><strong>行数规则</strong>：若 key <code>k</code> 在 df1 中出现 <strong>m</strong> 次、在 df2 中出现 <strong>n</strong> 次，则结果中 <code>k</code> 出现 <strong>m × n</strong> 次。</p>
+
+  <p>速查：</p>
+  <ul class="compact">
+    <li>两边都 unique → 结果行数 ≤ min(len1, len2)</li>
+    <li>一边有 dup → 结果会复制行</li>
+    <li>双方都有 dup → Cartesian product 爆炸</li>
+    <li>没匹配的 key → <strong>消失</strong>（inner 默认）</li>
+  </ul>
+
+  <hr>
+
+  <!-- ============== 10. Bool + String ============== -->
+  <h2 id="sec-bool">10. 布尔过滤 + 字符串 <span class="tier tier-1">⭐⭐⭐</span></h2>
+
+  <h3>布尔过滤</h3>
+<pre><code>df[df.get('age') > 18]                            # 单条件
+df[(df.get('age') > 18) & (df.get('city') == 'SD')]   # 两个条件，&、括号
+df[(df.get('a') > 1) | (df.get('b') < 0)]
+df[~ df.get('flag')]                              # 否定</code></pre>
+
+  <div class="danger">
+    必须 <code>&amp;</code> / <code>|</code> / <code>~</code>，<strong>不</strong>是 <code>and</code> / <code>or</code> / <code>not</code>。每个条件<strong>外套括号</strong>，否则因运算符优先级出错。
+  </div>
+
+  <h3>字符串方法（Series 上）</h3>
+  <table>
+    <tr><th>方法</th><th>作用</th></tr>
+    <tr><td><code>.str.contains('abc')</code></td><td>布尔 mask：包含子串</td></tr>
+    <tr><td><code>.str.startswith('x')</code> / <code>.endswith</code></td><td>开头/结尾</td></tr>
+    <tr><td><code>.str.split('-')</code></td><td>返回 list of list</td></tr>
+    <tr><td><code>.str.split('-').str.get(0)</code></td><td>取第 0 段</td></tr>
+    <tr><td><code>.str.replace('old', 'new')</code></td><td>替换</td></tr>
+    <tr><td><code>.str.upper()</code> / <code>.str.lower()</code></td><td>大小写</td></tr>
+    <tr><td><code>.str.len()</code></td><td>字符串长度</td></tr>
+  </table>
+
+  <p>链式 one-liner（Sp25/Wi26 趋势）：<code>df.get('name').iloc[6].replace('-', ' ').upper()</code></p>
+
+  <hr>
+
+  <!-- ============== 11. Density ============== -->
+  <h2 id="sec-density">11. Density histogram <span class="tier tier-2">⭐⭐</span></h2>
+
+  <div class="formula">Height × Width = Proportion       Σ(Height × Width) = 1</div>
+
+  <h3>关键性质</h3>
+  <ul class="compact">
+    <li>所有 bar 面积之和 = 1（不是高度和！）</li>
+    <li>bin <code>[a, b)</code> 半开，最后一个 bin 右端闭合。一个值只算进一个 bin</li>
+    <li>Y 轴单位：<em>per unit</em>（如 per dollar、per year）</li>
+    <li><strong>Rebin</strong>：合并两个 bin → 新 width 加倍，新高度按 Σ proportion ÷ 新 width 重算（<em>不是</em>取平均高度！）</li>
+  </ul>
+
+  <h3>典型问法</h3>
+  <ul class="compact">
+    <li>给一个 bin 的 height 和 width，问 proportion → 直接相乘</li>
+    <li>给 proportion 和 width，问 height → 相除</li>
+    <li>问"高于 X 的比例" → 找 bin 边界（注意半开！）</li>
+  </ul>
+
+  <h3>构图 API</h3>
+<pre><code>df.plot(kind='hist', y='col', density=True,
+        bins=np.arange(low, high+step, step),
+        ec='w')</code></pre>
+
+  <hr>
+
+  <!-- ============== 12. Probability ============== -->
+  <h2 id="sec-prob">12. 概率规则 <span class="tier tier-1">⭐⭐⭐</span></h2>
+
+  <h3>基本规则</h3>
+  <table>
+    <tr><th>规则</th><th>公式</th><th>前提</th></tr>
+    <tr><td>Addition (mutex)</td><td>P(A ∪ B) = P(A) + P(B)</td><td>A, B 互斥</td></tr>
+    <tr><td>Addition (general)</td><td>P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</td><td>任意</td></tr>
+    <tr><td>Multiplication (indep)</td><td>P(A ∩ B) = P(A) · P(B)</td><td>A, B 独立</td></tr>
+    <tr><td>Multiplication (general)</td><td>P(A ∩ B) = P(A) · P(B | A)</td><td>任意</td></tr>
+    <tr><td>Complement</td><td>P(A^c) = 1 − P(A)</td><td>任意</td></tr>
+    <tr><td>Conditional</td><td>P(A | B) = P(A ∩ B) / P(B)</td><td>P(B) > 0</td></tr>
+  </table>
+
+  <h3>独立性判断</h3>
+  <p>A, B 独立 ⟺ <code>P(A | B) = P(A)</code> ⟺ <code>P(A ∩ B) = P(A) · P(B)</code></p>
+
+  <h3>"At least one" 套路</h3>
+  <div class="formula">P(at least one) = 1 − P(none)</div>
+  <p>例：抛 n 次硬币至少一次正面 = 1 − (1/2)ⁿ。</p>
+
+  <h3>with vs without replacement</h3>
+  <table>
+    <tr><th></th><th>with replacement</th><th>without replacement</th></tr>
+    <tr><td>每次抽分布</td><td>不变</td><td>变（剩余池变小）</td></tr>
+    <tr><td>是否独立</td><td>独立</td><td>不独立</td></tr>
+    <tr><td>同一物可重复</td><td>可</td><td>不可</td></tr>
+  </table>
+
+  <hr>
+
+  <!-- ============== 13. Simulation ============== -->
+  <h2 id="sec-sim">13. Simulation 模板 <span class="tier tier-1">⭐⭐⭐</span></h2>
+
+<pre><code>results = np.array([])
+for i in np.arange(<b>reps</b>):           # 一般 10_000
+    # 模拟一次实验
+    outcome = ...                        # 用 np.random.choice 等
+    results = np.append(results, outcome)    # ← 必须重新赋值！
+
+# 计数 / 概率估计
+estimate = np.count_nonzero(results == target) / reps</code></pre>
+
+  <div class="danger">
+    <strong>必须重新赋值</strong>：<code>arr = np.append(arr, x)</code>。<code>np.append(arr, x)</code> 不修改原数组！
+  </div>
+
+  <h3>常见统计</h3>
+  <ul class="compact">
+    <li>事件发生概率：<code>np.count_nonzero(results == event) / reps</code></li>
+    <li>大于阈值的比例：<code>np.count_nonzero(results > threshold) / reps</code></li>
+    <li>样本均值：<code>results.mean()</code></li>
+    <li>histogram 看分布：<code>bpd.DataFrame().assign(s=results).plot(kind='hist', density=True)</code></li>
+  </ul>
+
+  <hr>
+
+  <!-- ============== 14. np.random ============== -->
+  <h2 id="sec-nprandom">14. np.random 三件套 <span class="tier tier-2">⭐⭐</span></h2>
+
+  <table>
+    <tr><th>函数</th><th>返回</th><th>用途</th></tr>
+    <tr><td><code>np.random.choice(arr, size, replace=)</code></td><td>抽中的值（array）</td><td>通用抽样</td></tr>
+    <tr><td><code>np.random.multinomial(n, [p1, p2, ...])</code></td><td><strong>计数 array</strong></td><td>从 categorical model 抽 n 个，给每类多少个</td></tr>
+    <tr><td><code>np.random.permutation(arr)</code></td><td>shuffle 后的 array</td><td>permutation test 打乱 label</td></tr>
+    <tr><td><code>df.sample(n, replace=False)</code></td><td>DataFrame</td><td>DataFrame 行抽样（bootstrap）</td></tr>
+  </table>
+
+  <h3>易混陷阱</h3>
+  <ul class="compact">
+    <li><code>multinomial</code> 返回的是<strong>计数</strong>（如 [37, 53, 10]），不是比例。要比例自己除 n</li>
+    <li><code>choice</code> 默认 <code>replace=True</code>。SRS 要 <code>replace=False</code></li>
+    <li><code>df.sample</code> 默认 <code>replace=False</code>。bootstrap 要写 <code>replace=True</code></li>
+    <li><code>p=</code> 参数：<code>choice(arr, size, p=probs)</code> 给定每个值的概率</li>
+  </ul>
+
+  <hr>
+
+  <!-- ============== 15. apply ============== -->
+  <h2 id="sec-apply">15. <code>.apply</code> 陷阱 <span class="tier tier-3">⭐</span></h2>
+
+  <h3>Series.apply</h3>
+<pre><code>def categorize(x):
+    if x < 18:
+        return 'child'
+    elif x < 65:
+        return 'adult'
+    else:
+        return 'senior'
+
+df.get('age').apply(<b>categorize</b>)       # ← func 不带括号！</code></pre>
+
+  <div class="danger">
+    <code>.apply(categorize)</code>，<strong>不</strong>是 <code>.apply(categorize())</code>。后者会先调用 <code>categorize()</code>（缺参数）报错。
+  </div>
+
+  <h3>加新列模板</h3>
+  <p><code>df = df.assign(category=df.get('age').apply(categorize))</code></p>
+
+  <hr>
+
+  <!-- ============== 16. Control flow ============== -->
+  <h2 id="sec-ctrl">16. 控制流 + 累加器 <span class="tier tier-3">⭐</span></h2>
+
+  <h3>if / elif / else 等价改写</h3>
+<pre><code># 原版
+if x > 0:
+    sign = 1
+elif x < 0:
+    sign = -1
+else:
+    sign = 0
+
+# 等价：分支次序无关时可换 elif 顺序
+# 但 if / elif 是<b>互斥</b>的，elif 只在前面 false 才检查</code></pre>
+
+  <h3>Accumulator 模式</h3>
+<pre><code>total = 0
+for x in arr:
+    total = total + x       # 累加
+
+count = 0
+for x in arr:
+    if x > threshold:
+        count = count + 1</code></pre>
+
+  <hr>
+
+  <!-- ============== Cuts ============== -->
+  <h2 id="cuts">🪓 砍刀清单（纸不够时按此顺序砍）<span class="tier tier-3">⭐</span></h2>
+
+  <p>顺序：从上往下砍，每砍一项重新评估纸面是否够。<strong>⭐⭐⭐ 永远不砍。</strong></p>
+
+  <ol class="compact">
+    <li>砍 §16 控制流（accumulator 不会单独考，跟 §13 一起）</li>
+    <li>砍 §15 apply 详细例子（只留 "func 不带括号" 一句）</li>
+    <li>砍 §14 multinomial 用法（只留名字 + 返回计数）</li>
+    <li>砍 §11 rebin 详细规则（只留 Height × Width = Proportion）</li>
+    <li>砍 §3 已知 n, w 反推 SD（少见）</li>
+    <li>砍 §10 字符串方法表的 <code>.str.startswith</code> / <code>.str.len</code></li>
+    <li>砍 §6 决策表（如果你已经对每种工具有把握，决策表是冗余）</li>
+    <li>砍 §7 单位换算表（如果你会推 m, b 公式，可现推）</li>
+    <li>砍 §8 reverse regression（出现率较低）</li>
+    <li>砍 §4 simulate under null 示例（保留流程即可）</li>
+  </ol>
+
+  <div class="ok">
+    <strong>保留 always</strong>：§0 速看 + §1 CI（含 bootstrap loop + percentile 表 + 解读对照）+ §2 三联术语 + Chebyshev 表 + CLT checklist + §4 p-value 决策 + §5 permutation vs bootstrap 对比 + §7 r/m/b 三件套公式 + §8 residual = actual − predicted + §9 merge 行数规则 + §10 布尔 &amp; 字符串 + §12 概率规则 + §13 simulation 骨架。
+  </div>
+
+  <div class="tip">
+    <strong>🎯 终极策略</strong>：你 cheatsheet 的真正价值 = 帮你<strong>定位</strong>而不是<strong>背</strong>。能在 3 秒内找到的公式才有用。所以多留空白、字大一点，比塞满更聪明。
+  </div>
+
+  <hr>
+
+  <div class="tip">
+    <strong>📅 时间表（今晚 + 明早）</strong>
+    <ul class="compact">
+      <li>今晚通读这份 cheatsheet（30-45 分钟）</li>
+      <li>抄到 8.5×11 纸正反两面（90-120 分钟，先打草稿规划布局）</li>
+      <li>明早起床扫一眼 §0 速看（5 分钟）</li>
+      <li>考前 2:45 到 Pepper Canyon 106，找好你的座位 → 看一遍 cheatsheet 一遍 §0 → 进入答题状态</li>
+    </ul>
+  </div>
+
+</main>
+
+<nav class="nav-bottom">
+  <span><a href="04-mock-final.html">← 04 Mock Final</a></span>
+  <span><a href="index.html">📗 返回 Final 目录</a></span>
+  <span></span>
+</nav>
+
+<script>
+(function(){
+  var KEY = 'dsc10-theme';
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e) {}
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (sysDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+
+  function init(){
+    var btn = document.getElementById('theme-toggle');
+    if(!btn) return;
+    function paint(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', cur === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+    }
+    paint();
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+      paint();
+    });
+    if(window.matchMedia){
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch(err) {}
+        if(!saved){
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          paint();
+        }
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
